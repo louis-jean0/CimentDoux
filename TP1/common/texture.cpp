@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +6,8 @@
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
-
+#include "../common/stb_image.cpp"
+#include <string>
 
 GLuint loadBMP_custom(const char * imagepath){
 
@@ -118,7 +120,33 @@ GLuint loadBMP_custom(const char * imagepath){
 //	return textureID;
 //}
 
+void setDefaultTexture2DParameters(GLuint texture) {
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
 
+GLuint loadTexture2DFromFilePath(const std::string& path) {
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	int width = 0;
+	int height = 0;
+	int channels = 3;
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 3);
+	if (!data) {
+		stbi_image_free(data);
+		throw std::runtime_error("Failed to load texture: " + path);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(data);
+	setDefaultTexture2DParameters(texture);
+	return texture;
+}
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII

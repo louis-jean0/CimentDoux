@@ -1,4 +1,5 @@
 // Include standard headers
+#include "glm/gtx/transform.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -21,34 +22,45 @@ GLFWwindow* window;
 
 using namespace glm;
 
-#include <common/shader.hpp>
-#include <common/objloader.hpp>
-#include <common/vboindexer.hpp>
+#include "../common/shader.hpp"
+#include "../common/objloader.hpp"
+#include "../common/vboindexer.hpp"
+#include "../common/texture.hpp"
 
 void processInput(GLFWwindow *window);
-void set_plane(std::vector<glm::vec3> &indexed_vertices, std::vector<unsigned short> &indices, int nX, int nY);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void set_plane(std::vector<glm::vec3> &indexed_vertices, std::vector<unsigned short> &indices, std::vector<glm::vec2> &UVs, int nX, int nY);
+void printUsage();
 
 // settings
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 1200;
 
 // Variables pour le plan (ici car nécessaire pour la caméra)
-int nX = 16;
-int nY = 16;
+int nX = 256;
+int nY = 256;
+int width = 16;
+int height = 16;
+bool regeneratePlane = false;
 
-// Variables globales pour l'orbite
+// Variables globales pour l'orbite et la caméra libre
 float horizontal_angle = 3.14f; 
 float vertical_angle = 0.0f; 
 float radius = 20.0f;
+bool orbital = true;
 
 // camera
-glm::vec3 camera_position = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 camera_target = glm::vec3(nX/2,nY/2,0.0f);
+glm::vec3 camera_position = glm::vec3(0,0,0);
+glm::vec3 camera_target = glm::vec3(height/nX,width/nY,0.0f);
 glm::vec3 camera_up = glm::vec3(0.0f, 1.0f,  0.0f);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+float currentTime;
+
+// Wireframe
+bool wireframe = false;
 
 //rotation
 float angle = 0.;
@@ -72,7 +84,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "TP1 - GLFW", NULL, NULL);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "TP1&2", NULL, NULL);
     if( window == NULL ){
         fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
         getchar();
@@ -89,9 +101,6 @@ int main(void)
         glfwTerminate();
         return -1;
     }
-
-    // Pour voir les arêtes
-    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -119,25 +128,37 @@ int main(void)
 
     // Create and compile our GLSL program from the shaders
     GLuint programID = LoadShaders( "vertex_shader.glsl", "fragment_shader.glsl" );
+    printUsage();
 
     /****************************************/
     std::vector<unsigned short> indices; //Triangles concaténés dans une liste
     std::vector<std::vector<unsigned short>> triangles;
     std::vector<glm::vec3> indexed_vertices;
+    std::vector<glm::vec2> UVs;
 
     // Chargement du fichier de maillage
     // std::string filename("suzanne.off");
     // loadOFF(filename, indexed_vertices, indices, triangles);
 
     // Création du plan
-    set_plane(indexed_vertices,indices,nX,nY);
+    set_plane(indexed_vertices,indices,UVs,nX,nY);
+
+    // Textures
+    GLuint grass = loadTexture2DFromFilePath("../textures/snowrocks.png");
+    GLuint rock = loadTexture2DFromFilePath("../textures/rock.png");
+    GLuint snowrock = loadTexture2DFromFilePath("../textures/grass.png");
+    GLuint heightmap = loadTexture2DFromFilePath("../textures/Heightmap_Mountain.png");
 
     // Load it into a VBO
-
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+
+    GLuint uvbuffer;
+    glGenBuffers(1,&uvbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+    glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs[0], GL_STATIC_DRAW);
 
     // Generate a buffer for the indices as well
     GLuint elementbuffer;
@@ -153,7 +174,28 @@ int main(void)
     double lastTime = glfwGetTime();
     int nbFrames = 0;
 
-    do{
+    do {
+
+        if (regeneratePlane) {
+            glDeleteBuffers(1, &vertexbuffer);
+            glDeleteBuffers(1, &elementbuffer);
+            
+            set_plane(indexed_vertices, indices, UVs, nX, nY);
+
+            glGenBuffers(1, &vertexbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+            glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+
+            glGenBuffers(1,&uvbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+            glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs[0], GL_STATIC_DRAW);
+
+            glGenBuffers(1, &elementbuffer);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+
+            regeneratePlane = false;
+        }
 
         // Measure speed
         // per-frame time logic
@@ -161,11 +203,12 @@ int main(void)
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        currentTime = glfwGetTime();
 
         // input
         // -----
         processInput(window);
-
+        glfwSetKeyCallback(window, keyCallback);
 
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -216,8 +259,40 @@ int main(void)
                     (void*)0            // array buffer offset
                     );
 
+        // 2nd attribute buffer : uvs
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+        glVertexAttribPointer(
+                    1,
+                    2,
+                    GL_FLOAT,
+                    GL_FALSE,
+                    0,
+                    (void*)0
+                    );
+
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+        // On active les textures
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, grass);
+        glUniform1i(glGetUniformLocation(programID, "grassSampler"), 0);
+
+        glActiveTexture(GL_TEXTURE0 + 1);
+        glBindTexture(GL_TEXTURE_2D, rock);
+        glUniform1i(glGetUniformLocation(programID,"rockSampler"),1);
+
+        glActiveTexture(GL_TEXTURE0 + 2);
+        glBindTexture(GL_TEXTURE_2D, snowrock);
+        glUniform1i(glGetUniformLocation(programID,"snowrockSampler"),2);
+
+        glActiveTexture(GL_TEXTURE0 + 3);
+        glBindTexture(GL_TEXTURE_2D,heightmap);
+        glUniform1i(glGetUniformLocation(programID,"heightmap"),3);
+        // Scale pour la heightmap
+        float heightmapScale = 5;
+        glUniform1f(glGetUniformLocation(programID,"heightmapScale"),heightmapScale);
 
         // Draw the triangles !
         glDrawElements(
@@ -228,6 +303,7 @@ int main(void)
                     );
 
         glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
 
         // Swap buffers
         glfwSwapBuffers(window);
@@ -239,6 +315,7 @@ int main(void)
 
     // Cleanup VBO and shader
     glDeleteBuffers(1, &vertexbuffer);
+    glDeleteBuffers(1, &uvbuffer);
     glDeleteBuffers(1, &elementbuffer);
     glDeleteProgram(programID);
     glDeleteVertexArrays(1, &VertexArrayID);
@@ -249,43 +326,83 @@ int main(void)
     return 0;
 }
 
-
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+    if(action == GLFW_PRESS) {
+        if (key == GLFW_KEY_P) {
+            nX += 1;
+            nY += 1;
+            regeneratePlane = true;
+        }
+        if (key == GLFW_KEY_SEMICOLON && nX > 1 && nY > 1) {
+            nX -= 1;
+            nY -= 1;
+            regeneratePlane = true;
+        }
+        if(key == GLFW_KEY_C) {
+            orbital = !orbital;
+        }
+        if(key == GLFW_KEY_Z) {
+            wireframe = !wireframe;
+            if(wireframe) {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+            else {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
+        }
+    }
+}
+
 void processInput(GLFWwindow *window) {
     // Sensibilité de la caméra
     float camera_speed = 3.0f * deltaTime;
 
-    // Ajustement des angles en fonction des touches pressées
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) horizontal_angle -= camera_speed;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) horizontal_angle += camera_speed;
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) vertical_angle += camera_speed;
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) vertical_angle -= camera_speed;
+    if(orbital) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) horizontal_angle -= camera_speed;
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) horizontal_angle += camera_speed;
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) vertical_angle += camera_speed;
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) vertical_angle -= camera_speed;
 
-    // Ajuster le zoom
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) radius -= 10*camera_speed; // 10 fois pour que ça aille plus vite sans modifier la vitesse de l'orbite
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) radius += 10*camera_speed;
+        // Zoom
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) radius -= 10*camera_speed; // 10 fois pour que ça aille plus vite sans modifier la vitesse de l'orbite
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) radius += 10*camera_speed;
 
-    // Limiter l'angle vertical
-    vertical_angle = std::max(-1.57f, std::min(1.57f, vertical_angle));
+        vertical_angle = std::max(-1.57f, std::min(1.57f, vertical_angle));
+    }
+    else {
+        // Caméra libre
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {camera_position.x += camera_speed; camera_target.x += camera_speed;}
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {camera_position.x -= camera_speed; camera_target.x -= camera_speed;}
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {camera_position.y += camera_speed; camera_target.y += camera_speed;}
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {camera_position.y -= camera_speed; camera_target.y -= camera_speed;}
+
+        // Zoom
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {camera_position.z += camera_speed; camera_target.z += camera_speed;} 
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {camera_position.z -= camera_speed; camera_target.z -= camera_speed;}
+    }
 }
 
-void set_plane(std::vector<glm::vec3> &indexed_vertices, std::vector<unsigned short> &indices, int nX, int nY) {
-
+void set_plane(std::vector<glm::vec3> &indexed_vertices, std::vector<unsigned short> &indices, std::vector<glm::vec2> &UVs, int nX, int nY) {
     indexed_vertices.clear();
     indices.clear();
+    UVs.clear();
 
     static FastNoiseLite noise;
+
+    float deltaX = width / (float)(nX - 1);
+    float deltaY = height / (float)(nY - 1);
 
     // Génération des points
     for(int i = 0; i < nX; i++) {
         for(int j = 0; j < nY; j++) {
-            float x = i;
-            float y = j;
+            float x = i * deltaX - width / 2;
+            float y = j * deltaY - height / 2;
             float z = std::min(0.0f,noise.GetNoise((float)i*1000,(float)j*100));
 
-            indexed_vertices.push_back(glm::vec3(x,y,z));
-
+            indexed_vertices.push_back(glm::vec3(x, y, z));
         }
     }
 
@@ -297,18 +414,37 @@ void set_plane(std::vector<glm::vec3> &indexed_vertices, std::vector<unsigned sh
             unsigned short bottomLeft = topLeft + nY;
             unsigned short bottomRight = bottomLeft + 1;
 
-            // Premier triangle
             indices.push_back(topLeft);
             indices.push_back(bottomLeft);
             indices.push_back(bottomRight);
 
-            // Second triangle
             indices.push_back(topLeft);
             indices.push_back(bottomRight);
             indices.push_back(topRight);
         }
     }
+
+    // Génération des UVs
+    for(int i = 0; i < nX; i++) {
+        for(int j = 0; j < nY; j++) {
+            float u = (float)i / (float)(nX - 1);
+            float v = (float)j / (float)(nY - 1);
+            UVs.push_back(glm::vec2(u, v));
+        }
+    }
 }
+
+void printUsage() {
+    std::cout << "Commandes disponibles :" << std::endl;
+    std::cout << "  - ESC : Quitter le programme." << std::endl;
+    std::cout << "  - P : Augmenter la résolution du plan." << std::endl;
+    std::cout << "  - M : Réduire la résolution du plan." << std::endl;
+    std::cout << "  - C : Basculer entre caméra orbitale et libre." << std::endl;
+    std::cout << "  - W : Activer/Désactiver le mode wireframe." << std::endl;
+    std::cout << "  - Z/S : Zoom avant/arrière (en mode caméra)." << std::endl;
+    std::cout << "  - Flèches directionnelles : Déplacer la caméra / Changer l'angle de vue." << std::endl;
+}
+
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------

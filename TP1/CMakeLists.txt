@@ -4,6 +4,9 @@ project (Tutorials)
 
 find_package(OpenGL REQUIRED)
 
+# Always generate compile_commands.json for clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+
 
 if( CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR )
     message( FATAL_ERROR "Please select another Build Directory ! (and give it a clever name, like bin_Visual2012_64bits/)" )
@@ -14,8 +17,6 @@ endif()
 if( CMAKE_BINARY_DIR MATCHES " " )
 	message( "Your Build Directory contains spaces. If you experience problems when compiling, this can be the cause." )
 endif()
-
-
 
 # Compile external dependencies 
 add_subdirectory (external)
@@ -29,8 +30,6 @@ include(MSVCMultipleProcessCompile) # /MP
 if(INCLUDE_DISTRIB)
 	add_subdirectory(distrib)
 endif(INCLUDE_DISTRIB)
-
-
 
 include_directories(
 	external/glfw-3.1.2/include/
@@ -76,9 +75,6 @@ target_link_libraries(TP1
 # Xcode and Visual working directories
 set_target_properties(TP1 PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/TP1/")
 create_target_launcher(TP1 WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/TP1/")
-
-
-
 
 SOURCE_GROUP(common REGULAR_EXPRESSION ".*/common/.*" )
 SOURCE_GROUP(shaders REGULAR_EXPRESSION ".*/.*shader$" )
