@@ -1,27 +1,29 @@
 #pragma once
+
 #include <glm/glm.hpp>
+
 #include <vector>
+#include <Mesh.hpp>
 #include <Transform.hpp>
 
 class SceneNode {
     public:
+        // Public attributes
+        SceneNode* parent = nullptr;
+        Mesh* mesh;
+        Transform transform;
+        std::vector<SceneNode*> children;
+
         // Constructor
-        SceneNode(Mesh &m);
+        SceneNode();
+        SceneNode(Mesh *mesh);
 
         // Destructor
         ~SceneNode();
 
-        // Getters
-        SceneNode* get_parent();
-        Mesh* get_mesh();
-        Transform get_transform();
-
         // Public methods
-        void add_child(SceneNode child);
-    
-    private:
-        SceneNode* parent;
-        Mesh* mesh;
-        Transform transform;
-        std::vector<SceneNode*> children;
-}
+        void set_parent(SceneNode *parent);
+        void add_child(SceneNode *child);
+        glm::mat4 get_world_transform();
+        void draw();
+};

@@ -51,7 +51,11 @@ add_executable(main
     src/SceneNode.cpp
     src/Mesh.cpp
     src/Transform.cpp
-    )
+    src/objloader.cpp
+    src/Sphere.cpp
+    src/stb_image.cpp
+    src/Texture.cpp
+)
 
 # Include directories for our project
 include_directories(

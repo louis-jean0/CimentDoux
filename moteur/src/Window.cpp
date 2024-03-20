@@ -10,7 +10,7 @@ Window::Window(unsigned int major, unsigned int minor, int width, int height, co
 }
 
 void Window::setup_GLFW() {
-    // Initialisation de GLFW
+    // Initializing GLFW
     glfwInit();
     if (!glfwInit()) {
         exit(0);
@@ -20,7 +20,7 @@ void Window::setup_GLFW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,  this->minor);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Création de la fenêtre
+    // Creating window
     this->window = glfwCreateWindow(this->width, this->height, this->title, NULL, NULL);
     if (window == NULL) {
         std::cout<<"Failed to create GLFW window"<<std::endl;
