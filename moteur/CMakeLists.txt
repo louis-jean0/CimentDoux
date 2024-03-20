@@ -48,6 +48,9 @@ add_executable(main
     src/VAO.cpp
     src/VBO.cpp
     src/Shader.cpp
+    src/SceneNode.cpp
+    src/Mesh.cpp
+    src/Transform.cpp
     )
 
 # Include directories for our project
