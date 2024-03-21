@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     SceneNode* moon = new SceneNode(moon_mesh);
     float moon_rotation_speed = 50.0f;
     float moon_to_earth_distance = 1.0f;
-    moon->transform.translation = glm::vec3(moon_to_earth_distance,0.0f,0.0f); // 1 unit from the Earth thanks to SceneNode
+    moon->transform.translation = glm::vec3(moon_to_earth_distance,0.0f,0.0f);
     moon->transform.rotation.x = 6.68f;
     earth->add_child(moon);
 
