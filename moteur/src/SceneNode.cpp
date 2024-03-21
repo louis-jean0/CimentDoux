@@ -29,18 +29,13 @@ void SceneNode::add_child(SceneNode *child) {
 }
 
 glm::mat4 SceneNode::get_world_transform() {
-    glm::mat4 parent_transform = parent ? parent->get_world_transform() : glm::mat4(1.0f);
-    glm::mat4 local_transform = glm::translate(glm::mat4(1.0f), this->transform.translation) *
-                                glm::rotate(glm::mat4(1.0f), glm::radians(this->transform.rotation.x), glm::vec3(1, 0, 0)) *
-                                glm::rotate(glm::mat4(1.0f), glm::radians(this->transform.rotation.y), glm::vec3(0, 1, 0)) *
-                                glm::rotate(glm::mat4(1.0f), glm::radians(this->transform.rotation.z), glm::vec3(0, 0, 1));
-    
-    // Appliquer l'échelle localement, pas dans le calcul hérité
-    glm::mat4 scale_transform = glm::scale(glm::mat4(1.0f), this->transform.scale);
-
-    return parent_transform * local_transform * scale_transform;
+    if(parent) {
+        return parent->get_world_transform() * transform.get_matrix();
+    }
+    else {
+        return transform.get_matrix();
+    }
 }
-
 
 void SceneNode::draw() {
     if(mesh) {
