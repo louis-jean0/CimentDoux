@@ -1,18 +1,13 @@
+#include <GL/gl.h>
 #include <Mesh.hpp>
+#include <cstddef>
 
 Mesh::Mesh() {}
 
-Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<unsigned short> indices, std::vector<glm::vec2> uvs) {
-    this->vertices = vertices;
+Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<unsigned short> indices, std::vector<Texture> textures) {
+    this.->vertices = vertices;
     this->indices = indices;
-    this->uvs = uvs;
-}
-
-Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<unsigned short> indices, std::vector<glm::vec2> uvs) {
-    this->vertices = vertices;
-    this->normals = normals;
-    this->indices = indices;
-    this->uvs = uvs;
+    this->textures = textures;
 }
 
 void Mesh::setup_mesh() {
@@ -22,7 +17,7 @@ void Mesh::setup_mesh() {
   
     glBindVertexArray(vao);
 
-    // Positions
+    // Vertices
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
     glEnableVertexAttribArray(0); // Vertex positions
@@ -32,8 +27,17 @@ void Mesh::setup_mesh() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
 
-    // Vertex positions
-    
+    // Vertex position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+    // Vertex normal
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+    // Vertex uv
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
     glBindVertexArray(0);
 
