@@ -58,6 +58,7 @@ add_executable(main
     src/Sphere.cpp
     src/stb_image.cpp
     src/Texture.cpp
+    src/Model.cpp
 )
 
 # Include directories for our project
