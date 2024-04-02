@@ -3,10 +3,11 @@
 
 Mesh::Mesh() {}
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned short> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
+    setup_mesh();
 }
 
 void Mesh::setup_mesh() {
@@ -24,7 +25,7 @@ void Mesh::setup_mesh() {
 
     // Indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     // Vertex position
     glEnableVertexAttribArray(0);
@@ -66,7 +67,7 @@ void Mesh::draw() {
         //std::cout<<"test"<<std::endl;
     }
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 

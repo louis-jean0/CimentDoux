@@ -1,13 +1,20 @@
-#include <Texture.hpp>
 #include <assimp/material.h>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
 #include <Mesh.hpp>
+#include <Texture.hpp>
 
 class Model {
     public:
+        // Public attributes
+        std::vector<Mesh> meshes;
+        
         // Constructors
         Model();
+        Model(Mesh &mesh);
         Model(std::string path);
         
         // Public methods
@@ -17,12 +24,12 @@ class Model {
     
     private:
         // Private attributes
-        std::vector<Mesh> meshes;
         std::string directory;
+        std::vector<Texture> textures_loaded;
 
         // Private methods
         void load_model(std::string path);
         void process_node(aiNode *node, const aiScene *scene);
         Mesh process_mesh(aiMesh *mesh, const aiScene *scene);
-        std::vector<Texture> load_material_textures(aiMaterial *material, aiTextureType *tex_type, std::string tex_type_name);
+        std::vector<Texture> load_material_textures(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name);
 };

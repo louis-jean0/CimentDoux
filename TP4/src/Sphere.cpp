@@ -8,11 +8,7 @@ Sphere::Sphere(glm::vec3 center, float radius, unsigned int n_x, unsigned int n_
 }
 
 void Sphere::build_sphere(glm::vec3 center, float radius, unsigned int n_x, unsigned int n_y) {
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec3> normals;
-    std::vector<unsigned short> indices;
-    std::vector<glm::vec2> uvs;
-
+    this->radius = radius;
     for (unsigned int i = 0; i <= n_x; ++i) {
         float V = (float)i / (float)n_x;
         float phi = V * glm::pi<float>();
@@ -26,28 +22,24 @@ void Sphere::build_sphere(glm::vec3 center, float radius, unsigned int n_x, unsi
             float z = sinf(theta) * sinf(phi);
 
             // Adjust positions by the center
-            glm::vec3 vertex = center + glm::vec3(x, y, z) * radius;
-            vertices.push_back(vertex);
-            normals.push_back(glm::normalize(vertex - center));
+            Vertex vertex;
+            vertex.position = center + glm::vec3(x, y, z) * radius;
+            vertex.normal = glm::normalize(vertex.position - center);
             float u = theta / (2 * glm::pi<float>());
             float v = phi / glm::pi<float>();
-            uvs.push_back(glm::vec2(u, v));
+            vertex.uv = glm::vec2(u, v);
+            this->vertices.push_back(vertex);
             }
     }
 
     // Indices
     for (unsigned int i = 0; i < n_y * n_x + n_y; ++i) {
-        indices.push_back(i);
-        indices.push_back(i + n_y + 1);
-        indices.push_back(i + n_y);
+        this->indices.push_back(i);
+        this->indices.push_back(i + n_y + 1);
+        this->indices.push_back(i + n_y);
 
-        indices.push_back(i + n_y + 1);
-        indices.push_back(i);
-        indices.push_back(i + 1);
+        this->indices.push_back(i + n_y + 1);
+        this->indices.push_back(i);
+        this->indices.push_back(i + 1);
     }
-
-    this->vertices = vertices;
-    this->normals = normals;
-    this->indices = indices;
-    this->uvs = uvs;
 }

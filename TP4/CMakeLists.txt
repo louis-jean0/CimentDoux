@@ -47,18 +47,16 @@ target_sources(imgui PUBLIC
 add_executable(main
     src/main.cpp
     src/Window.cpp
-    src/EBO.cpp
-    src/VAO.cpp
-    src/VBO.cpp
     src/Shader.cpp
     src/SceneNode.cpp
     src/Mesh.cpp
     src/Transform.cpp
-    src/objloader.cpp
-    src/Sphere.cpp
     src/stb_image.cpp
     src/Texture.cpp
     src/Model.cpp
+    src/Plane.cpp
+    src/Sphere.cpp
+    src/PlaneCollider.cpp
 )
 
 # Include directories for our project

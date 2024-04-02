@@ -13,4 +13,4 @@ out vec4 FragColor;
 
 void main() {
     FragColor = texture(texture_diffuse1,uvs);
-}                                                                         
+}

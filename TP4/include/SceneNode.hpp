@@ -1,22 +1,24 @@
 #pragma once
 
 #include <glm/glm.hpp>
-
 #include <vector>
-#include <Mesh.hpp>
+
+#include <Model.hpp>
 #include <Transform.hpp>
 
 class SceneNode {
     public:
         // Public attributes
-        SceneNode* parent = nullptr;
-        Mesh* mesh;
+        SceneNode *parent = nullptr;
+        Mesh *mesh = nullptr;
+        Model *model = nullptr;
         Transform transform;
         std::vector<SceneNode*> children;
 
         // Constructor
         SceneNode();
         SceneNode(Mesh *mesh);
+        SceneNode(Model *model);
 
         // Destructor
         ~SceneNode();

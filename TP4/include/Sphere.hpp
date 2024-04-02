@@ -5,6 +5,7 @@
 class Sphere : public Mesh {
     public:
         // Constructor
+        float radius;
         Sphere(glm::vec3 center, float radius, unsigned int n_x, unsigned int n_y);
 
     private:

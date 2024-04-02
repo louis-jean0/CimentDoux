@@ -6,16 +6,14 @@ layout (location = 2) in vec2 aUVs;
 
 // Matrices de transformation
 uniform mat4 model;
-
 uniform mat4 view;
 uniform mat4 projection;
 
 out vec3 normal;
 out vec2 uvs;
 
-
 void main() {
-    normal = transpose(inverse(mat3(model))) * aNormal;
+    normal = normalize(transpose(inverse(mat3(model))) * aNormal);
     uvs = aUVs;
     gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
