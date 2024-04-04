@@ -49,13 +49,11 @@ const unsigned int SCR_WIDTH = 1440;
 const unsigned int SCR_HEIGHT = 1080;
 
 // Camera settings
-glm::vec3 sphere_position = glm::vec3(0.0f,1.0f,0.0f);
-float sphere_radius = 0.5f;
-glm::vec3 camera_pos = sphere_position + glm::vec3(0.0f,5.0f,2.0f);
+glm::vec3 sphere_position = glm::vec3(0.0f,0.0f,0.0f);
+float sphere_radius = 0.1f;
+glm::vec3 camera_pos = sphere_position;
 glm::vec3 camera_target = glm::vec3(0.0f,0.0f,0.0f);
 glm::vec3 camera_up = glm::vec3(0.0f,1.0f,0.0f);
-float horizontal_angle = 3.14f; 
-float vertical_angle = 0.0f; 
 float radius = 10.0f;
 
 // Wireframe
@@ -89,21 +87,19 @@ int main(int argc, char* argv[]) {
     Shader shader;
     shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
 
-    Plane* plane_plane = new Plane(5,5);
+    Plane* plane_plane = new Plane(100,100,100,1);
     Mesh* plane_mesh = static_cast<Mesh*>(plane_plane);
     Texture plane_texture("../data/textures/terrain.jpg");
     plane_mesh->add_texture(plane_texture);
     plane_mesh->bind_shader(shader);
     SceneNode* plane = new SceneNode(plane_mesh);
-    plane->transform.scale = glm::vec3(10.0f);
     PlaneCollider* plane_collider = new PlaneCollider(*plane_plane);
 
     Mesh* sphere_mesh = new Sphere(sphere_position,sphere_radius,20,20);
     Texture sphere_texture("../data/textures/2k_neptune.jpg");
     sphere_mesh->add_texture(sphere_texture);
     sphere_mesh->bind_shader(shader);
-    Model* backpack = new Model("../data/models/backpack/backpack.obj");
-    SceneNode* sphere = new SceneNode(backpack);
+    SceneNode* sphere = new SceneNode(sphere_mesh);
 
     printUsage();
 
@@ -124,7 +120,7 @@ int main(int argc, char* argv[]) {
         last_frame_time = current_frame_time;
 
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-        glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Model is computed directly thanks to the SceneNode
@@ -140,9 +136,10 @@ int main(int argc, char* argv[]) {
         shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
         shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(projection));
 
+        // Scene
         plane->draw();
         sphere->transform.translation = sphere_position;
-        //plane_collider->check_collision_with_sphere(sphere_radius,sphere_position);
+        plane_collider->check_collision_with_sphere(sphere_radius,sphere_position);
         sphere->draw();
 
         // ImGui
@@ -213,7 +210,7 @@ void processInput(GLFWwindow *window) {
     radius = std::max(1.0f,radius);
 
     camera_target = sphere_position;
-    camera_pos = camera_target + glm::vec3(0.0f,1.0f,2.0f);
+    camera_pos = camera_target + glm::vec3(0.0f,sphere_radius / 2,2.0f);
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
