@@ -1,7 +1,5 @@
 #include <TP/Camera/Camera_Helper.hpp>
 
-
-
 glm::vec3 Camera_Helper::quatToEuler(glm::quat _quat)
 {
 	// Opengl quat to euler function give yaw betweel -90 and 90
@@ -29,7 +27,6 @@ glm::vec3 Camera_Helper::quatToEuler(glm::quat _quat)
 	float sqy = _quat.y * _quat.y;
 	float sqz = _quat.z * _quat.z;
 
-
 	eulerAngles.y = atan2(2.f * _quat.y * _quat.w - 2.f * _quat.x * _quat.z, 1.f - 2.f * sqy - 2.f * sqz);
 	eulerAngles.z = asin(2.f * test);
 	eulerAngles.x = atan2(2.f * _quat.x * _quat.w - 2.f * _quat.y * _quat.z, 1.f - 2.f * sqx - 2.f * sqz);
@@ -47,4 +44,17 @@ void Camera_Helper::computeFinalView(glm::mat4& _outProjectionMatrix, glm::mat4&
 
 	// Camera matrix
 	_outviewMatrix = glm::lookAt(_position, _position + front, up);
+}
+
+glm::vec3 Camera_Helper::projectVectorOnPlane(glm::vec3 &vector, glm::vec3 &planeNormal) {
+	return cross(planeNormal, cross(vector, planeNormal));
+}
+
+void Camera_Helper::clipAngleToValue(float &angle, float value) {
+	if(angle > value) {
+		angle = value;
+	}
+	if(angle < -value) {
+		angle = -value;
+	}
 }

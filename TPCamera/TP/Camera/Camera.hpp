@@ -1,5 +1,7 @@
 #pragma once
 
+#include <TP/Camera/Camera_Helper.hpp>
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -7,6 +9,12 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
+
+enum CameraMode {
+	FIRST_MODE = 1,
+	SECOND_MODE,
+	MODE_COUNT
+};
 
 class Camera
 {
@@ -21,6 +29,11 @@ public:
 	glm::quat getRotation() const {return m_rotation;}
 	glm::mat4 getViewMatrix() const {return m_viewMatrix;}
 	glm::mat4 getProjectionMatrix() const {return m_projectionMatrix;}
+	bool getShowMouse() const {return m_showMouse;}
+	glm::vec3 getCFront() const;
+	glm::vec3 getCUp() const;
+	glm::vec3 getCRight() const;
+	void setShowMouse(bool m_showMouse) {this->m_showMouse = m_showMouse;} // For callback (in TP.cpp) purpose
 
 private:
 
@@ -32,9 +45,18 @@ private:
 	glm::quat	m_rotation{};
 	float 		m_translationSpeed{1.0f};
 	float 		m_rotationSpeed{0.01f};
-
+	bool m_xAxisReversed = false;
+	bool m_yAxisReversed = false;
+	InterpolationMode m_interpolationMode = SMOOTHSTEP;
+	
 	//Interface option
 	bool m_showImguiDemo{ false };
+	CameraMode	m_cameraMode{FIRST_MODE};
+	bool m_showMouse = true;
+
+	// Window handling (I'm not sure it's a good practice to do this here, but for this TP it will do just fine)
+	double lastCursorXPos,lastCursorYPos;
+	bool firstPass = true;
 
 	//View
 	glm::mat4 m_viewMatrix;

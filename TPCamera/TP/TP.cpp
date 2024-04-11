@@ -42,19 +42,24 @@ using namespace glm;
 #endif
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1500;
+const unsigned int SCR_HEIGHT = 1000;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+// Camera (here just because the keycallback needs to access it)
+Camera myCamera;
+bool showMouse = true;
+
 bool globalInit();
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 GLFWwindow* initWindow();
 void windowSetup();
 void initImgui();
 void updateLightPosition(GLuint _lightID);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main(void)
 {
@@ -75,7 +80,6 @@ int main(void)
 
     /****************************************/  
 
-
     //Chargement du fichier de maillage
     ObjController map;
     Actor target;
@@ -83,14 +87,12 @@ int main(void)
     map.loadObj("obj/myMap2.obj", glm::vec3(0.6f, 0.5f, 0.3f), colorID);
     target.load("obj/cameraTarget.obj", glm::vec3(0.8f, 0.5f, 0.4f), colorID);
 
-
     glUseProgram(programID);
 
     // Init ImGUI
     initImgui();
-
+    
     // Init Camera
-    Camera myCamera;
     //[Camera] Aller plus loin : loader une position, rotation et fov ?
     myCamera.init();
 
@@ -101,8 +103,6 @@ int main(void)
     //VSync - avoid having 3000 fps
     glfwSwapInterval(1);
 
-
-    
     /*__________________UPDATE__________________*/
     do {
         float currentFrame = glfwGetTime();
@@ -110,6 +110,12 @@ int main(void)
         lastFrame = currentFrame;
 
         //input
+        if(showMouse) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // To be in "full screen", way easier to move with mouse
+        }
 
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -125,7 +131,6 @@ int main(void)
         // Update
         target.update(deltaTime, window, myCamera.getRotation());
         myCamera.update(deltaTime, window);
-
 
         glm::mat4 viewMatrix = myCamera.getViewMatrix();
         glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -143,7 +148,6 @@ int main(void)
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
-
 
         // Swap buffers
         glfwSwapBuffers(window);
@@ -202,7 +206,7 @@ bool globalInit()
     return true;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
@@ -219,10 +223,11 @@ GLFWwindow* initWindow()
 
 
     // Open a window and create its OpenGL context
-    GLFWwindow* createdWindow = glfwCreateWindow(1500, 1000, "TP Camera", NULL, NULL);
+    GLFWwindow* createdWindow = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "TP Camera", NULL, NULL);
     if (createdWindow != NULL) {
         glfwMakeContextCurrent(createdWindow);
-        glfwSetFramebufferSizeCallback(createdWindow, framebuffer_size_callback);
+        glfwSetFramebufferSizeCallback(createdWindow, framebufferSizeCallback);
+        glfwSetKeyCallback(createdWindow, keyCallback);
     }
 
     return createdWindow;
@@ -233,11 +238,11 @@ void windowSetup()
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     // Hide the mouse and enable unlimited mouvement
-    //  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // Set the mouse at the center of the screen
     glfwPollEvents();
-    //glfwSetCursorPos(window, 1024 / 2, 768 / 2);
+    glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
 
     // Dark blue background
     glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
@@ -265,4 +270,14 @@ void updateLightPosition(GLuint _lightID)
 {
     const glm::vec3 lightPos = glm::vec3(4.f, 90.f, 4.f);
     glUniform3f(_lightID, lightPos.x, lightPos.y, lightPos.z);
+}
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if(action == GLFW_PRESS) {
+        if (key == GLFW_KEY_T) {
+            showMouse = myCamera.getShowMouse();
+            showMouse = !showMouse;
+            myCamera.setShowMouse(showMouse);
+        }
+    }
 }
