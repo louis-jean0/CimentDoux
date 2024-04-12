@@ -34,6 +34,7 @@ public:
 	glm::vec3 getCUp() const;
 	glm::vec3 getCRight() const;
 	void setShowMouse(bool m_showMouse) {this->m_showMouse = m_showMouse;} // For callback (in TP.cpp) purpose
+	void interpolate(float delta_time);
 
 private:
 
@@ -45,9 +46,16 @@ private:
 	glm::quat	m_rotation{};
 	float 		m_translationSpeed{1.0f};
 	float 		m_rotationSpeed{0.01f};
-	bool m_xAxisReversed = false;
-	bool m_yAxisReversed = false;
-	InterpolationMode m_interpolationMode = SMOOTHSTEP;
+	bool 		m_xAxisReversed{false};
+	bool 		m_yAxisReversed{false};
+
+	// Interpolation (for transition)
+	InterpolationMode m_interpolationMode{SMOOTHERSTEP};
+	bool		m_isInterpolating{false};
+	float 		m_interpolationDuration{5.0f};
+	float 		m_interpolationProgress{0.0f};
+	glm::vec3 	m_interpolationStartPosition{m_position};
+	glm::vec3	m_interpolationStopPosition{(m_position.x, m_position.y, m_position.z + 20)};
 	
 	//Interface option
 	bool m_showImguiDemo{ false };

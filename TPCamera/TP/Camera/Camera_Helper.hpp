@@ -36,6 +36,5 @@ public:
 	static void computeFinalView(glm::mat4& _outProjectionMatrix, glm::mat4& _outviewMatrix, glm::vec3& _position, glm::quat _rotation, float _fovDegree);
 	static glm::vec3 projectVectorOnPlane(glm::vec3 &vector, glm::vec3 &planeNormal);
 	static void clipAngleToValue(float &angle, float value);
-	//static void interpolate()
-	
+	static void clipAngleToBounds(float &angle, float value);
 };

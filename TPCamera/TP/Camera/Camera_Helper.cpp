@@ -50,11 +50,23 @@ glm::vec3 Camera_Helper::projectVectorOnPlane(glm::vec3 &vector, glm::vec3 &plan
 	return cross(planeNormal, cross(vector, planeNormal));
 }
 
+// Here, the angle will be clipped to value, that means that if you are at 180 and you want to go further, you won't be able
+// This is satisfying for the pitch since we don't want to be upside-down, but not for the yaw (you want to be able to do a full 360 turn)
 void Camera_Helper::clipAngleToValue(float &angle, float value) {
 	if(angle > value) {
 		angle = value;
 	}
 	if(angle < -value) {
 		angle = -value;
+	}
+}
+
+// This is more appropriate for the yaw
+void Camera_Helper::clipAngleToBounds(float &angle, float value) {
+	if(angle > value) {
+		angle -= 360;
+	}
+	if(angle < -value) {
+		angle += 360;
 	}
 }

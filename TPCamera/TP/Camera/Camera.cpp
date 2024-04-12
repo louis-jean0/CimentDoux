@@ -16,6 +16,7 @@ void Camera::init()
 	m_rotation = glm::quat{};
 	m_rotationSpeed = 0.01f;
 	m_showImguiDemo = false;
+	m_interpolationDuration = 0.5f;
 }
 
 void Camera::updateInterface(float _deltaTime)
@@ -53,9 +54,18 @@ void Camera::updateInterface(float _deltaTime)
 		ImGui::Separator();
 		ImGui::SliderFloat("FOV",&m_fovDegree,30.0f,179.9f);
 		ImGui::Separator();
+		ImGui::Text("Camera transition");
+		if(ImGui::Button("Transition")) {
+			m_interpolationProgress = 0.0f;
+			m_interpolationStartPosition = m_position;
+			m_interpolationStopPosition = glm::vec3(m_position.x, m_position.y, m_position.z + 20);
+			m_isInterpolating = true;
+		}
+		ImGui::Separator();
 		if(ImGui::Button("Reset values")) {
 			init();
 		}
+		
 	}
 	ImGui::End();
 
@@ -172,6 +182,12 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 						m_eulerAngleInDegrees.y -= m_rotationSpeed;
 					}
 				}
+				if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
+					m_position.y += m_translationSpeed;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
+					m_position.y -= m_translationSpeed;
+				}
 			}
 		break;
 
@@ -181,11 +197,56 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 
 }
 
+void Camera::interpolate(float delta_time) {
+	if(m_interpolationProgress < m_interpolationDuration) { // Correct because glfwGetTime() returns time in seconds
+		m_interpolationProgress += delta_time;
+		float v = m_interpolationProgress / m_interpolationDuration;
+	
+		switch(m_interpolationMode) {
+			case LINEAR:
+				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+			break;
+
+			case SMOOTHSTEP:
+				v = v * v * (3 - 2 * v);
+				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+			break;
+
+			case SMOOTHSTEP2:
+				v = v * v * (3 - 2 * v);
+				v = v * v * (3 - 2 * v);
+				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+			break;
+
+			case SMOOTHSTEP3:
+				v = v * v * (3 - 2 * v);
+				v = v * v * (3 - 2 * v);
+				v = v * v * (3 - 2 * v);
+				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+			break;
+
+			case SMOOTHERSTEP:
+				v = v * v * v * (v * (v * 6 - 15) + 10);
+				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+			break;
+
+			default:
+			break;
+		}
+	}
+	else {
+		m_isInterpolating = false;
+	}
+}
+
 void Camera::update(float _deltaTime, GLFWwindow* _window)
 {
 	updateInterface(_deltaTime);
 	updateFreeInput(_deltaTime, _window);
-	Camera_Helper::clipAngleToValue(m_eulerAngleInDegrees.y,180); // Clip yaw to [-180;180]
+	if(m_isInterpolating) {
+		interpolate(_deltaTime);
+	}
+	Camera_Helper::clipAngleToBounds(m_eulerAngleInDegrees.y,180); // Clip yaw to [-180;180] (but still be able to do a 360 turn)
 	Camera_Helper::clipAngleToValue(m_eulerAngleInDegrees.x,90); // Clip pitch to [-90;90]
 	m_eulerAngle = glm::radians(m_eulerAngleInDegrees);
 	m_rotation = glm::quat{m_eulerAngle};
