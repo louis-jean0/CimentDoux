@@ -1,6 +1,7 @@
 #pragma once
 
-#include <TP/Camera/Camera_Helper.hpp>
+#include "Camera_Helper.hpp"
+#include "Camera_Shake.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -16,6 +17,19 @@ enum CameraMode {
 	MODE_COUNT
 };
 
+enum InterpolationMode {
+	LINEAR,
+	SMOOTHSTEP,
+	SMOOTHSTEP2,
+	SMOOTHSTEP3,
+	SMOOTHERSTEP,
+	SQUARED,
+	INV_SQUARED,
+	CUBED,
+	INV_CUBED,
+	SIN
+};
+
 class Camera
 {
 public: 
@@ -29,12 +43,16 @@ public:
 	glm::quat getRotation() const {return m_rotation;}
 	glm::mat4 getViewMatrix() const {return m_viewMatrix;}
 	glm::mat4 getProjectionMatrix() const {return m_projectionMatrix;}
+	glm::vec3 getPosition() const {return m_position;}
+	glm::vec3 getRotationDegrees() const {return m_eulerAngleInDegrees;}
 	bool getShowMouse() const {return m_showMouse;}
 	glm::vec3 getCFront() const;
 	glm::vec3 getCUp() const;
 	glm::vec3 getCRight() const;
+	void setPosition(glm::vec3 position) {this->m_position = position;}
+	void setRotationDegrees(glm::vec3 degrees) {this->m_eulerAngleInDegrees = degrees;}
 	void setShowMouse(bool m_showMouse) {this->m_showMouse = m_showMouse;} // For callback (in TP.cpp) purpose
-	void interpolate(float delta_time);
+	void transition(float delta_time);
 
 private:
 
@@ -49,16 +67,20 @@ private:
 	bool 		m_xAxisReversed{false};
 	bool 		m_yAxisReversed{false};
 
-	// Interpolation (for transition)
-	InterpolationMode m_interpolationMode{SMOOTHERSTEP};
-	bool		m_isInterpolating{false};
-	float 		m_interpolationDuration{5.0f};
-	float 		m_interpolationProgress{0.0f};
-	glm::vec3 	m_interpolationStartPosition{m_position};
-	glm::vec3	m_interpolationStopPosition{(m_position.x, m_position.y, m_position.z + 20)};
-	
+	// Transition
+	InterpolationMode m_interpolationMode{SMOOTHSTEP};
+	bool		m_isTransitioning{false};
+	int 		m_transitionDuration{3};
+	float 		m_transitionProgress{0.0f};
+	glm::vec3 	m_transitionStartPosition{m_position};
+	glm::vec3	m_transitionStopPosition{m_position + glm::normalize(getCFront()) * 30.0f};
+
+	// Shake
+	Camera_Shake* m_shake = new Camera_Shake(*this,0.5f,0.1f,5.0f);
+
 	//Interface option
 	bool m_showImguiDemo{ false };
+	bool m_showHelp{false};
 	CameraMode	m_cameraMode{FIRST_MODE};
 	bool m_showMouse = true;
 

@@ -1,4 +1,5 @@
-#include <TP/Camera/Camera.hpp>
+#include <GLFW/glfw3.h>
+#include "Camera.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -10,13 +11,16 @@ void Camera::init()
 {
 	m_fovDegree = 45.0f;
 	m_position = glm::vec3(0.f, 40.f, 0.f);
-	m_translationSpeed = 1.0f;
+	m_translationSpeed = 25.0f;
 	m_eulerAngle = glm::vec3(0.f, 0.f, 0.f);
 	m_eulerAngleInDegrees = glm::vec3(0.f, 0.f, 0.f);
 	m_rotation = glm::quat{};
-	m_rotationSpeed = 0.01f;
+	m_rotationSpeed = 1.0f;
 	m_showImguiDemo = false;
-	m_interpolationDuration = 0.5f;
+	m_showHelp = false;
+	m_transitionDuration = 1;
+	m_interpolationMode = LINEAR;
+	m_shake = new Camera_Shake(*this,0.5f,0.1f,5.0f);
 }
 
 void Camera::updateInterface(float _deltaTime)
@@ -28,7 +32,9 @@ void Camera::updateInterface(float _deltaTime)
 		ImGui::Text("Welcome to this TP about Cameras! Press escape to close the exe");
 		ImGui::Text("Long live to the cameras");
 		ImGui::Separator();
-		ImGui::Checkbox("Show ImGui demo", &m_showImguiDemo);
+		//ImGui::Checkbox("Show ImGui demo", &m_showImguiDemo);
+		// ImGui::SameLine();
+		ImGui::Checkbox("Show help", &m_showHelp);
 		ImGui::Separator();
 		ImGui::Text(("Camera mode : " + std::to_string(m_cameraMode)).c_str());
 		if(ImGui::IsKeyPressed(ImGuiKey_Tab)) {
@@ -38,34 +44,63 @@ void Camera::updateInterface(float _deltaTime)
 			}
 			init(); // Reset values when changing mode
 		}
+		ImGui::Separator();
+
+		ImGui::Text("Camera FOV");
+		ImGui::SliderFloat("FOV",&m_fovDegree,30.0f,179.9f);
+		ImGui::Separator();
+
 		ImGui::Text("Camera translation");
 		ImGui::DragFloat3("Camera position (x,y,z)",glm::value_ptr(m_position),m_translationSpeed);
-		ImGui::SliderFloat("Translation speed",&m_translationSpeed,0.01f,5.0f);
+		ImGui::SliderFloat("Translation speed",&m_translationSpeed,5.0f,50.0f);
 		ImGui::Separator();
+
 		ImGui::Text("Camera rotation (in degrees)");
-		ImGui::Separator();
 		ImGui::Checkbox("Reverse x-axis", &m_xAxisReversed);
 		ImGui::Checkbox("Reverse y-axis", &m_yAxisReversed);
-		ImGui::Separator();
 		ImGui::SliderFloat("Yaw",&m_eulerAngleInDegrees.y,-180.0f,180.0f);
 		ImGui::SliderFloat("Pitch",&m_eulerAngleInDegrees.x,-90.0f,90.0f);
 		ImGui::SliderFloat("Roll",&m_eulerAngleInDegrees.z,-90.0f,90.0f);
-		ImGui::SliderFloat("Rotation speed",&m_rotationSpeed,0.01f,1.0f);
+		ImGui::SliderFloat("Rotation speed",&m_rotationSpeed,1.0f,50.0f);
 		ImGui::Separator();
-		ImGui::SliderFloat("FOV",&m_fovDegree,30.0f,179.9f);
-		ImGui::Separator();
+
 		ImGui::Text("Camera transition");
-		if(ImGui::Button("Transition")) {
-			m_interpolationProgress = 0.0f;
-			m_interpolationStartPosition = m_position;
-			m_interpolationStopPosition = glm::vec3(m_position.x, m_position.y, m_position.z + 20);
-			m_isInterpolating = true;
+		ImGui::SliderInt("Transition duration",&m_transitionDuration,1,10);
+		const char* transitions[] = {"LINEAR","SMOOTHSTEP","SMOOTHSTEP2","SMOOTHSTEP3","SMOOTHERSTEP","SQUARED","INV_SQUARED","CUBED","INV_CUBED","SIN"};
+		int currentTransition = (int)m_interpolationMode;
+		if(ImGui::BeginCombo("Transition mode", transitions[currentTransition])) {
+			for(int n = 0; n < IM_ARRAYSIZE(transitions); n++) {
+				bool isSelected = (currentTransition == n);
+				if(ImGui::Selectable(transitions[n], isSelected)) {
+					currentTransition = n;
+					m_interpolationMode = (InterpolationMode)currentTransition;
+				}
+				if(isSelected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		if(ImGui::Button("Play transition")) {
+			m_transitionProgress = 0.0f;
+			m_transitionStartPosition = m_position;
+			m_transitionStopPosition = m_position + glm::normalize(getCFront()) * 30.0f;
+			m_isTransitioning = true;
 		}
 		ImGui::Separator();
+
+		ImGui::Text("Camera shake");
+		ImGui::SliderFloat("Shake duration",&m_shake->duration,0.1f,10.0f);
+		ImGui::SliderFloat("Shake amplitude",&m_shake->amplitude,0.1f,2.0f);
+		ImGui::SliderFloat("Shake frequency",&m_shake->frequency,5.0f,10.0f);
+		if(ImGui::Button("Play shake")) {
+			m_shake->playShake();
+		}
+		ImGui::Separator();
+
 		if(ImGui::Button("Reset values")) {
 			init();
 		}
-		
 	}
 	ImGui::End();
 
@@ -74,160 +109,217 @@ void Camera::updateInterface(float _deltaTime)
 		ImGui::ShowDemoWindow();
 	}
 
+	if(m_showHelp) {
+		ImGui::Begin("Camera help", &m_showHelp);
+		ImGui::Text("To toggle mouse, press T");
+		ImGui::Text("To change camera mode, press TAB");
+		ImGui::Text("In first mode, you can move the camera by using W,A,S,D and rotate it with the mouse (mouse needs to be toggled off)");
+		ImGui::Text("In second mode, you can move the camera using W,A,S,D and rotate it with directional keys");
+		ImGui::Text("To run a camera transition, click on the 'Play transition' button");
+		ImGui::Text("To play a camera shake, click on the 'Play shake' button or press the space bar");
+		ImGui::Text("Click on the 'Reset values' button to reset all the values of the program without restarting it");
+		ImGui::End();
+	}
+
 }
 
 void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 {
 
-	switch(m_cameraMode) {
+	if(!m_isTransitioning) {
 
-		case FIRST_MODE:
-			if(!m_showMouse) {
-				double cursorXPos,cursorYPos;
-				glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);
+		if(glfwGetKey(_window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+			m_shake->playShake();
+		}
 
-				if(firstPass) {
-					firstPass = false;
+		static bool lastShowMouseState = m_showMouse;
+
+		if(m_showMouse && !lastShowMouseState) {
+			double cursorXPos, cursorYPos;
+			glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);
+			lastCursorXPos = cursorXPos;
+			lastCursorYPos = cursorYPos;
+			firstPass = true;
+		}
+
+		lastShowMouseState = m_showMouse;
+
+		switch(m_cameraMode) {
+
+			case FIRST_MODE:
+				if(!m_showMouse) {
+					double cursorXPos,cursorYPos;
+					glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);
+
+					if(firstPass) {
+						firstPass = false;
+						lastCursorXPos = cursorXPos;
+						lastCursorYPos = cursorYPos;
+					}
+
+					double xDiff = cursorXPos - lastCursorXPos;
+					double yDiff = cursorYPos - lastCursorYPos;
+
 					lastCursorXPos = cursorXPos;
 					lastCursorYPos = cursorYPos;
-				}
 
-				double xDiff = cursorXPos - lastCursorXPos;
-				double yDiff = cursorYPos - lastCursorYPos;
-
-				lastCursorXPos = cursorXPos;
-				lastCursorYPos = cursorYPos;
-
-				if(m_xAxisReversed) {
-					m_eulerAngleInDegrees.y += xDiff * m_rotationSpeed; // Reversed yaw
-				}
-				else {
-					m_eulerAngleInDegrees.y -= xDiff * m_rotationSpeed; // Yaw
-				}
-
-				if(m_yAxisReversed) {
-					m_eulerAngleInDegrees.x -= yDiff * m_rotationSpeed; // Reversed pitch
-				}
-				else {
-					m_eulerAngleInDegrees.x += yDiff * m_rotationSpeed; // Pitch
-				}
-				
-				glm::vec3 CFront = getCFront();
-				glm::vec3 CRight = getCRight();
-
-				if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
-					m_position += CFront * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
-					m_position -= CFront * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
-					m_position += CRight * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
-					m_position -= CRight * m_translationSpeed;
-				}
-			}
-		break;
-
-		case SECOND_MODE:
-			{
-				m_rotationSpeed = 1.0f; // Adapt rotation speed for this mode
-				glm::vec3 CFront = getCFront();
-				glm::vec3 CRight = getCRight();
-				CFront.y = 0; // Here, since we don't want to follow CFront height, we define its y component to 0 (little trick so we don't have to project on a plane)
-				CRight.y = 0;
-
-				if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
-					m_position += CFront * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
-					m_position -= CFront * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
-					m_position += CRight * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
-					m_position -= CRight * m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS) {
-					if(m_yAxisReversed) {
-						m_eulerAngleInDegrees.x += m_rotationSpeed;
-					}
-					else {
-						m_eulerAngleInDegrees.x -= m_rotationSpeed;
-					}
-				}
-				if(glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-					if(m_yAxisReversed) {
-						m_eulerAngleInDegrees.x -= m_rotationSpeed;
-					}
-					else {
-						m_eulerAngleInDegrees.x += m_rotationSpeed;
-					}
-				}
-				if(glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 					if(m_xAxisReversed) {
-						m_eulerAngleInDegrees.y -= m_rotationSpeed;
+						m_eulerAngleInDegrees.y += xDiff * m_rotationSpeed * _deltaTime; // Reversed yaw
 					}
 					else {
-						m_eulerAngleInDegrees.y += m_rotationSpeed;
+						m_eulerAngleInDegrees.y -= xDiff * m_rotationSpeed * _deltaTime; // Yaw
 					}
-				}
-				if(glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-					if(m_xAxisReversed) {
-						m_eulerAngleInDegrees.y += m_rotationSpeed;
-					}
-					else {
-						m_eulerAngleInDegrees.y -= m_rotationSpeed;
-					}
-				}
-				if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
-					m_position.y += m_translationSpeed;
-				}
-				if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
-					m_position.y -= m_translationSpeed;
-				}
-			}
-		break;
 
-		default:
-		break;
+					if(m_yAxisReversed) {
+						m_eulerAngleInDegrees.x -= yDiff * m_rotationSpeed * _deltaTime; // Reversed pitch
+					}
+					else {
+						m_eulerAngleInDegrees.x += yDiff * m_rotationSpeed * _deltaTime; // Pitch
+					}
+					
+					glm::vec3 CFront = glm::normalize(getCFront());
+					glm::vec3 CRight = glm::normalize(getCRight());
+
+					if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
+						m_position += CFront * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
+						m_position -= CFront * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
+						m_position += CRight * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
+						m_position -= CRight * m_translationSpeed * _deltaTime;
+					}
+				}
+			break;
+
+			case SECOND_MODE:
+				{
+					m_rotationSpeed = 50.0f; // Adapt rotation speed for this mode
+					glm::vec3 CFront = getCFront();
+					glm::vec3 CRight = getCRight();
+					CFront.y = 0; // Here, since we don't want to follow CFront height, we define its y component to 0 (little trick so we don't have to project on a plane)
+					CRight.y = 0;
+
+					if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
+						m_position += CFront * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
+						m_position -= CFront * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
+						m_position += CRight * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
+						m_position -= CRight * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS) {
+						if(m_yAxisReversed) {
+							m_eulerAngleInDegrees.x += m_rotationSpeed * _deltaTime;
+						}
+						else {
+							m_eulerAngleInDegrees.x -= m_rotationSpeed * _deltaTime;
+						}
+					}
+					if(glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+						if(m_yAxisReversed) {
+							m_eulerAngleInDegrees.x -= m_rotationSpeed * _deltaTime;
+						}
+						else {
+							m_eulerAngleInDegrees.x += m_rotationSpeed * _deltaTime;
+						}
+					}
+					if(glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+						if(m_xAxisReversed) {
+							m_eulerAngleInDegrees.y -= m_rotationSpeed * _deltaTime;
+						}
+						else {
+							m_eulerAngleInDegrees.y += m_rotationSpeed * _deltaTime;
+						}
+					}
+					if(glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+						if(m_xAxisReversed) {
+							m_eulerAngleInDegrees.y += m_rotationSpeed * _deltaTime;
+						}
+						else {
+							m_eulerAngleInDegrees.y -= m_rotationSpeed * _deltaTime;
+						}
+					}
+					if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
+						m_position.y += m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
+						m_position.y -= m_translationSpeed * _deltaTime;
+					}
+				}
+			break;
+
+			default:
+			break;
+		}
+
 	}
 
 }
 
-void Camera::interpolate(float delta_time) {
-	if(m_interpolationProgress < m_interpolationDuration) { // Correct because glfwGetTime() returns time in seconds
-		m_interpolationProgress += delta_time;
-		float v = m_interpolationProgress / m_interpolationDuration;
+void Camera::transition(float delta_time) {
+	if(m_transitionProgress < m_transitionDuration) { // Correct because glfwGetTime() returns time in seconds
+		m_transitionProgress += delta_time;
+		float v = m_transitionProgress / m_transitionDuration;
 	
 		switch(m_interpolationMode) {
 			case LINEAR:
-				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
 			break;
 
 			case SMOOTHSTEP:
 				v = v * v * (3 - 2 * v);
-				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
 			break;
 
 			case SMOOTHSTEP2:
 				v = v * v * (3 - 2 * v);
 				v = v * v * (3 - 2 * v);
-				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
 			break;
 
 			case SMOOTHSTEP3:
 				v = v * v * (3 - 2 * v);
 				v = v * v * (3 - 2 * v);
 				v = v * v * (3 - 2 * v);
-				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
 			break;
 
 			case SMOOTHERSTEP:
 				v = v * v * v * (v * (v * 6 - 15) + 10);
-				m_position = glm::mix(m_interpolationStartPosition,m_interpolationStopPosition,v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
+			break;
+
+			case SQUARED:
+				v = v * v;
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
+			break;
+
+			case INV_SQUARED:
+				v = 1 - (1 - v) * (1 - v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
+			break;
+
+			case CUBED:
+				v = v * v * v;
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
+			break;
+
+			case INV_CUBED:
+				v = 1 - (1 - v) * (1 - v) * (1 - v);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
+			break;
+
+			case SIN:
+				v = sin(v * M_PI / 2);
+				m_position = glm::mix(m_transitionStartPosition,m_transitionStopPosition,v);
 			break;
 
 			default:
@@ -235,7 +327,7 @@ void Camera::interpolate(float delta_time) {
 		}
 	}
 	else {
-		m_isInterpolating = false;
+		m_isTransitioning = false;
 	}
 }
 
@@ -243,11 +335,12 @@ void Camera::update(float _deltaTime, GLFWwindow* _window)
 {
 	updateInterface(_deltaTime);
 	updateFreeInput(_deltaTime, _window);
-	if(m_isInterpolating) {
-		interpolate(_deltaTime);
+	if(m_isTransitioning) {
+		transition(_deltaTime);
 	}
+	m_shake->update(_deltaTime);
 	Camera_Helper::clipAngleToBounds(m_eulerAngleInDegrees.y,180); // Clip yaw to [-180;180] (but still be able to do a 360 turn)
-	Camera_Helper::clipAngleToValue(m_eulerAngleInDegrees.x,90); // Clip pitch to [-90;90]
+	Camera_Helper::clampAngleToValue(m_eulerAngleInDegrees.x,90); // Clamp pitch to [-90;90]
 	m_eulerAngle = glm::radians(m_eulerAngleInDegrees);
 	m_rotation = glm::quat{m_eulerAngle};
 	Camera_Helper::computeFinalView(m_projectionMatrix, m_viewMatrix, m_position, m_rotation, m_fovDegree);

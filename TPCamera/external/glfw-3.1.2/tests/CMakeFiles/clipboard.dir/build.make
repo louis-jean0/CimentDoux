@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/e20190010736/HAI819I-moteurjeux/TPCamera/external
+CMAKE_SOURCE_DIR = /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/e20190010736/HAI819I-moteurjeux/TPCamera/external
+CMAKE_BINARY_DIR = /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external
 
 # Include any dependencies generated for this target.
 include glfw-3.1.2/tests/CMakeFiles/clipboard.dir/depend.make
@@ -72,30 +72,30 @@ include glfw-3.1.2/tests/CMakeFiles/clipboard.dir/flags.make
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o: glfw-3.1.2/tests/CMakeFiles/clipboard.dir/flags.make
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o: glfw-3.1.2/tests/clipboard.c
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o: glfw-3.1.2/tests/CMakeFiles/clipboard.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o -MF CMakeFiles/clipboard.dir/clipboard.c.o.d -o CMakeFiles/clipboard.dir/clipboard.c.o -c /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/clipboard.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o"
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.o -MF CMakeFiles/clipboard.dir/clipboard.c.o.d -o CMakeFiles/clipboard.dir/clipboard.c.o -c /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/clipboard.c
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/clipboard.dir/clipboard.c.i"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/clipboard.c > CMakeFiles/clipboard.dir/clipboard.c.i
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/clipboard.c > CMakeFiles/clipboard.dir/clipboard.c.i
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clipboard.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/clipboard.dir/clipboard.c.s"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/clipboard.c -o CMakeFiles/clipboard.dir/clipboard.c.s
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/clipboard.c -o CMakeFiles/clipboard.dir/clipboard.c.s
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o: glfw-3.1.2/tests/CMakeFiles/clipboard.dir/flags.make
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o: glfw-3.1.2/deps/getopt.c
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o: glfw-3.1.2/tests/CMakeFiles/clipboard.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o -MF CMakeFiles/clipboard.dir/__/deps/getopt.c.o.d -o CMakeFiles/clipboard.dir/__/deps/getopt.c.o -c /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/deps/getopt.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o"
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.o -MF CMakeFiles/clipboard.dir/__/deps/getopt.c.o.d -o CMakeFiles/clipboard.dir/__/deps/getopt.c.o -c /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/deps/getopt.c
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/clipboard.dir/__/deps/getopt.c.i"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/deps/getopt.c > CMakeFiles/clipboard.dir/__/deps/getopt.c.i
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/deps/getopt.c > CMakeFiles/clipboard.dir/__/deps/getopt.c.i
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/__/deps/getopt.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/clipboard.dir/__/deps/getopt.c.s"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/deps/getopt.c -o CMakeFiles/clipboard.dir/__/deps/getopt.c.s
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/deps/getopt.c -o CMakeFiles/clipboard.dir/__/deps/getopt.c.s
 
 # Object files for target clipboard
 clipboard_OBJECTS = \
@@ -119,18 +119,18 @@ glfw-3.1.2/tests/clipboard: /usr/lib/x86_64-linux-gnu/libXxf86vm.so
 glfw-3.1.2/tests/clipboard: /usr/lib/x86_64-linux-gnu/libXcursor.so
 glfw-3.1.2/tests/clipboard: /usr/lib/x86_64-linux-gnu/libGL.so
 glfw-3.1.2/tests/clipboard: glfw-3.1.2/tests/CMakeFiles/clipboard.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable clipboard"
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/clipboard.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable clipboard"
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/clipboard.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/build: glfw-3.1.2/tests/clipboard
 .PHONY : glfw-3.1.2/tests/CMakeFiles/clipboard.dir/build
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clean:
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && $(CMAKE_COMMAND) -P CMakeFiles/clipboard.dir/cmake_clean.cmake
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests && $(CMAKE_COMMAND) -P CMakeFiles/clipboard.dir/cmake_clean.cmake
 .PHONY : glfw-3.1.2/tests/CMakeFiles/clipboard.dir/clean
 
 glfw-3.1.2/tests/CMakeFiles/clipboard.dir/depend:
-	cd /home/e20190010736/HAI819I-moteurjeux/TPCamera/external && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/e20190010736/HAI819I-moteurjeux/TPCamera/external /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests /home/e20190010736/HAI819I-moteurjeux/TPCamera/external /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/CMakeFiles/clipboard.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/CMakeFiles/clipboard.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : glfw-3.1.2/tests/CMakeFiles/clipboard.dir/depend
 

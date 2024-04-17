@@ -1,4 +1,4 @@
-# Install script for directory: /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src
+# Install script for directory: /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,6 +43,6 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/libglfw3.a")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE STATIC_LIBRARY FILES "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/libglfw3.a")
 endif()
 

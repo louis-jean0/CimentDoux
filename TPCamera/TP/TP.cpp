@@ -109,6 +109,12 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        // To ignore TAB for ImGui
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.KeysDown[GLFW_KEY_TAB]) {
+            io.KeysDown[GLFW_KEY_TAB] = false;
+        }
+
         //input
         if(showMouse) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -260,7 +266,6 @@ void initImgui()
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");

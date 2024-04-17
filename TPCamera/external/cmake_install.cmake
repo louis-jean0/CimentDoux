@@ -1,4 +1,4 @@
-# Install script for directory: /home/e20190010736/HAI819I-moteurjeux/TPCamera/external
+# Install script for directory: /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/cmake_install.cmake")
+  include("/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

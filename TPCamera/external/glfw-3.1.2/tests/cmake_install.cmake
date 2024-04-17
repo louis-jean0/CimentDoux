@@ -1,4 +1,4 @@
-# Install script for directory: /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests
+# Install script for directory: /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

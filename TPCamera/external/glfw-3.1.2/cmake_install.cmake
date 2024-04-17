@@ -1,4 +1,4 @@
-# Install script for directory: /home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2
+# Install script for directory: /home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,13 +43,13 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/include/GLFW" FILES_MATCHING REGEX "/glfw3\\.h$" REGEX "/glfw3native\\.h$")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE DIRECTORY FILES "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/include/GLFW" FILES_MATCHING REGEX "/glfw3\\.h$" REGEX "/glfw3native\\.h$")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw" TYPE FILE FILES
-    "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/glfw3Config.cmake"
-    "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/glfw3ConfigVersion.cmake"
+    "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/glfw3Config.cmake"
+    "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/glfw3ConfigVersion.cmake"
     )
 endif()
 
@@ -57,7 +57,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw/glfwTargets.cmake")
     file(DIFFERENT EXPORT_FILE_CHANGED FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw/glfwTargets.cmake"
-         "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/CMakeFiles/Export/lib/cmake/glfw/glfwTargets.cmake")
+         "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/CMakeFiles/Export/lib/cmake/glfw/glfwTargets.cmake")
     if(EXPORT_FILE_CHANGED)
       file(GLOB OLD_CONFIG_FILES "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw/glfwTargets-*.cmake")
       if(OLD_CONFIG_FILES)
@@ -66,21 +66,21 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
       endif()
     endif()
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw" TYPE FILE FILES "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/CMakeFiles/Export/lib/cmake/glfw/glfwTargets.cmake")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw" TYPE FILE FILES "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/CMakeFiles/Export/lib/cmake/glfw/glfwTargets.cmake")
   if("${CMAKE_INSTALL_CONFIG_NAME}" MATCHES "^()$")
-    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw" TYPE FILE FILES "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/CMakeFiles/Export/lib/cmake/glfw/glfwTargets-noconfig.cmake")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/glfw" TYPE FILE FILES "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/CMakeFiles/Export/lib/cmake/glfw/glfwTargets-noconfig.cmake")
   endif()
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/glfw3.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/glfw3.pc")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/cmake_install.cmake")
-  include("/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/examples/cmake_install.cmake")
-  include("/home/e20190010736/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/cmake_install.cmake")
+  include("/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/src/cmake_install.cmake")
+  include("/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/examples/cmake_install.cmake")
+  include("/home/louis/Documents/HAI819I-moteurjeux/TPCamera/external/glfw-3.1.2/tests/cmake_install.cmake")
 
 endif()
 

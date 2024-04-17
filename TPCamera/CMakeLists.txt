@@ -78,6 +78,8 @@ add_executable(TP
 	TP/Camera/Camera.hpp
 	TP/Camera/Camera_Helper.cpp
 	TP/Camera/Camera_Helper.hpp
+	TP/Camera/Camera_Shake.cpp
+	TP/Camera/Camera_Shake.hpp
 
 	TP/Actor/ObjController.cpp
 	TP/Actor/ObjController.hpp
