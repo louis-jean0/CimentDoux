@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include <Model.hpp>
+#include <Mesh.hpp>
 #include <Transform.hpp>
 
 class SceneNode {
@@ -11,14 +11,12 @@ class SceneNode {
         // Public attributes
         SceneNode *parent = nullptr;
         Mesh *mesh = nullptr;
-        Model *model = nullptr;
         Transform transform;
         std::vector<SceneNode*> children;
 
         // Constructor
         SceneNode();
         SceneNode(Mesh *mesh);
-        SceneNode(Model *model);
 
         // Destructor
         ~SceneNode();

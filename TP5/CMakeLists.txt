@@ -24,9 +24,6 @@ add_subdirectory(external/glm)
 add_library(glad STATIC external/glad/src/glad.c)
 target_include_directories(glad PRIVATE external/glad/include)
 
-# Assimp
-add_subdirectory(external/assimp)
-
 # ImGui setup
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui-1.90.4)
 file(GLOB IMGUI_SOURCES ${IMGUI_DIR}/src/*.cpp)
@@ -53,7 +50,6 @@ add_executable(main
     src/Transform.cpp
     src/stb_image.cpp
     src/Texture.cpp
-    src/Model.cpp
     src/Plane.cpp
     src/Sphere.cpp
     src/PlaneCollider.cpp
@@ -68,11 +64,10 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     external/glfw-3.3.9/include
     external/glad/include
-    external/assimp/include
 )
 
 # Linking libraries
-target_link_libraries(main glfw glad imgui assimp)
+target_link_libraries(main glfw glad imgui)
 
 # Output directories
 set_target_properties(glad imgui PROPERTIES

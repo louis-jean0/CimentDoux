@@ -16,6 +16,11 @@ void Sphere::update(float delta_time) {
     center += velocity * delta_time;
 }
 
+void Sphere::launchSphere(glm::vec3 position, glm::vec3 direction, float speed) {
+    center = position;
+    this->velocity = glm::normalize(direction) * speed;
+}
+
 void Sphere::build_sphere(glm::vec3 center, float radius, unsigned int n_x, unsigned int n_y) {
     for (unsigned int i = 0; i <= n_x; ++i) {
         float V = (float)i / (float)n_x;

@@ -7,7 +7,6 @@
 #include <imgui_impl_opengl3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <assimp/Importer.hpp>
 #include <sys/sysinfo.h>
 #include <sstream>
 #include <fstream>
@@ -66,11 +65,12 @@ float friction_coefficient = 0.5f;
 float restitution_coefficient = 0.1f;
 
 // Sphere
+Sphere* sphere;
 float sphereRadius = 3;
-glm::vec3 spherePosition = glm::vec3(20.0f,0.0f,20.0f);
+glm::vec3 spherePosition = glm::vec3(0.0f,0.0f,0.0f);
 
 // Wireframe
-bool wireframe = false;
+bool wireframe = true;
 
 // Timing
 float last_frame_time = glfwGetTime();
@@ -96,6 +96,7 @@ int main(int argc, char* argv[]) {
     ImGui_ImplOpenGL3_Init("#version 460");
 
     glEnable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Wireframe plus pratique pour visualiser ici
 
     Shader shader;
     shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]) {
     SceneNode plane_node(plane);
     PlaneCollider* plane_collider = new PlaneCollider(*plane);
 
-    Sphere* sphere = new Sphere(spherePosition,sphereRadius,20,20);
+    sphere = new Sphere(spherePosition,sphereRadius,20,20);
     sphere->add_texture(nullptr);
     sphere->bind_shader(shader);
     SceneNode* sphere_node = new SceneNode(sphere);
@@ -185,6 +186,13 @@ int main(int argc, char* argv[]) {
         }
         ImGui::End();
 
+        ImGui::Begin("Sphere");
+        ImGui::SliderFloat("Launch speed", &launchSpeed, 1.0f,500.0f);
+        if(ImGui::Button("Launch sphere")) {
+            sphere->launchSphere(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
+        }
+        ImGui::End();
+
         ImGui::Begin("Plane");
         ImGui::SliderFloat("Friction coefficient", &friction_coefficient, 0.0f, 1.0f);
         ImGui::SliderFloat("Restitution coefficient", &restitution_coefficient, 0.0f, 1.0f);
@@ -192,13 +200,7 @@ int main(int argc, char* argv[]) {
         plane_collider->setFrictionCoefficient(friction_coefficient);
         plane_collider->setRestitutionCoefficient(restitution_coefficient);
         ImGui::End();
-
-        ImGui::Begin("Sphere");
-        if(ImGui::Button("Translation")) {
-
-        }
-        ImGui::End();
-
+        
         myCamera.update(delta_time, window.get_window());
 
         // Model is computed directly thanks to the SceneNode
@@ -219,8 +221,8 @@ int main(int argc, char* argv[]) {
 
         // Cube
         cube->update(delta_time);
-        cube_node->transform.translation = cube->getCenter();
         plane_collider->check_collision_with_cube(*cube);
+        cube_node->transform.translation = cube->getCenter();
         cube_node->draw();
 
         // Sphere
@@ -263,6 +265,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         }
         if(key == GLFW_KEY_SPACE) {
             cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
+        }
+        if(key == GLFW_KEY_C) {
+            sphere->launchSphere(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
         }
     }
 }

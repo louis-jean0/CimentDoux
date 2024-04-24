@@ -18,7 +18,7 @@ void Cube::update(float delta_time) {
 }
 
 void Cube::launchCube(glm::vec3 position, glm::vec3 direction, float speed) {
-    center = position;
+    this->center = position;
     this->velocity = glm::normalize(direction) * speed;
 }
 

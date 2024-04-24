@@ -1,4 +1,3 @@
-#include "SceneNode.hpp"
 #include <PlaneCollider.hpp>
 
 PlaneCollider::PlaneCollider(const Plane &plane) : plane(plane) {}
@@ -11,8 +10,16 @@ void PlaneCollider::check_collision_with_sphere(Sphere &sphere) {
     if(current_height >= spherePosition.y - sphere.getRadius()) {
         glm::vec3 newPosition = glm::vec3(spherePosition.x, current_height + sphere.getRadius(), spherePosition.z);
         sphere.setCenter(newPosition);
+
         glm::vec3 newVelocity = sphere.getVelocity();
-        newVelocity.y = 0;
+
+        // Inversement et réduction de la vitesse y selon le coefficient de restitution
+        newVelocity.y = -newVelocity.y * restitution_coefficient;
+
+        // Application de la friction sur les composantes x et z
+        newVelocity.x *= (1.0 - friction_coefficient);
+        newVelocity.z *= (1.0 - friction_coefficient);
+
         sphere.setVelocity(newVelocity);
     }
 }

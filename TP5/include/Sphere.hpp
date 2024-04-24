@@ -13,6 +13,7 @@ class Sphere : public Mesh {
         void setRadius(float radius) {this->radius = radius;}
         void setVelocity(glm::vec3 velocity) {this->velocity = velocity;}
         void update(float delta_time);
+        void launchSphere(glm::vec3 position, glm::vec3 direction, float speed);
 
     private:
         glm::vec3 center;
