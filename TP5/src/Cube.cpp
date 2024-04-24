@@ -7,7 +7,7 @@ Cube::Cube(glm::vec3 center, float size) {
     this->size = size;
     build_cube(center,size);
     this->velocity = glm::vec3(0.0f);
-    this->mass = 1.0f;
+    this->mass = 10.0f;
 }
 
 void Cube::update(float delta_time) {
