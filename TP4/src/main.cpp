@@ -6,7 +6,6 @@
 #include <imgui_impl_opengl3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <assimp/Importer.hpp>
 #include <sys/sysinfo.h>
 #include <sstream>
 #include <fstream>
