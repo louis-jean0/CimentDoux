@@ -56,8 +56,14 @@ bool showMouse = true;
 Camera myCamera;
 
 // Cube
+Cube* cube;
 float cubeSize = 3;
 glm::vec3 cubePosition = glm::vec3(0.0f,0.0f,0.0f);
+float launchSpeed = 100.0f;
+
+// Plane collider
+float friction_coefficient = 0.5f;
+float restitution_coefficient = 0.1f;
 
 // Sphere
 float sphereRadius = 3;
@@ -94,12 +100,12 @@ int main(int argc, char* argv[]) {
     Shader shader;
     shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
 
-    Plane plane(1000,1000,10000,0);
-    Texture plane_texture("../data/textures/terrain.jpg");
-    plane.add_texture(nullptr);
-    plane.bind_shader(shader);
-    SceneNode plane_node(&plane);
-    PlaneCollider plane_collider(plane);
+    Plane* plane = new Plane(1000,1000,10000,0);
+    Texture plane_texture("../data/textures/2k_neptune.jpg");
+    plane->add_texture(plane_texture);
+    plane->bind_shader(shader);
+    SceneNode plane_node(plane);
+    PlaneCollider* plane_collider = new PlaneCollider(*plane);
 
     Sphere* sphere = new Sphere(spherePosition,sphereRadius,20,20);
     sphere->add_texture(nullptr);
@@ -108,7 +114,7 @@ int main(int argc, char* argv[]) {
     sphere->setCenter(glm::vec3(20.0f,50.0f,20.0f));
     sphere_node->transform.translation = sphere->getCenter();
 
-    Cube* cube = new Cube(cubePosition,cubeSize);
+    cube = new Cube(cubePosition,cubeSize);
     cube->add_texture(nullptr);
     cube->bind_shader(shader);
     SceneNode* cube_node = new SceneNode(cube);
@@ -173,9 +179,18 @@ int main(int argc, char* argv[]) {
         ImGui::End();
 
         ImGui::Begin("Cube");
+        ImGui::SliderFloat("Launch speed", &launchSpeed, 1.0f,500.0f);
         if(ImGui::Button("Launch cube")) {
-            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), 100.0f);
+            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
         }
+        ImGui::End();
+
+        ImGui::Begin("Plane");
+        ImGui::SliderFloat("Friction coefficient", &friction_coefficient, 0.0f, 1.0f);
+        ImGui::SliderFloat("Restitution coefficient", &restitution_coefficient, 0.0f, 1.0f);
+        // Not good to put here but ok for this TP
+        plane_collider->setFrictionCoefficient(friction_coefficient);
+        plane_collider->setRestitutionCoefficient(restitution_coefficient);
         ImGui::End();
 
         ImGui::Begin("Sphere");
@@ -205,12 +220,12 @@ int main(int argc, char* argv[]) {
         // Cube
         cube->update(delta_time);
         cube_node->transform.translation = cube->getCenter();
-        plane_collider.check_collision_with_cube(*cube);
+        plane_collider->check_collision_with_cube(*cube);
         cube_node->draw();
 
         // Sphere
         sphere->update(delta_time);
-        plane_collider.check_collision_with_sphere(*sphere);
+        plane_collider->check_collision_with_sphere(*sphere);
         sphere_node->transform.translation = sphere->getCenter();
         sphere_node->draw();
 
@@ -245,6 +260,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             showMouse = myCamera.getShowMouse();
             showMouse = !showMouse;
             myCamera.setShowMouse(showMouse);
+        }
+        if(key == GLFW_KEY_SPACE) {
+            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
         }
     }
 }
