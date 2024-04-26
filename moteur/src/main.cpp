@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
     SceneNode plane_node(plane);
 
 
-    Model model("../data/models/cube/Cube.gltf");
+    Model model("../data/models/capsule.obj");
     model.bind_shader_to_meshes(shader);
     SceneNode* model_node = new SceneNode(&model);
     model_node->transform.scale = glm::vec3(1.0f);
@@ -102,11 +102,37 @@ int main(int argc, char* argv[]) {
     obst2.bind_shader_to_meshes(shader);
     SceneNode* obst2_node = new SceneNode(&obst2);
     obst2_node->transform.scale = glm::vec3(1.0f);
-    obst2_node->transform.translation = glm::vec3(15., 2.0f, 18.);
+    obst2_node->transform.translation = glm::vec3(15., 2.0f, 17);
+
+    Model obst3("../data/models/cube/Cube.gltf");
+    obst3.bind_shader_to_meshes(shader);
+    SceneNode* obst3_node = new SceneNode(&obst3);
+    obst3_node->transform.scale = glm::vec3(1.0f);
+    obst3_node->transform.translation = glm::vec3(15., 3.0f, 19);
+
+    Model obst4("../data/models/cube/Cube.gltf");
+    obst4.bind_shader_to_meshes(shader);
+    SceneNode* obst4_node = new SceneNode(&obst4);
+    obst4_node->transform.scale = glm::vec3(2.0f,1.f,3.f);
+    obst4_node->transform.translation = glm::vec3(15., 4.0f, 23);
+
+    Model obst5("../data/models/cube/Cube.gltf");
+    obst5.bind_shader_to_meshes(shader);
+    SceneNode* obst5_node = new SceneNode(&obst4);
+    obst5_node->transform.scale = glm::vec3(3.0f,1.f,5.f);
+    obst5_node->transform.translation = glm::vec3(15., 5.0f, 33);
+
+    Model obst6("../data/models/cube/Cube.gltf");
+    obst4.bind_shader_to_meshes(shader);
+    SceneNode* obst6_node = new SceneNode(&obst4);
+    obst6_node->transform.scale = glm::vec3(2.0f,1.f,3.f);
+    obst6_node->transform.translation = glm::vec3(15., 4.0f, 83.5);
 
     myCamera.init();
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    float temps_debut=glfwGetTime();
 
     // Render loop
     while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
@@ -174,10 +200,16 @@ int main(int argc, char* argv[]) {
         model_node->draw();
         obst1_node->draw();
         obst2_node->draw();
+        obst3_node->draw();
+        obst4_node->draw();
+
+        obst5_node->transform.translation += glm::vec3(0.f, 0.f,-sin(temps_debut-currentFrame)/8.);
+        obst5_node->draw();
+        obst6_node->draw();
 
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);
-        std::cout << deltaTime << std::endl;
+        //std::cout << deltaTime << std::endl;
         ImGui::End();
 
 

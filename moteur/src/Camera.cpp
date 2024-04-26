@@ -15,7 +15,7 @@ void Camera::init()
 	m_eulerAngle = glm::vec3(0.f, 0.f, 0.f);
 	m_eulerAngleInDegrees = glm::vec3(0.f, 0.f, 0.f);
 	m_rotation = glm::quat{};
-	m_rotationSpeed = 1.0f;
+	m_rotationSpeed = 5.0f;
 	m_showImguiDemo = false;
 	m_showHelp = false;
 	m_transitionDuration = 1;
@@ -176,6 +176,12 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 					}
 					if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
 						m_position -= CRight * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
+						m_position += glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
+					}
+					if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
+						m_position -= glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
 					}
 				}
 			break;
