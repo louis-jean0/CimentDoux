@@ -42,10 +42,6 @@ float cubeSize = 3;
 glm::vec3 cubePosition = glm::vec3(0.0f,0.0f,0.0f);
 float launchSpeed = 100.0f;
 
-// Sphere
-float sphereRadius = 3;
-glm::vec3 spherePosition = glm::vec3(20.0f,0.0f,20.0f);
-
 // Wireframe
 bool wireframe = false;
 
@@ -58,8 +54,22 @@ float MS_PER_UPDATE = 0.001;
 // Trans
 float PasTranslationCube = 0.01;
 
+// Physique
+double v0_Vitesse = 0.01f;
+glm::vec3 v0 = glm::vec3(0., v0_Vitesse, 0.);
+float m = 100.0f;
+float g = 9.81;
+float hauteur = 5.0f;
+glm::vec3 F = glm::vec3(0., 0., 0.);
+glm::vec3 a = glm::vec3(0., 0., 0.);
+
+
 glm::mat4 view;
 glm::mat4 proj;
+
+bool appuyer = false;
+bool DebAnim = true;
+bool Space = false;
 
 int main(int argc, char* argv[]) {
     // Initialize window
@@ -86,7 +96,7 @@ int main(int argc, char* argv[]) {
     SceneNode plane_node(plane);
 
 
-    Model model("../data/models/cube/Cube.gltf");
+    Model model("../data/models/capsule/capsule.obj");
     model.bind_shader_to_meshes(shader);
     SceneNode* model_node = new SceneNode(&model);
     model_node->transform.scale = glm::vec3(1.0f);
@@ -102,9 +112,10 @@ int main(int argc, char* argv[]) {
     obst2.bind_shader_to_meshes(shader);
     SceneNode* obst2_node = new SceneNode(&obst2);
     obst2_node->transform.scale = glm::vec3(1.0f);
-    obst2_node->transform.translation = glm::vec3(15., 2.0f, 18.);
+    obst2_node->transform.translation = glm::vec3(16., 2.0f, 18.);
 
     myCamera.init();
+
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -138,28 +149,44 @@ int main(int argc, char* argv[]) {
 
         myCamera.updateInterface(deltaTime);
 
+
         while (lag >= MS_PER_UPDATE) {
             myCamera.update(deltaTime, window.get_window());  
+            glm::vec3 forwardVector = glm::normalize(myCamera.getRotation() * glm::vec3(0.0f, 1.0f, 0.0f));
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
                 model_node->transform.translation += glm::vec3(PasTranslationCube, 0., 0.);
             }
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
-                model_node->transform.translation -= glm::vec3(PasTranslationCube, 0., 0.);
+                model_node->transform.translation -=  glm::vec3(PasTranslationCube, 0., 0.);
             }
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
-                model_node->transform.translation += glm::vec3(0., 0., PasTranslationCube);
+                model_node->transform.translation +=  glm::vec3(0., 0., PasTranslationCube);
             }
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
-                model_node->transform.translation -= glm::vec3(0., 0., PasTranslationCube);
+                model_node->transform.translation -=  glm::vec3(0., 0., PasTranslationCube);
             }
 
+            if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
+                v0_Vitesse = sqrt(2.0f * g * hauteur);
+                Space = true;
+            } else if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_RELEASE) {
+                Space = false;
+            }
+
+            v0_Vitesse -= g * deltaTime;
+            model_node->transform.translation.y += v0_Vitesse * deltaTime;
+
+            if (model_node->transform.translation.y <= 0.0f) {
+                model_node->transform.translation.y = 0.0f;
+                v0_Vitesse = 0.0f;
+            } 
+            
             lag -= MS_PER_UPDATE;    
         }
-
 
         view = myCamera.getViewMatrix();
         proj = myCamera.getProjectionMatrix();  
