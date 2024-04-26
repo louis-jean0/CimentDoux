@@ -33,7 +33,7 @@ void Model::bind_shader_to_meshes(const GLchar* vertex_path, const GLchar* fragm
 // Private methods
 void Model::load_model(std::string path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate || aiProcess_FlipUVs);
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenBoundingBoxes);
     if(!scene || scene->mFlags && AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout<<"ERROR::ASSIMP"<<importer.GetErrorString()<<std::endl;
     }
@@ -76,6 +76,7 @@ Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
+    AABB bounding_box;
     // Vertices data
     for(unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
@@ -114,5 +115,7 @@ Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
         std::vector<Texture> specular_maps = load_material_textures(material, aiTextureType_SPECULAR, "texture_specular");
         textures.insert(textures.end(),specular_maps.begin(),specular_maps.end());
     }
-    return Mesh(vertices, indices, textures);
+    aiAABB aabb = mesh->mAABB;
+    bounding_box.processAABB(glm::vec3(aabb.mMin.x, aabb.mMin.y, aabb.mMin.z), glm::vec3(aabb.mMax.x, aabb.mMax.y, aabb.mMax.z));
+    return Mesh(vertices, indices, textures, bounding_box);
 }

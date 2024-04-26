@@ -3,10 +3,11 @@
 
 Mesh::Mesh() {}
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, AABB bounding_box) {
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
+    this->bounding_box = bounding_box;
     setup_mesh();
 }
 
@@ -69,6 +70,7 @@ void Mesh::draw() {
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    bounding_box.drawBox();
 }
 
 void Mesh::bind_shader(Shader shader) {
@@ -81,4 +83,8 @@ void Mesh::bind_shader(const GLchar *vertex_path,const GLchar *fragment_path) {
 
 void Mesh::unbind_shader() {
     shader.Program = 0;
+}
+
+glm::vec3 Mesh::getVerticeFromIndice(unsigned int indice) {
+    return this->vertices[indice].position;
 }

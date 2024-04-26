@@ -43,6 +43,8 @@ target_sources(imgui PUBLIC
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+
 # Executable definition
 add_executable(main
     src/main.cpp
@@ -61,6 +63,7 @@ add_executable(main
     src/Camera_Helper.cpp
     src/quaternion_utils.cpp
     src/Cube.cpp
+    src/AABB.cpp
 )
 
 # Include directories for our project
@@ -69,6 +72,7 @@ include_directories(
     external/glfw-3.3.9/include
     external/glad/include
     external/assimp/include
+    external
 )
 
 # Linking libraries

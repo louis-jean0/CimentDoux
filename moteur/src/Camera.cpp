@@ -10,7 +10,7 @@
 void Camera::init()
 {
 	m_fovDegree = 45.0f;
-	m_position = glm::vec3(500.f, 30.f, 500.f);
+	m_position = glm::vec3(0.f, 30.f, 0.f);
 	m_translationSpeed = 25.0f;
 	m_eulerAngle = glm::vec3(0.f, 0.f, 0.f);
 	m_eulerAngleInDegrees = glm::vec3(0.f, 0.f, 0.f);

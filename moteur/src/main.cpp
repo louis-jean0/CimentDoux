@@ -121,7 +121,16 @@ int main(int argc, char* argv[]) {
     cube->setCenter(glm::vec3(10.0f,50.0f,10.0f));
     cube_node->transform.translation = cube->getCenter();
 
+    Model model("../data/models/backpack/backpack.obj");
+    model.bind_shader_to_meshes(shader);
+    SceneNode* model_node = new SceneNode(&model);
+
+    Shader aabbShader;
+    aabbShader.setShader("../shaders/aabb.vert","../shaders/aabb.frag");
+
     myCamera.init();
+
+    //model_node->transform.scale = glm::vec3(100.0f);
 
     printUsage();
 
@@ -228,6 +237,8 @@ int main(int argc, char* argv[]) {
         plane_collider->check_collision_with_sphere(*sphere);
         sphere_node->transform.translation = sphere->getCenter();
         sphere_node->draw();
+
+        model_node->draw();
 
         // Render window & ImGui
         ImGui::Render();
