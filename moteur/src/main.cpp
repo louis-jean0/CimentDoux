@@ -27,25 +27,6 @@ void printUsage();
 void processInput(GLFWwindow *window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-long long GetMemoryUsage() {
-    long long memory_usage = 0;
-    std::ifstream status_file("/proc/self/status");
-    if (status_file.is_open()) {
-        std::string line;
-        while (std::getline(status_file, line)) {
-            if (line.find("VmRSS:") != std::string::npos) {
-                std::istringstream iss(line);
-                std::string label;
-                long long value;
-                iss >> label >> value;
-                memory_usage = value;
-                break;
-            }
-        }
-        status_file.close();
-    }
-    return memory_usage;
-}
 
 // Window settings
 const unsigned int SCR_WIDTH = 1440;
@@ -61,10 +42,6 @@ float cubeSize = 3;
 glm::vec3 cubePosition = glm::vec3(0.0f,0.0f,0.0f);
 float launchSpeed = 100.0f;
 
-// Plane collider
-float friction_coefficient = 0.5f;
-float restitution_coefficient = 0.1f;
-
 // Sphere
 float sphereRadius = 3;
 glm::vec3 spherePosition = glm::vec3(20.0f,0.0f,20.0f);
@@ -72,17 +49,19 @@ glm::vec3 spherePosition = glm::vec3(20.0f,0.0f,20.0f);
 // Wireframe
 bool wireframe = false;
 
-// Timing
-float last_frame_time = glfwGetTime();
-float current_frame_time;
-float delta_time;
+// Gameloop
+float deltaTime = 0.0f;	
+float lastFrame = 0.0f;
+float lag = 0.0f;
+float MS_PER_UPDATE = 0.001;
+
+// Trans
+float PasTranslationCube = 0.01;
+
+glm::mat4 view;
+glm::mat4 proj;
 
 int main(int argc, char* argv[]) {
-
-    current_frame_time = glfwGetTime();
-    delta_time = current_frame_time - last_frame_time;
-    last_frame_time = current_frame_time;
-
     // Initialize window
     Window window(4,6,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
     window.setup_GLFW();
@@ -100,38 +79,41 @@ int main(int argc, char* argv[]) {
     Shader shader;
     shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
 
-    Plane* plane = new Plane(1000,1000,10000,0);
+    Plane* plane = new Plane(100, 100, 100,0);
     Texture plane_texture("../data/textures/2k_neptune.jpg");
     plane->add_texture(plane_texture);
     plane->bind_shader(shader);
     SceneNode plane_node(plane);
-    PlaneCollider* plane_collider = new PlaneCollider(*plane);
 
-    Sphere* sphere = new Sphere(spherePosition,sphereRadius,20,20);
-    sphere->add_texture(nullptr);
-    sphere->bind_shader(shader);
-    SceneNode* sphere_node = new SceneNode(sphere);
-    sphere->setCenter(glm::vec3(20.0f,50.0f,20.0f));
-    sphere_node->transform.translation = sphere->getCenter();
 
-    cube = new Cube(cubePosition,cubeSize);
-    cube->add_texture(nullptr);
-    cube->bind_shader(shader);
-    SceneNode* cube_node = new SceneNode(cube);
-    cube->setCenter(glm::vec3(10.0f,50.0f,10.0f));
-    cube_node->transform.translation = cube->getCenter();
+    Model model("../data/models/cube/Cube.gltf");
+    model.bind_shader_to_meshes(shader);
+    SceneNode* model_node = new SceneNode(&model);
+    model_node->transform.scale = glm::vec3(1.0f);
+    model_node->transform.translation = glm::vec3(1.0f);
+
+    Model obst1("../data/models/cube/Cube.gltf");
+    obst1.bind_shader_to_meshes(shader);
+    SceneNode* obst1_node = new SceneNode(&obst1);
+    obst1_node->transform.scale = glm::vec3(1.0f);
+    obst1_node->transform.translation = glm::vec3(15., 1.0f, 15.);
+
+    Model obst2("../data/models/cube/Cube.gltf");
+    obst2.bind_shader_to_meshes(shader);
+    SceneNode* obst2_node = new SceneNode(&obst2);
+    obst2_node->transform.scale = glm::vec3(1.0f);
+    obst2_node->transform.translation = glm::vec3(15., 2.0f, 18.);
 
     myCamera.init();
 
-    printUsage();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Render loop
-    while (!glfwWindowShouldClose(window.get_window()) && glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS) {
-        float fps = ImGui::GetIO().Framerate;
-        float ms_per_frame = 1000.0f / fps;
-        current_frame_time = glfwGetTime();
-        delta_time = current_frame_time - last_frame_time;
-        last_frame_time = current_frame_time;
+    while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        lag += deltaTime;
 
         glfwSetKeyCallback(window.get_window(), keyCallback);
     
@@ -140,7 +122,7 @@ int main(int argc, char* argv[]) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
         else {
-            glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED); // To be in "full screen", way easier to move with mouse
+            glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
         processInput(window.get_window());
@@ -153,81 +135,51 @@ int main(int argc, char* argv[]) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Begin("Metrics");
-        ImGui::Separator();
-        ImGui::Spacing();
 
-        char hostname[256];
-        gethostname(hostname, sizeof(hostname));
-        ImGui::Text("Computer name: %s", hostname);
+        myCamera.updateInterface(deltaTime);
 
-        FILE *fp = popen("uname -sr", "r");
-        char os[256];
-        fgets(os, sizeof(os), fp);
-        pclose(fp);
-        ImGui::Text("OS : %s", os);
+        while (lag >= MS_PER_UPDATE) {
+            myCamera.update(deltaTime, window.get_window());  
 
-        struct sysinfo si;
-        sysinfo(&si);
-        double ram_totale = si.totalram * si.mem_unit / (1024 * 1024 * 1024); // Convertir en Go
-        ImGui::Text("Total RAM : %.2f Go", ram_totale);
-        long long ram_utilisee_programme = GetMemoryUsage();
-        double ram_utilisee_go = static_cast<double>(ram_utilisee_programme) / (1024 * 1024); // Convertir en Mo
-        double pourcentage_ram_utilisee = (ram_utilisee_go / ram_totale); // Calculer le pourcentage
-        ImGui::Text("RAM used by the program : %.4f Mo / %.4f %%", ram_utilisee_go, pourcentage_ram_utilisee);
-        ImGui::Text("FPS : %.2f / ms per frame : %.2f", fps, ms_per_frame);
-        ImGui::End();
+            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
+                model_node->transform.translation += glm::vec3(PasTranslationCube, 0., 0.);
+            }
 
-        ImGui::Begin("Cube");
-        ImGui::SliderFloat("Launch speed", &launchSpeed, 1.0f,500.0f);
-        if(ImGui::Button("Launch cube")) {
-            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
+            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                model_node->transform.translation -= glm::vec3(PasTranslationCube, 0., 0.);
+            }
+
+            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
+                model_node->transform.translation += glm::vec3(0., 0., PasTranslationCube);
+            }
+
+            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+                model_node->transform.translation -= glm::vec3(0., 0., PasTranslationCube);
+            }
+
+            lag -= MS_PER_UPDATE;    
         }
-        ImGui::End();
 
-        ImGui::Begin("Plane");
-        ImGui::SliderFloat("Friction coefficient", &friction_coefficient, 0.0f, 1.0f);
-        ImGui::SliderFloat("Restitution coefficient", &restitution_coefficient, 0.0f, 1.0f);
-        // Not good to put here but ok for this TP
-        plane_collider->setFrictionCoefficient(friction_coefficient);
-        plane_collider->setRestitutionCoefficient(restitution_coefficient);
-        ImGui::End();
 
-        ImGui::Begin("Sphere");
-        if(ImGui::Button("Translation")) {
-
-        }
-        ImGui::End();
-
-        myCamera.update(delta_time, window.get_window());
-
-        // Model is computed directly thanks to the SceneNode
-
-        // View
-        glm::mat4 view = myCamera.getViewMatrix();
-
-        // Projection
-        glm::mat4 projection = myCamera.getProjectionMatrix();
+        view = myCamera.getViewMatrix();
+        proj = myCamera.getProjectionMatrix();  
 
         // Sending to shader
         shader.useShader();
         shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
-        shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(projection));
+        shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(proj));
 
         // Scene
         plane_node.draw();
+        model_node->draw();
+        obst1_node->draw();
+        obst2_node->draw();
 
-        // Cube
-        cube->update(delta_time);
-        cube_node->transform.translation = cube->getCenter();
-        plane_collider->check_collision_with_cube(*cube);
-        cube_node->draw();
+        ImGui::Begin("Paramètres");
+        ImGui::Text("Delta time : %f", deltaTime);
+        std::cout << deltaTime << std::endl;
+        ImGui::End();
 
-        // Sphere
-        sphere->update(delta_time);
-        plane_collider->check_collision_with_sphere(*sphere);
-        sphere_node->transform.translation = sphere->getCenter();
-        sphere_node->draw();
 
         // Render window & ImGui
         ImGui::Render();
@@ -261,22 +213,17 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             showMouse = !showMouse;
             myCamera.setShowMouse(showMouse);
         }
-        if(key == GLFW_KEY_SPACE) {
-            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
-        }
     }
 }
 
-void printUsage() {
-}
 
 void processInput(GLFWwindow *window) {
-    // float movementSpeed = 5.0f * delta_time;
-    // if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-    //     cubePosition.z -= movementSpeed;
-    // }
-    // if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-    //     cubePosition.z += movementSpeed;
+    //float movementSpeed = 5.0f * delta_time;
+    //if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
+      //   cubePosition.z -= movementSpeed;
+    //}
+    //if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+     //cubePosition.z += movementSpeed;
     // }
     // if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
     //     cubePosition.x -= movementSpeed;
