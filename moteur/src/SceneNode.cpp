@@ -44,6 +44,11 @@ glm::mat4 SceneNode::get_world_transform() {
 void SceneNode::draw() {
     glm::mat4 model_matrix = get_world_transform();
     if(model) {
+        if(transform.transform_updated) {
+            model->updateGlobalBoundingBox(model_matrix);
+            transform.transform_updated = false;
+            model->bounding_box.drawBox();
+        }
         for(auto& mesh : model->meshes) {
             mesh.shader.useShader();
             mesh.shader.setBindMatrix4fv("model", 1, 0, glm::value_ptr(model_matrix));

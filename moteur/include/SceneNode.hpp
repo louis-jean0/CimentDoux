@@ -12,7 +12,7 @@ class SceneNode {
         SceneNode *parent = nullptr;
         Mesh *mesh = nullptr;
         Model *model = nullptr;
-        Transform transform;
+        Transform transform = Transform();
         std::vector<SceneNode*> children;
 
         // Constructor

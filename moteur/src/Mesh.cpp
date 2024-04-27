@@ -70,7 +70,6 @@ void Mesh::draw() {
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-    bounding_box.drawBox();
 }
 
 void Mesh::bind_shader(Shader shader) {

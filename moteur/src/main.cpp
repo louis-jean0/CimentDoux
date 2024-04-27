@@ -21,6 +21,7 @@
 #include <PlaneCollider.hpp>
 #include <Camera.hpp>
 #include <Cube.hpp>
+#include <ModelCollider.hpp>
 
 // Functions prototypes
 void printUsage();
@@ -55,20 +56,6 @@ bool showMouse = true;
 // Camera
 Camera myCamera;
 
-// Cube
-Cube* cube;
-float cubeSize = 3;
-glm::vec3 cubePosition = glm::vec3(0.0f,0.0f,0.0f);
-float launchSpeed = 100.0f;
-
-// Plane collider
-float friction_coefficient = 0.5f;
-float restitution_coefficient = 0.1f;
-
-// Sphere
-float sphereRadius = 3;
-glm::vec3 spherePosition = glm::vec3(20.0f,0.0f,20.0f);
-
 // Wireframe
 bool wireframe = false;
 
@@ -76,6 +63,8 @@ bool wireframe = false;
 float last_frame_time = glfwGetTime();
 float current_frame_time;
 float delta_time;
+
+SceneNode* model_node2;
 
 int main(int argc, char* argv[]) {
 
@@ -105,32 +94,20 @@ int main(int argc, char* argv[]) {
     plane->add_texture(plane_texture);
     plane->bind_shader(shader);
     SceneNode plane_node(plane);
-    PlaneCollider* plane_collider = new PlaneCollider(*plane);
 
-    Sphere* sphere = new Sphere(spherePosition,sphereRadius,20,20);
-    sphere->add_texture(nullptr);
-    sphere->bind_shader(shader);
-    SceneNode* sphere_node = new SceneNode(sphere);
-    sphere->setCenter(glm::vec3(20.0f,50.0f,20.0f));
-    sphere_node->transform.translation = sphere->getCenter();
+    Model* model1 = new Model("../data/models/capsule/capsule.obj");
+    model1->bind_shader_to_meshes(shader);
+    SceneNode* model_node1 = new SceneNode(model1);
+    ModelCollider collider1(model1->bounding_box);
 
-    cube = new Cube(cubePosition,cubeSize);
-    cube->add_texture(nullptr);
-    cube->bind_shader(shader);
-    SceneNode* cube_node = new SceneNode(cube);
-    cube->setCenter(glm::vec3(10.0f,50.0f,10.0f));
-    cube_node->transform.translation = cube->getCenter();
-
-    Model model("../data/models/backpack/backpack.obj");
-    model.bind_shader_to_meshes(shader);
-    SceneNode* model_node = new SceneNode(&model);
-
-    Shader aabbShader;
-    aabbShader.setShader("../shaders/aabb.vert","../shaders/aabb.frag");
+    Model* model2 = new Model("../data/models/boombox/BoomBox.gltf");
+    model2->bind_shader_to_meshes(shader);
+    SceneNode* model_node2 = new SceneNode(model2);
+    ModelCollider collider2(model2->bounding_box);
 
     myCamera.init();
 
-    //model_node->transform.scale = glm::vec3(100.0f);
+    model_node2->transform.set_scale(glm::vec3(100.0f));
 
     printUsage();
 
@@ -187,27 +164,6 @@ int main(int argc, char* argv[]) {
         ImGui::Text("FPS : %.2f / ms per frame : %.2f", fps, ms_per_frame);
         ImGui::End();
 
-        ImGui::Begin("Cube");
-        ImGui::SliderFloat("Launch speed", &launchSpeed, 1.0f,500.0f);
-        if(ImGui::Button("Launch cube")) {
-            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
-        }
-        ImGui::End();
-
-        ImGui::Begin("Plane");
-        ImGui::SliderFloat("Friction coefficient", &friction_coefficient, 0.0f, 1.0f);
-        ImGui::SliderFloat("Restitution coefficient", &restitution_coefficient, 0.0f, 1.0f);
-        // Not good to put here but ok for this TP
-        plane_collider->setFrictionCoefficient(friction_coefficient);
-        plane_collider->setRestitutionCoefficient(restitution_coefficient);
-        ImGui::End();
-
-        ImGui::Begin("Sphere");
-        if(ImGui::Button("Translation")) {
-
-        }
-        ImGui::End();
-
         myCamera.update(delta_time, window.get_window());
 
         // Model is computed directly thanks to the SceneNode
@@ -223,22 +179,16 @@ int main(int argc, char* argv[]) {
         shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
         shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(projection));
 
+        //std::cout<<collider1.checkCollision(collider2)<<std::endl;
+        
+        std::cout<<model1->bounding_box.min.y<<std::endl;
+
         // Scene
         plane_node.draw();
-
-        // Cube
-        cube->update(delta_time);
-        cube_node->transform.translation = cube->getCenter();
-        plane_collider->check_collision_with_cube(*cube);
-        cube_node->draw();
-
-        // Sphere
-        sphere->update(delta_time);
-        plane_collider->check_collision_with_sphere(*sphere);
-        sphere_node->transform.translation = sphere->getCenter();
-        sphere_node->draw();
-
-        model_node->draw();
+        model_node1->transform.adjust_translation(glm::vec3(0.03f,0.0f,0.0f));
+        model_node2->transform.adjust_translation(glm::vec3(0.01f,0.0f,0.0f));
+        model_node1->draw();
+        model_node2->draw();
 
         // Render window & ImGui
         ImGui::Render();
@@ -272,9 +222,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             showMouse = !showMouse;
             myCamera.setShowMouse(showMouse);
         }
-        if(key == GLFW_KEY_SPACE) {
-            cube->launchCube(myCamera.getPosition(), myCamera.getCFront(), launchSpeed);
-        }
     }
 }
 
@@ -282,18 +229,18 @@ void printUsage() {
 }
 
 void processInput(GLFWwindow *window) {
-    // float movementSpeed = 5.0f * delta_time;
-    // if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-    //     cubePosition.z -= movementSpeed;
-    // }
+    float movementSpeed = 5.0f * delta_time;
+    if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
+        model_node2->transform.set_translation(model_node2->transform.get_translation() + glm::vec3(movementSpeed));
+    }
     // if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-    //     cubePosition.z += movementSpeed;
+    //     model_node2.z += movementSpeed;
     // }
     // if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-    //     cubePosition.x -= movementSpeed;
+    //     model_node2.x -= movementSpeed;
     // }
     // if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-    //     cubePosition.x += movementSpeed;
+    //     model_node2.x += movementSpeed;
     // }
 }
 

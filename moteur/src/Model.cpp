@@ -30,6 +30,49 @@ void Model::bind_shader_to_meshes(const GLchar* vertex_path, const GLchar* fragm
     }
 }
 
+void Model::computeBoundingBox() {
+    if(meshes.empty()) {
+        return;
+    }
+    glm::vec3 min = meshes[0].bounding_box.min;
+    glm::vec3 max = meshes[0].bounding_box.max;
+    for(auto& mesh : meshes) {
+        min.x = std::min(min.x, mesh.bounding_box.min.x);
+        min.y = std::min(min.y, mesh.bounding_box.min.y);
+        min.z = std::min(min.z, mesh.bounding_box.min.z);
+        max.x = std::max(max.x, mesh.bounding_box.max.x);
+        max.y = std::max(max.y, mesh.bounding_box.max.y);
+        max.z = std::max(max.z, mesh.bounding_box.max.z);
+    }
+    bounding_box = AABB(min,max);
+}
+
+void Model::updateGlobalBoundingBox(const glm::mat4& modelMatrix) {
+    glm::vec3 minWorld = glm::vec3(modelMatrix * glm::vec4(bounding_box.originalMin, 1.0));
+    glm::vec3 maxWorld = glm::vec3(modelMatrix * glm::vec4(bounding_box.originalMax, 1.0));
+
+    glm::vec3 corners[8] = {
+        glm::vec3(minWorld.x, minWorld.y, minWorld.z),
+        glm::vec3(maxWorld.x, minWorld.y, minWorld.z),
+        glm::vec3(minWorld.x, maxWorld.y, minWorld.z),
+        glm::vec3(maxWorld.x, maxWorld.y, minWorld.z),
+        glm::vec3(minWorld.x, minWorld.y, maxWorld.z),
+        glm::vec3(maxWorld.x, minWorld.y, maxWorld.z),
+        glm::vec3(minWorld.x, maxWorld.y, maxWorld.z),
+        glm::vec3(maxWorld.x, maxWorld.y, maxWorld.z)
+    };
+
+    glm::vec3 newMin = corners[0];
+    glm::vec3 newMax = corners[0];
+
+    for (int i = 1; i < 8; ++i) {
+        newMin = glm::min(newMin, corners[i]);
+        newMax = glm::max(newMax, corners[i]);
+    }
+    bounding_box.min = newMin;
+    bounding_box.max = newMax;
+}
+
 // Private methods
 void Model::load_model(std::string path) {
     Assimp::Importer importer;
@@ -39,6 +82,7 @@ void Model::load_model(std::string path) {
     }
     directory = path.substr(0, path.find_last_of('/'));
     process_node(scene->mRootNode, scene);
+    computeBoundingBox();
 }
 
 void Model::process_node(aiNode *node, const aiScene *scene)  {

@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 # Always generate compile_commands.json for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
+# Debug
+set(CMAKE_BUILD_TYPE Debug)
+
 # Project information
 project(main VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
@@ -64,6 +67,7 @@ add_executable(main
     src/quaternion_utils.cpp
     src/Cube.cpp
     src/AABB.cpp
+    src/ModelCollider.cpp
 )
 
 # Include directories for our project
