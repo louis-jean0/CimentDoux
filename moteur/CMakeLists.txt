@@ -33,6 +33,10 @@ file(GLOB IMGUI_SOURCES ${IMGUI_DIR}/src/*.cpp)
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR}/include ${IMGUI_DIR}/backends)
 
+# OpenAL
+add_subdirectory(external/openal-soft-master)
+
+
 # Find and link OpenGL
 find_package(OpenGL REQUIRED)
 target_link_libraries(imgui PUBLIC ${OPENGL_gl_LIBRARY} glfw)
@@ -42,6 +46,8 @@ target_sources(imgui PUBLIC
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp 
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
+
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 
 # Executable definition
 add_executable(main
@@ -69,10 +75,13 @@ include_directories(
     external/glfw-3.3.9/include
     external/glad/include
     external/assimp/include
+    external/assimp/include
+    external/openal-soft-master/include/AL
+    external
 )
 
 # Linking libraries
-target_link_libraries(main glfw glad imgui assimp)
+target_link_libraries(main glfw glad imgui assimp OpenAL)
 
 # Output directories
 set_target_properties(glad imgui PROPERTIES

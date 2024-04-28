@@ -22,6 +22,10 @@
 #include <Camera.hpp>
 #include <Cube.hpp>
 
+#include <AL/al.h>
+#include <AL/alc.h>
+
+
 // Functions prototypes
 void printUsage();
 void processInput(GLFWwindow *window);
@@ -35,12 +39,6 @@ bool showMouse = true;
 
 // Camera
 Camera myCamera;
-
-// Cube
-Cube* cube;
-float cubeSize = 3;
-glm::vec3 cubePosition = glm::vec3(0.0f,0.0f,0.0f);
-float launchSpeed = 100.0f;
 
 // Wireframe
 bool wireframe = false;
@@ -56,10 +54,9 @@ float PasTranslationCube = 0.01;
 
 // Physique
 double v0_Vitesse = 0.01f;
-glm::vec3 v0 = glm::vec3(0., v0_Vitesse, 0.);
-float m = 100.0f;
 float g = 9.81;
-float hauteur = 5.0f;
+float hauteur = 3.0f;
+float vitesse = 0.5;
 glm::vec3 F = glm::vec3(0., 0., 0.);
 glm::vec3 a = glm::vec3(0., 0., 0.);
 
@@ -70,6 +67,30 @@ glm::mat4 proj;
 bool appuyer = false;
 bool DebAnim = true;
 bool Space = false;
+
+// Phong
+float cutIn = 25., cutOut = 35.;
+float cutOff;
+float outerCutOff;
+glm::vec3 lightAmbiant = glm::vec3(0.1);
+glm::vec3 lightSpecular = glm::vec3(1.);
+glm::vec3 lightDiffuse = glm::vec3(0.8);
+float constant = 1.;
+float linear = 0.09;
+float quadratic = 0.032;
+
+// PBR
+float metallic = 1.0;
+float roughness = 1.0;
+float ao = 1.0;
+float NormalStrength = 1.0;
+
+    glm::vec3 lightPositions[] = {
+        glm::vec3(0.0f,  1.0f, 0.0f),
+        glm::vec3(10.0f,  3.0f, 10.0f),
+        glm::vec3(15.0f,  3.0f, 12.0f),
+        glm::vec3(17.0f,  3.0f, 14.0f),
+    };
 
 int main(int argc, char* argv[]) {
     // Initialize window
@@ -84,29 +105,49 @@ int main(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
+    ALCdevice* audioDevice = alcOpenDevice(nullptr);
+    if (!audioDevice) {
+        std::cerr << "Impossible d'initialiser le périphérique audio." << std::endl;
+        return -1;
+    }
+
+    ALCcontext* audioContext = alcCreateContext(audioDevice, nullptr);
+    alcMakeContextCurrent(audioContext);
+
+    ALuint audioSource;
+    alGenSources(1, &audioSource);
+    glm::vec3 soundPosition(10.0f, 5.0f, 0.0f); // Position de la source audio dans l'espace 3D
+    alSource3f(audioSource, AL_POSITION, soundPosition.x, soundPosition.y, soundPosition.z);
+    glm::vec3 soundDirection(0.0f, -1.0f, 0.0f); // Direction de la source audio
+    alSource3f(audioSource, AL_DIRECTION, soundDirection.x, soundDirection.y, soundDirection.z);
+    alSourcei(audioSource, AL_LOOPING, AL_TRUE); // Jouer le son en boucle
+  
     glEnable(GL_DEPTH_TEST);
 
     Shader shader;
-    shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
+    shader.setShader("../shaders/LampeTorche.vert","../shaders/LampeTorche.frag");
 
     Plane* plane = new Plane(100, 100, 100,0);
-    Texture plane_texture("../data/textures/2k_neptune.jpg");
+    Texture plane_texture("../data/textures/pierre_diffuse.jpg");
+
     plane->add_texture(plane_texture);
+
     plane->bind_shader(shader);
     SceneNode plane_node(plane);
 
-
-    Model model("../data/models/capsule/capsule.obj");
+    Model model("../data/models/capsule/capsule.gltf");
     model.bind_shader_to_meshes(shader);
     SceneNode* model_node = new SceneNode(&model);
     model_node->transform.scale = glm::vec3(1.0f);
     model_node->transform.translation = glm::vec3(1.0f);
+    model_node->transform.rotation.z = 90.0f;
 
-    Model obst1("../data/models/cube/Cube.gltf");
+    Model obst1("../data/models/platform/FloorDirtSmall.glb");
     obst1.bind_shader_to_meshes(shader);
     SceneNode* obst1_node = new SceneNode(&obst1);
-    obst1_node->transform.scale = glm::vec3(1.0f);
-    obst1_node->transform.translation = glm::vec3(15., 1.0f, 15.);
+    obst1_node->transform.scale = glm::vec3(100.0f);
+    obst1_node->transform.translation = glm::vec3(15., 3.0f, 15.);
+    obst1_node->transform.rotation.x = 90.0f;
 
     Model obst2("../data/models/cube/Cube.gltf");
     obst2.bind_shader_to_meshes(shader);
@@ -115,9 +156,7 @@ int main(int argc, char* argv[]) {
     obst2_node->transform.translation = glm::vec3(16., 2.0f, 18.);
 
     myCamera.init();
-
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
 
     // Render loop
     while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
@@ -152,7 +191,6 @@ int main(int argc, char* argv[]) {
 
         while (lag >= MS_PER_UPDATE) {
             myCamera.update(deltaTime, window.get_window());  
-            glm::vec3 forwardVector = glm::normalize(myCamera.getRotation() * glm::vec3(0.0f, 1.0f, 0.0f));
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
                 model_node->transform.translation += glm::vec3(PasTranslationCube, 0., 0.);
@@ -171,19 +209,28 @@ int main(int argc, char* argv[]) {
             }
 
             if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
+                // Dérivée de la conservation de l'énergie
                 v0_Vitesse = sqrt(2.0f * g * hauteur);
                 Space = true;
             } else if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_RELEASE) {
                 Space = false;
             }
 
-            v0_Vitesse -= g * deltaTime;
+            v0_Vitesse -= deltaTime * vitesse;
             model_node->transform.translation.y += v0_Vitesse * deltaTime;
 
+            /*
             if (model_node->transform.translation.y <= 0.0f) {
                 model_node->transform.translation.y = 0.0f;
                 v0_Vitesse = 0.0f;
-            } 
+            }*/
+
+            // Avec rebonds (pour tests)
+            
+            if (model_node->transform.translation.y <= 0.0f) {
+                model_node->transform.translation.y = -model_node->transform.translation.y;
+                v0_Vitesse = sqrt(2.0f * g * hauteur);
+            }
             
             lag -= MS_PER_UPDATE;    
         }
@@ -192,9 +239,48 @@ int main(int argc, char* argv[]) {
         proj = myCamera.getProjectionMatrix();  
 
         // Sending to shader
+
+        glm::vec3 camPos = myCamera.getPosition();
+        glm::vec3 camFront = myCamera.getCFront();
+        cutOff = glm::cos(glm::radians(cutIn));
+        outerCutOff = glm::cos(glm::radians(cutOut));
+
         shader.useShader();
         shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
         shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(proj));
+
+        // Phong + Flashlight
+        shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
+        shader.setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
+        shader.setBind3f("lightDir", camFront[0], camFront[1], camFront[2]);
+        shader.setBind1f("cutOff", cutOff);
+        shader.setBind1f("outerCutOff", outerCutOff);
+
+        shader.setBind3f("lightambient", lightAmbiant[0], lightAmbiant[1], lightAmbiant[2]);
+        shader.setBind3f("lightdiffuse", lightDiffuse[0], lightDiffuse[1], lightDiffuse[2]);
+        shader.setBind3f("lightspecular", lightSpecular[0], lightSpecular[1], lightSpecular[2]);
+        shader.setBind3f("camPos", camPos[0], camPos[1], camPos[2]);
+
+        shader.setBind1f("constant", constant);
+        shader.setBind1f("linear", linear);
+        shader.setBind1f("quadratic", quadratic);
+
+        // PBR
+        shader.setBind3f("albedo", lightDiffuse[0], lightDiffuse[1], lightDiffuse[2]);
+        shader.setBind1f("metallic", metallic);
+        shader.setBind1f("roughness", roughness);
+        shader.setBind1f("NormalStrength", NormalStrength);
+        shader.setBind1f("ao", ao);
+        for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i) {
+            std::string lightName = "lightPositions[" + std::to_string(i) + "]";
+            shader.setBind3f(lightName.c_str(), lightPositions[i][0], lightPositions[i][1], lightPositions[i][2]);
+        }        
+        shader.setBind3f("camPos", camPos[0], camPos[1], camPos[2]);
+
+
+
+        std::cout << camFront[0] << "\t" << camFront[1] << "\t" << camFront[2] << "\t" << std::endl;
+
 
         // Scene
         plane_node.draw();
@@ -202,11 +288,32 @@ int main(int argc, char* argv[]) {
         obst1_node->draw();
         obst2_node->draw();
 
+
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);
+        ImGui::SliderFloat("Vitesse du saut", &vitesse, 0.01, 5.);
+        ImGui::InputFloat("// Vitesse du saut", &vitesse, 0.1);
+        ImGui::SliderFloat("Hauteur du saut", &hauteur, 0., 10.);
+        ImGui::InputFloat("// Hauteur du saut", &hauteur, 0.1);
+        ImGui::Spacing();
+        ImGui::SliderFloat("cutOff", &cutIn, 0., 180.);
+        ImGui::SliderFloat("outerCutOff", &cutOut, 0., 180.);
+        ImGui::SliderFloat3("Light Ambiant", &lightAmbiant[0], 0., 1.);
+        ImGui::SliderFloat3("Light Diffuse", &lightDiffuse[0], 0., 1.);
+        ImGui::SliderFloat3("Light Specular", &lightSpecular[0], 0., 1.);
+        ImGui::SliderFloat("constant", &constant, 0., 1.);
+        ImGui::SliderFloat("linear", &linear, 0., 0.1);
+        ImGui::SliderFloat("quadratic", &quadratic, 0., 0.01);
+        /*
+        ImGui::Spacing();
+        ImGui::SliderFloat("Metallic", &metallic, 0., 1.);
+        ImGui::SliderFloat("Roughness", &roughness, 0., 1.);
+        ImGui::SliderFloat("AO", &ao, 0., 1.);
+        ImGui::SliderFloat("NormalStrength", &NormalStrength, 0., 5.);
+        */
+
         std::cout << deltaTime << std::endl;
         ImGui::End();
-
 
         // Render window & ImGui
         ImGui::Render();
@@ -218,7 +325,11 @@ int main(int argc, char* argv[]) {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
+    alDeleteSources(1, &audioSource);
+    alDeleteBuffers(1, &aiBuffer);
+    alcMakeContextCurrent(nullptr);
+    alcDestroyContext(audioContext);
+    alcCloseDevice(audioDevice);
     window.~Window();
 
     return 0;
