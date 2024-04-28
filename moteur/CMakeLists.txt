@@ -68,6 +68,7 @@ add_executable(main
     src/Cube.cpp
     src/AABB.cpp
     src/ModelCollider.cpp
+    src/ShaderManager.cpp
 )
 
 # Include directories for our project

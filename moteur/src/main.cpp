@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 
     Model* model2 = new Model("../data/models/boombox/BoomBox.gltf");
     model2->bind_shader_to_meshes(shader);
-    SceneNode* model_node2 = new SceneNode(model2);
+    model_node2 = new SceneNode(model2);
     ModelCollider collider2(model2->bounding_box);
 
     myCamera.init();
@@ -174,21 +174,16 @@ int main(int argc, char* argv[]) {
         // Projection
         glm::mat4 projection = myCamera.getProjectionMatrix();
 
-        // Sending to shader
-        shader.useShader();
-        shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
-        shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(projection));
-
-        //std::cout<<collider1.checkCollision(collider2)<<std::endl;
+        std::cout<<collider1.checkCollision(collider2)<<std::endl;
         
-        std::cout<<model1->bounding_box.min.y<<std::endl;
+        std::cout<<model2->bounding_box.min.x<<std::endl;
 
         // Scene
-        plane_node.draw();
-        model_node1->transform.adjust_translation(glm::vec3(0.03f,0.0f,0.0f));
-        model_node2->transform.adjust_translation(glm::vec3(0.01f,0.0f,0.0f));
-        model_node1->draw();
-        model_node2->draw();
+        plane_node.draw(view, projection);
+        //model_node1->transform.adjust_translation(glm::vec3(0.003f,0.0f,0.0f));
+        //model_node2->transform.adjust_translation(glm::vec3(0.001f,0.0f,0.0f));
+        model_node1->draw(view, projection);
+        model_node2->draw(view, projection);
 
         // Render window & ImGui
         ImGui::Render();
@@ -231,17 +226,18 @@ void printUsage() {
 void processInput(GLFWwindow *window) {
     float movementSpeed = 5.0f * delta_time;
     if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-        model_node2->transform.set_translation(model_node2->transform.get_translation() + glm::vec3(movementSpeed));
+        if(model_node2 == nullptr) return;
+        model_node2->transform.adjust_translation(glm::vec3(0.0f,0.0f,movementSpeed));
     }
-    // if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-    //     model_node2.z += movementSpeed;
-    // }
-    // if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-    //     model_node2.x -= movementSpeed;
-    // }
-    // if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-    //     model_node2.x += movementSpeed;
-    // }
+    if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+        model_node2->transform.adjust_translation(glm::vec3(0.0f,0.0f,-movementSpeed));
+    }
+    if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        model_node2->transform.adjust_translation(glm::vec3(movementSpeed,0.0f,0.0f));
+    }
+    if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        model_node2->transform.adjust_translation(glm::vec3(-movementSpeed,0.0f,0.0f));
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

@@ -63,7 +63,6 @@ Texture::Texture(const char* image_path, const std::string &directory, const std
             std::cout<< "Failed to load texture" << std::endl;
         }
     stbi_image_free(data);
-
 }
 
 unsigned int Texture::texture_from_file(const char* image_path, const std::string &directory) {

@@ -6,9 +6,9 @@
 
 class ModelCollider {
     public:
-        ModelCollider(const AABB& bounding_box);
-        bool checkCollision(const ModelCollider& other) const;
+        ModelCollider(AABB& bounding_box);
+        bool checkCollision(ModelCollider& other);
 
     private:
-        AABB bounding_box;
+        AABB& bounding_box;
 };

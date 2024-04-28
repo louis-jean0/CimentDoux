@@ -27,5 +27,5 @@ class SceneNode {
         void set_parent(SceneNode *parent);
         void add_child(SceneNode *child);
         glm::mat4 get_world_transform();
-        void draw();
+        void draw(glm::mat4& view, glm::mat4& projection);
 };

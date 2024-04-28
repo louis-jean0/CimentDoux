@@ -1,4 +1,5 @@
 #include <AABB.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <climits>
 
 AABB::AABB() {}
@@ -50,7 +51,7 @@ void AABB::drawBox() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Unbind VBO
     glBindVertexArray(0); // Unbind VAO
-    
+
     glBindVertexArray(VAO);
     glDrawArrays(GL_LINES, 0, 24); // 24 sommets au total
     glBindVertexArray(0);
