@@ -1,4 +1,4 @@
-#version 460 core
+#version 410 core
 
 in vec3 normal;
 in vec2 uvs;

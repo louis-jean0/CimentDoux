@@ -61,6 +61,7 @@ add_executable(main
     src/Camera_Helper.cpp
     src/quaternion_utils.cpp
     src/Cube.cpp
+    src/Scene.cpp
 )
 
 # Include directories for our project

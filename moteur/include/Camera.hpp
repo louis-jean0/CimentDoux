@@ -2,6 +2,7 @@
 
 #include "Camera_Helper.hpp"
 
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,6 +10,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
+
+
 
 enum CameraMode {
 	FIRST_MODE = 1,
@@ -33,7 +36,12 @@ class Camera
 {
 public: 
 
+	//gestion plusieurs cam
+	int mode_cam=0;
+	glm::vec3 pos_player;
+
 	void init();
+	void reset();
 	void update(float _deltaTime, GLFWwindow* _window);
 	void updateInterface(float _deltaTime);
 	void updateFreeInput(float _deltaTime, GLFWwindow* _window);
@@ -52,6 +60,7 @@ public:
 	void setRotationDegrees(glm::vec3 degrees) {this->m_eulerAngleInDegrees = degrees;}
 	void setShowMouse(bool m_showMouse) {this->m_showMouse = m_showMouse;} // For callback (in TP.cpp) purpose
 	void transition(float delta_time);
+
 
 private:
 
@@ -80,6 +89,8 @@ private:
 	CameraMode	m_cameraMode{FIRST_MODE};
 	bool m_showMouse = true;
 
+
+
 	// Window handling (I'm not sure it's a good practice to do this here, but for this TP it will do just fine)
 	double lastCursorXPos,lastCursorYPos;
 	bool firstPass = true;
@@ -87,4 +98,5 @@ private:
 	//View
 	glm::mat4 m_viewMatrix;
 	glm::mat4 m_projectionMatrix;
+
 };

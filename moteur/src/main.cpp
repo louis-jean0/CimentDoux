@@ -21,6 +21,7 @@
 #include <PlaneCollider.hpp>
 #include <Camera.hpp>
 #include <Cube.hpp>
+#include <Scene.hpp>
 
 // Functions prototypes
 void printUsage();
@@ -35,6 +36,7 @@ bool showMouse = true;
 
 // Camera
 Camera myCamera;
+Scene scene;
 
 // Cube
 Cube* cube;
@@ -63,7 +65,7 @@ glm::mat4 proj;
 
 int main(int argc, char* argv[]) {
     // Initialize window
-    Window window(4,6,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
+    Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
     window.setup_GLFW();
 
     // Initialize ImGui
@@ -72,25 +74,15 @@ int main(int argc, char* argv[]) {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
-    ImGui_ImplOpenGL3_Init("#version 460");
+    ImGui_ImplOpenGL3_Init("#version 410");
 
     glEnable(GL_DEPTH_TEST);
 
     Shader shader;
     shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
 
-    Plane* plane = new Plane(100, 100, 100,0);
-    Texture plane_texture("../data/textures/2k_neptune.jpg");
-    plane->add_texture(plane_texture);
-    plane->bind_shader(shader);
-    SceneNode plane_node(plane);
-
-
-    Model model("../data/models/capsule.obj");
-    model.bind_shader_to_meshes(shader);
-    SceneNode* model_node = new SceneNode(&model);
-    model_node->transform.scale = glm::vec3(1.0f);
-    model_node->transform.translation = glm::vec3(1.0f);
+    scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
+    //scene.creationMap(shader);
 
     Model obst1("../data/models/cube/Cube.gltf");
     obst1.bind_shader_to_meshes(shader);
@@ -118,15 +110,21 @@ int main(int argc, char* argv[]) {
 
     Model obst5("../data/models/cube/Cube.gltf");
     obst5.bind_shader_to_meshes(shader);
-    SceneNode* obst5_node = new SceneNode(&obst4);
+    SceneNode* obst5_node = new SceneNode(&obst5);
     obst5_node->transform.scale = glm::vec3(3.0f,1.f,5.f);
     obst5_node->transform.translation = glm::vec3(15., 5.0f, 33);
 
     Model obst6("../data/models/cube/Cube.gltf");
-    obst4.bind_shader_to_meshes(shader);
-    SceneNode* obst6_node = new SceneNode(&obst4);
+    obst6.bind_shader_to_meshes(shader);
+    SceneNode* obst6_node = new SceneNode(&obst6);
     obst6_node->transform.scale = glm::vec3(2.0f,1.f,3.f);
     obst6_node->transform.translation = glm::vec3(15., 4.0f, 83.5);
+
+    Model model("../data/models/capsule.obj");
+    model.bind_shader_to_meshes(shader);
+    SceneNode* model_node = new SceneNode(&model);
+    model_node->transform.scale = glm::vec3(1.0f);
+    model_node->transform.translation = glm::vec3(1.0f);
 
     myCamera.init();
 
@@ -167,24 +165,27 @@ int main(int argc, char* argv[]) {
         while (lag >= MS_PER_UPDATE) {
             myCamera.update(deltaTime, window.get_window());  
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.translation += glm::vec3(PasTranslationCube, 0., 0.);
             }
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.translation -= glm::vec3(PasTranslationCube, 0., 0.);
             }
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.translation += glm::vec3(0., 0., PasTranslationCube);
             }
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.translation -= glm::vec3(0., 0., PasTranslationCube);
             }
 
             lag -= MS_PER_UPDATE;    
         }
+        
+        //gestion grossière de la cam pour l'instant
+        myCamera.pos_player=model_node->transform.translation;
 
 
         view = myCamera.getViewMatrix();
@@ -196,13 +197,16 @@ int main(int argc, char* argv[]) {
         shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(proj));
 
         // Scene
-        plane_node.draw();
+        //pour tous dessiner si ca fonctionne
+        //scene.draw();
+        scene.draw_plan();
+
         model_node->draw();
+              
         obst1_node->draw();
         obst2_node->draw();
         obst3_node->draw();
         obst4_node->draw();
-
         obst5_node->transform.translation += glm::vec3(0.f, 0.f,-sin(temps_debut-currentFrame)/8.);
         obst5_node->draw();
         obst6_node->draw();
@@ -241,6 +245,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             }
         }
         if (key == GLFW_KEY_T) {
+            myCamera.mode_cam=(myCamera.mode_cam+1)%3;
+            myCamera.reset();
             showMouse = myCamera.getShowMouse();
             showMouse = !showMouse;
             myCamera.setShowMouse(showMouse);
