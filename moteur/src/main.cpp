@@ -108,19 +108,25 @@ int main(int argc, char* argv[]) {
 
     Model model("../data/models/capsule/capsule.gltf");
     model.bind_shader_to_meshes(shader);
+
     SceneNode* model_node = new SceneNode(&model);
     model_node->transform.set_scale(glm::vec3(1.0f));
-    model_node->transform.set_translation(glm::vec3(1.0f));
+    glm::vec3 center = model.getMin();
+    std::cout << center.x << std::endl;
+
+    model_node->transform.set_translation(glm::vec3(1.0f, .0f, 1.f));
     model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
+    ModelCollider colider(model.bounding_box);
 
     scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
     //scene.creationMap(shader);
 
-    Model obst1("../data/models/platform/GreyBricks.glb");
+    Model obst1("../data/models/plane/plane.gltf");
     obst1.bind_shader_to_meshes(shader);
     SceneNode* obst1_node = new SceneNode(&obst1);
     obst1_node->transform.set_scale(glm::vec3(300.0f));
     obst1_node->transform.set_translation(glm::vec3(15., 3.0f, 15.));
+    ModelCollider colider1(obst1.bounding_box);
 
     myCamera.init();
     
@@ -221,8 +227,8 @@ int main(int argc, char* argv[]) {
             model_node->transform.adjust_translation(glm::vec3(0.0f,v0_Vitesse * deltaTime,0.0f));
 
             
-            if (model_node->transform.get_translation().y <= 0.0f) {
-                model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,0.0f,model_node->transform.get_translation().z));
+            if (model_node->transform.get_translation().y <= 0.0) {
+                model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x, 0.0f, model_node->transform.get_translation().z));
                 v0_Vitesse = 0.0f;
             }
 
@@ -238,6 +244,9 @@ int main(int argc, char* argv[]) {
         
         //gestion grossière de la cam pour l'instant
         myCamera.pos_player = model_node->transform.get_translation();
+
+
+        std::cout << colider.checkCollision(colider1) << std::endl;
 
         view = myCamera.getViewMatrix();
         proj = myCamera.getProjectionMatrix();  

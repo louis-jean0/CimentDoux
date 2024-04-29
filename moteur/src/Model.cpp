@@ -69,6 +69,7 @@ void Model::updateGlobalBoundingBox(const glm::mat4& modelMatrix) {
         newMin = glm::min(newMin, corners[i]);
         newMax = glm::max(newMax, corners[i]);
     }
+
     bounding_box.min = newMin;
     bounding_box.max = newMax;
 }
@@ -162,4 +163,17 @@ Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     aiAABB aabb = mesh->mAABB;
     bounding_box.processAABB(glm::vec3(aabb.mMin.x, aabb.mMin.y, aabb.mMin.z), glm::vec3(aabb.mMax.x, aabb.mMax.y, aabb.mMax.z));
     return Mesh(vertices, indices, textures, bounding_box);
+}
+
+
+glm::vec3 Model::getMin() {
+    return bounding_box.min;
+}
+
+glm::vec3 Model::getMax() {
+    return bounding_box.max;
+}
+
+glm::vec3 Model::getCenter() {
+    return glm::vec3((bounding_box.min.x + bounding_box.min.x) / 2., (bounding_box.min.y + bounding_box.min.y) / 2., (bounding_box.min.z + bounding_box.min.z) / 2.);
 }

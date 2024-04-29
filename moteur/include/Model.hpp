@@ -25,6 +25,11 @@ class Model {
         void bind_shader_to_meshes(const GLchar* vertex_path, const GLchar* fragment_path);
         void computeBoundingBox();
         void updateGlobalBoundingBox(const glm::mat4 &modelMatrix);
+
+
+        glm::vec3 getMin();
+        glm::vec3 getMax();
+        glm::vec3 getCenter();     
     
     private:
         // Private attributes
