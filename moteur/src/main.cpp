@@ -23,30 +23,14 @@
 #include <Cube.hpp>
 #include <ModelCollider.hpp>
 
+
+
+
 // Functions prototypes
 void printUsage();
 void processInput(GLFWwindow *window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-long long GetMemoryUsage() {
-    long long memory_usage = 0;
-    std::ifstream status_file("/proc/self/status");
-    if (status_file.is_open()) {
-        std::string line;
-        while (std::getline(status_file, line)) {
-            if (line.find("VmRSS:") != std::string::npos) {
-                std::istringstream iss(line);
-                std::string label;
-                long long value;
-                iss >> label >> value;
-                memory_usage = value;
-                break;
-            }
-        }
-        status_file.close();
-    }
-    return memory_usage;
-}
 
 // Window settings
 const unsigned int SCR_WIDTH = 1440;
@@ -59,19 +43,43 @@ Camera myCamera;
 // Wireframe
 bool wireframe = false;
 
-// Timing
-float last_frame_time = glfwGetTime();
-float current_frame_time;
-float delta_time;
+// Gameloop
+float deltaTime = 0.0f;	
+float lastFrame = 0.0f;
+float lag = 0.0f;
+float MS_PER_UPDATE = 0.001;
 
-SceneNode* model_node2;
+// Trans
+float PasTranslationCube = 0.01;
+
+// Physique
+double v0_Vitesse = 0.01f;
+float g = 9.81;
+float hauteur = 3.0f;
+float vitesse = 0.5;
+glm::vec3 F = glm::vec3(0., 0., 0.);
+glm::vec3 a = glm::vec3(0., 0., 0.);
+
+
+glm::mat4 view;
+glm::mat4 proj;
+
+bool appuyer = false;
+bool DebAnim = true;
+bool Space = false;
+
+// Phong
+float cutIn = 25., cutOut = 35.;
+float cutOff;
+float outerCutOff;
+glm::vec3 lightAmbiant = glm::vec3(0.1);
+glm::vec3 lightSpecular = glm::vec3(1.);
+glm::vec3 lightDiffuse = glm::vec3(0.8);
+float constant = 1.;
+float linear = 0.09;
+float quadratic = 0.032;
 
 int main(int argc, char* argv[]) {
-
-    current_frame_time = glfwGetTime();
-    delta_time = current_frame_time - last_frame_time;
-    last_frame_time = current_frame_time;
-
     // Initialize window
     Window window(4,6,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
     window.setup_GLFW();
@@ -84,40 +92,45 @@ int main(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
+
     glEnable(GL_DEPTH_TEST);
 
     Shader shader;
-    shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
+    shader.setShader("../shaders/LampeTorche.vert","../shaders/LampeTorche.frag");
 
-    Plane* plane = new Plane(1000,1000,10000,0);
-    Texture plane_texture("../data/textures/2k_neptune.jpg");
+    Shader shaderMesh;
+    shaderMesh.setShader("../shaders/mesh.vert","../shaders/mesh.frag");
+
+    Plane* plane = new Plane(100, 100, 100,0);
+    Texture plane_texture("../data/textures/pavement.jpg");
+
     plane->add_texture(plane_texture);
+
     plane->bind_shader(shader);
     SceneNode plane_node(plane);
 
-    Model* model1 = new Model("../data/models/capsule/capsule.obj");
-    model1->bind_shader_to_meshes(shader);
-    SceneNode* model_node1 = new SceneNode(model1);
-    ModelCollider collider1(model1->bounding_box);
+    Model model("../data/models/capsule/capsule.gltf");
+    model.bind_shader_to_meshes(shader);
+    SceneNode* model_node = new SceneNode(&model);
+    model_node->transform.scale = glm::vec3(1.0f);
+    model_node->transform.translation = glm::vec3(1.0f);
+    model_node->transform.rotation.z = 90.0f;
 
-    Model* model2 = new Model("../data/models/boombox/BoomBox.gltf");
-    model2->bind_shader_to_meshes(shader);
-    model_node2 = new SceneNode(model2);
-    ModelCollider collider2(model2->bounding_box);
+    Model obst1("../data/models/platform/GreyBricks.glb");
+    obst1.bind_shader_to_meshes(shader);
+    SceneNode* obst1_node = new SceneNode(&obst1);
+    obst1_node->transform.scale = glm::vec3(300.0f);
+    obst1_node->transform.translation = glm::vec3(15., 3.0f, 15.);
 
     myCamera.init();
-
-    model_node2->transform.set_scale(glm::vec3(100.0f));
-
-    printUsage();
+    
 
     // Render loop
-    while (!glfwWindowShouldClose(window.get_window()) && glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS) {
-        float fps = ImGui::GetIO().Framerate;
-        float ms_per_frame = 1000.0f / fps;
-        current_frame_time = glfwGetTime();
-        delta_time = current_frame_time - last_frame_time;
-        last_frame_time = current_frame_time;
+    while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        lag += deltaTime;
 
         glfwSetKeyCallback(window.get_window(), keyCallback);
     
@@ -126,7 +139,7 @@ int main(int argc, char* argv[]) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
         else {
-            glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED); // To be in "full screen", way easier to move with mouse
+            glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
         processInput(window.get_window());
@@ -139,51 +152,118 @@ int main(int argc, char* argv[]) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Begin("Metrics");
-        ImGui::Separator();
-        ImGui::Spacing();
 
-        char hostname[256];
-        gethostname(hostname, sizeof(hostname));
-        ImGui::Text("Computer name: %s", hostname);
+        myCamera.updateInterface(deltaTime);
 
-        FILE *fp = popen("uname -sr", "r");
-        char os[256];
-        fgets(os, sizeof(os), fp);
-        pclose(fp);
-        ImGui::Text("OS : %s", os);
 
-        struct sysinfo si;
-        sysinfo(&si);
-        double ram_totale = si.totalram * si.mem_unit / (1024 * 1024 * 1024); // Convertir en Go
-        ImGui::Text("Total RAM : %.2f Go", ram_totale);
-        long long ram_utilisee_programme = GetMemoryUsage();
-        double ram_utilisee_go = static_cast<double>(ram_utilisee_programme) / (1024 * 1024); // Convertir en Mo
-        double pourcentage_ram_utilisee = (ram_utilisee_go / ram_totale); // Calculer le pourcentage
-        ImGui::Text("RAM used by the program : %.4f Mo / %.4f %%", ram_utilisee_go, pourcentage_ram_utilisee);
-        ImGui::Text("FPS : %.2f / ms per frame : %.2f", fps, ms_per_frame);
-        ImGui::End();
+        while (lag >= MS_PER_UPDATE) {
+            myCamera.update(deltaTime, window.get_window());  
 
-        myCamera.update(delta_time, window.get_window());
+            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
+                model_node->transform.translation += glm::vec3(PasTranslationCube, 0., 0.);
+            }
 
-        // Model is computed directly thanks to the SceneNode
+            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                model_node->transform.translation -=  glm::vec3(PasTranslationCube, 0., 0.);
+            }
 
-        // View
-        glm::mat4 view = myCamera.getViewMatrix();
+            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
+                model_node->transform.translation +=  glm::vec3(0., 0., PasTranslationCube);
+            }
 
-        // Projection
-        glm::mat4 projection = myCamera.getProjectionMatrix();
+            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+                model_node->transform.translation -=  glm::vec3(0., 0., PasTranslationCube);
+            }
 
-        std::cout<<collider1.checkCollision(collider2)<<std::endl;
-        
-        std::cout<<model2->bounding_box.min.x<<std::endl;
+            if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
+                // Dérivée de la conservation de l'énergie
+                v0_Vitesse = sqrt(2.0f * g * hauteur);
+                Space = true;
+            } else if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_RELEASE) {
+                Space = false;
+            }
+
+            v0_Vitesse -= deltaTime * vitesse;
+            model_node->transform.translation.y += v0_Vitesse * deltaTime;
+
+            /*
+            if (model_node->transform.translation.y <= 0.0f) {
+                model_node->transform.translation.y = 0.0f;
+                v0_Vitesse = 0.0f;
+            }*/
+
+            // Avec rebonds (pour tests)
+            
+            if (model_node->transform.translation.y <= 0.0f) {
+                model_node->transform.translation.y = -model_node->transform.translation.y;
+                v0_Vitesse = sqrt(2.0f * g * hauteur);
+            }
+            
+            lag -= MS_PER_UPDATE;    
+        }
+
+        view = myCamera.getViewMatrix();
+        proj = myCamera.getProjectionMatrix();  
+
+        // Sending to shader
+
+        glm::vec3 camPos = myCamera.getPosition();
+        glm::vec3 camFront = myCamera.getCFront();
+        cutOff = glm::cos(glm::radians(cutIn));
+        outerCutOff = glm::cos(glm::radians(cutOut));
+
+        shader.useShader();
+        shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
+        shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(proj));
+
+        // Phong + Flashlight
+        shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
+        shader.setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
+        shader.setBind3f("lightDir", camFront[0], camFront[1], camFront[2]);
+        shader.setBind1f("cutOff", cutOff);
+        shader.setBind1f("outerCutOff", outerCutOff);
+
+        shader.setBind3f("lightambient", lightAmbiant[0], lightAmbiant[1], lightAmbiant[2]);
+        shader.setBind3f("lightdiffuse", lightDiffuse[0], lightDiffuse[1], lightDiffuse[2]);
+        shader.setBind3f("lightspecular", lightSpecular[0], lightSpecular[1], lightSpecular[2]);
+        shader.setBind3f("camPos", camPos[0], camPos[1], camPos[2]);
+
+        shader.setBind1f("constant", constant);
+        shader.setBind1f("linear", linear);
+        shader.setBind1f("quadratic", quadratic);
+
 
         // Scene
-        plane_node.draw(view, projection);
-        //model_node1->transform.adjust_translation(glm::vec3(0.003f,0.0f,0.0f));
-        //model_node2->transform.adjust_translation(glm::vec3(0.001f,0.0f,0.0f));
-        model_node1->draw(view, projection);
-        model_node2->draw(view, projection);
+        plane_node.draw();
+        model_node->draw();
+        obst1_node->draw();
+
+
+        ImGui::Begin("Paramètres");
+        ImGui::Text("Delta time : %f", deltaTime);
+        ImGui::SliderFloat("Vitesse du saut", &vitesse, 0.01, 5.);
+        ImGui::InputFloat("// Vitesse du saut", &vitesse, 0.1);
+        ImGui::SliderFloat("Hauteur du saut", &hauteur, 0., 10.);
+        ImGui::InputFloat("// Hauteur du saut", &hauteur, 0.1);
+        ImGui::Spacing();
+        ImGui::SliderFloat("cutOff", &cutIn, 0., 180.);
+        ImGui::SliderFloat("outerCutOff", &cutOut, 0., 180.);
+        ImGui::SliderFloat3("Light Ambiant", &lightAmbiant[0], 0., 1.);
+        ImGui::SliderFloat3("Light Diffuse", &lightDiffuse[0], 0., 1.);
+        ImGui::SliderFloat3("Light Specular", &lightSpecular[0], 0., 1.);
+        ImGui::SliderFloat("constant", &constant, 0., 1.);
+        ImGui::SliderFloat("linear", &linear, 0., 0.1);
+        ImGui::SliderFloat("quadratic", &quadratic, 0., 0.01);
+        /*
+        ImGui::Spacing();
+        ImGui::SliderFloat("Metallic", &metallic, 0., 1.);
+        ImGui::SliderFloat("Roughness", &roughness, 0., 1.);
+        ImGui::SliderFloat("AO", &ao, 0., 1.);
+        ImGui::SliderFloat("NormalStrength", &NormalStrength, 0., 5.);
+        */
+
+        std::cout << deltaTime << std::endl;
+        ImGui::End();
 
         // Render window & ImGui
         ImGui::Render();
@@ -220,24 +300,21 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
-void printUsage() {
-}
 
 void processInput(GLFWwindow *window) {
-    float movementSpeed = 5.0f * delta_time;
-    if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
-        if(model_node2 == nullptr) return;
-        model_node2->transform.adjust_translation(glm::vec3(0.0f,0.0f,movementSpeed));
-    }
-    if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-        model_node2->transform.adjust_translation(glm::vec3(0.0f,0.0f,-movementSpeed));
-    }
-    if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-        model_node2->transform.adjust_translation(glm::vec3(movementSpeed,0.0f,0.0f));
-    }
-    if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        model_node2->transform.adjust_translation(glm::vec3(-movementSpeed,0.0f,0.0f));
-    }
+    //float movementSpeed = 5.0f * delta_time;
+    //if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
+      //   cubePosition.z -= movementSpeed;
+    //}
+    //if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+     //cubePosition.z += movementSpeed;
+    // }
+    // if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+    //     cubePosition.x -= movementSpeed;
+    // }
+    // if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+    //     cubePosition.x += movementSpeed;
+    // }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

@@ -10,8 +10,8 @@
 void Camera::init()
 {
 	m_fovDegree = 45.0f;
-	m_position = glm::vec3(0.f, 30.f, 0.f);
-	m_translationSpeed = 25.0f;
+	m_position = glm::vec3(0.f, 2.f, 0.f);
+	m_translationSpeed = 5.0f;
 	m_eulerAngle = glm::vec3(0.f, 0.f, 0.f);
 	m_eulerAngleInDegrees = glm::vec3(0.f, 0.f, 0.f);
 	m_rotation = glm::quat{};
@@ -318,7 +318,6 @@ void Camera::transition(float delta_time) {
 
 void Camera::update(float _deltaTime, GLFWwindow* _window)
 {
-	updateInterface(_deltaTime);
 	updateFreeInput(_deltaTime, _window);
 	if(m_isTransitioning) {
 		transition(_deltaTime);
