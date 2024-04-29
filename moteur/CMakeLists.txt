@@ -72,6 +72,7 @@ add_executable(main
     src/AABB.cpp
     src/ModelCollider.cpp
     src/ShaderManager.cpp
+    src/Scene.cpp
 )
 
 # Include directories for our project

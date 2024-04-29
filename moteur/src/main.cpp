@@ -25,6 +25,7 @@
 
 
 
+#include <Scene.hpp>
 
 // Functions prototypes
 void printUsage();
@@ -39,6 +40,7 @@ bool showMouse = true;
 
 // Camera
 Camera myCamera;
+Scene scene;
 
 // Wireframe
 bool wireframe = false;
@@ -80,7 +82,7 @@ float quadratic = 0.032;
 
 int main(int argc, char* argv[]) {
     // Initialize window
-    Window window(4,6,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
+    Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
     window.setup_GLFW();
 
     // Initialize ImGui
@@ -89,20 +91,20 @@ int main(int argc, char* argv[]) {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
-    ImGui_ImplOpenGL3_Init("#version 460");
+    ImGui_ImplOpenGL3_Init("#version 410");
 
     glEnable(GL_DEPTH_TEST);
 
     Shader shader;
     shader.setShader("../shaders/LampeTorche.vert","../shaders/LampeTorche.frag");
-
+    /*
     Plane* plane = new Plane(100, 100, 100,0);
     Texture plane_texture("../data/textures/pavement.jpg");
 
     plane->add_texture(plane_texture);
 
     plane->bind_shader(shader);
-    SceneNode plane_node(plane);
+    SceneNode plane_node(plane);*/
 
     Model model("../data/models/capsule/capsule.gltf");
     model.bind_shader_to_meshes(shader);
@@ -110,6 +112,9 @@ int main(int argc, char* argv[]) {
     model_node->transform.set_scale(glm::vec3(1.0f));
     model_node->transform.set_translation(glm::vec3(1.0f));
     model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
+
+    scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
+    //scene.creationMap(shader);
 
     Model obst1("../data/models/platform/GreyBricks.glb");
     obst1.bind_shader_to_meshes(shader);
@@ -119,6 +124,43 @@ int main(int argc, char* argv[]) {
 
     myCamera.init();
     
+
+    Model obst2("../data/models/cube/Cube.gltf");
+    obst2.bind_shader_to_meshes(shader);
+    SceneNode* obst2_node = new SceneNode(&obst2);
+    obst2_node->transform.set_scale(glm::vec3(1.0f));
+    obst2_node->transform.set_translation(glm::vec3(15., 2.0f, 17));
+
+    Model obst3("../data/models/cube/Cube.gltf");
+    obst3.bind_shader_to_meshes(shader);
+    SceneNode* obst3_node = new SceneNode(&obst3);
+    obst3_node->transform.set_scale(glm::vec3(1.0f));
+    obst3_node->transform.set_translation(glm::vec3(15., 3.0f, 19));
+
+    Model obst4("../data/models/cube/Cube.gltf");
+    obst4.bind_shader_to_meshes(shader);
+    SceneNode* obst4_node = new SceneNode(&obst4);
+    obst4_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
+    obst4_node->transform.set_translation(glm::vec3(15., 4.0f, 23));
+
+    Model obst5("../data/models/cube/Cube.gltf");
+    obst5.bind_shader_to_meshes(shader);
+    SceneNode* obst5_node = new SceneNode(&obst5);
+    obst5_node->transform.set_scale(glm::vec3(3.0f,1.f,5.f));
+    obst5_node->transform.set_translation(glm::vec3(15., 5.0f, 33));
+
+    Model obst6("../data/models/cube/Cube.gltf");
+    obst6.bind_shader_to_meshes(shader);
+    SceneNode* obst6_node = new SceneNode(&obst6);
+    obst6_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
+    obst6_node->transform.set_translation(glm::vec3(15., 4.0f, 83.5));
+
+    myCamera.init();
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    float temps_debut=glfwGetTime();
+
     // Render loop
     while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
@@ -152,19 +194,19 @@ int main(int argc, char* argv[]) {
         while (lag >= MS_PER_UPDATE) {
             myCamera.update(deltaTime, window.get_window());  
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.adjust_translation(glm::vec3(PasTranslationCube, 0., 0.));
             }
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.adjust_translation(glm::vec3(-PasTranslationCube, 0., 0.));
             }
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS && myCamera.mode_cam!=2) {
                model_node->transform.adjust_translation(glm::vec3(0., 0., PasTranslationCube));
             }
 
-            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS && myCamera.mode_cam!=2) {
                 model_node->transform.adjust_translation(glm::vec3(0., 0., -PasTranslationCube));
             }
 
@@ -194,6 +236,9 @@ int main(int argc, char* argv[]) {
             
             lag -= MS_PER_UPDATE;    
         }
+        
+        //gestion grossière de la cam pour l'instant
+        myCamera.pos_player = model_node->transform.get_translation();
 
         view = myCamera.getViewMatrix();
         proj = myCamera.getProjectionMatrix();  
@@ -225,7 +270,7 @@ int main(int argc, char* argv[]) {
         shader.setBind1f("quadratic", quadratic);
 
         // Scene
-        plane_node.draw(view, proj);
+        //plane_node.draw(view, proj);
         model_node->draw(view, proj);
         obst1_node->draw(view, proj);
 
@@ -251,6 +296,24 @@ int main(int argc, char* argv[]) {
         ImGui::SliderFloat("AO", &ao, 0., 1.);
         ImGui::SliderFloat("NormalStrength", &NormalStrength, 0., 5.);
         */
+        //pour tous dessiner si ca fonctionne
+        //scene.draw();
+        scene.draw_plan(view, proj);
+
+        model_node->draw(view, proj);
+              
+        obst1_node->draw(view, proj);
+        obst2_node->draw(view, proj);
+        obst3_node->draw(view, proj);
+        obst4_node->draw(view, proj);
+        obst5_node->transform.adjust_translation(glm::vec3(0.f, 0.f,-sin(temps_debut-currentFrame)*deltaTime*20));
+        obst5_node->draw(view, proj);
+        obst6_node->draw(view, proj);
+
+        ImGui::Begin("Paramètres");
+        ImGui::Text("Delta time : %f", deltaTime);
+        //std::cout << deltaTime << std::endl;
+        ImGui::End();
 
         //std::cout << deltaTime << std::endl;
         ImGui::End();
@@ -282,10 +345,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
         }
-        if (key == GLFW_KEY_T) {
+        if(key == GLFW_KEY_T) {
             showMouse = myCamera.getShowMouse();
             showMouse = !showMouse;
             myCamera.setShowMouse(showMouse);
+        }
+        if (key == GLFW_KEY_H) {
+            myCamera.mode_cam=(myCamera.mode_cam+1)%3;
+            myCamera.reset();
         }
     }
 }

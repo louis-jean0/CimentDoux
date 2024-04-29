@@ -15,7 +15,22 @@ void Camera::init()
 	m_eulerAngle = glm::vec3(0.f, 0.f, 0.f);
 	m_eulerAngleInDegrees = glm::vec3(0.f, 0.f, 0.f);
 	m_rotation = glm::quat{};
-	m_rotationSpeed = 1.0f;
+	m_rotationSpeed = 5.0f;
+	m_showImguiDemo = false;
+	m_showHelp = false;
+	m_transitionDuration = 1;
+	m_interpolationMode = LINEAR;
+}
+
+void Camera::reset()
+{
+	m_fovDegree = 45.0f;
+	m_position = pos_player + glm::vec3(0.f, 1.f, -10.f);
+	m_translationSpeed = 5.0f;
+	m_eulerAngle = glm::vec3(0.f, 0.f, 0.f);
+	m_eulerAngleInDegrees = glm::vec3(0.f, 0.f, 0.f);
+	m_rotation = glm::quat{};
+	m_rotationSpeed = 5.0f;
 	m_showImguiDemo = false;
 	m_showHelp = false;
 	m_transitionDuration = 1;
@@ -129,120 +144,118 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 
 		lastShowMouseState = m_showMouse;
 
-		switch(m_cameraMode) {
+		if(mode_cam==0){
+			m_position=pos_player+glm::vec3(0.,1.,1.);
 
-			case FIRST_MODE:
-				if(!m_showMouse) {
-					double cursorXPos,cursorYPos;
-					glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);
+		}
+		if(mode_cam==1){
+				double cursorXPos,cursorYPos;
+				glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);
 
-					if(firstPass) {
-						firstPass = false;
-						lastCursorXPos = cursorXPos;
-						lastCursorYPos = cursorYPos;
-					}
-
-					double xDiff = cursorXPos - lastCursorXPos;
-					double yDiff = cursorYPos - lastCursorYPos;
-
+				if(firstPass) {
+					firstPass = false;
 					lastCursorXPos = cursorXPos;
 					lastCursorYPos = cursorYPos;
+				}
 
-					if(m_xAxisReversed) {
-						m_eulerAngleInDegrees.y += xDiff * m_rotationSpeed * _deltaTime; // Reversed yaw
-					}
-					else {
-						m_eulerAngleInDegrees.y -= xDiff * m_rotationSpeed * _deltaTime; // Yaw
-					}
+				double xDiff = cursorXPos - lastCursorXPos;
+				double yDiff = cursorYPos - lastCursorYPos;
 
+				lastCursorXPos = cursorXPos;
+				lastCursorYPos = cursorYPos;
+
+				if(m_xAxisReversed) {
+					m_eulerAngleInDegrees.y += xDiff * m_rotationSpeed * _deltaTime; // Reversed yaw
+				}
+				else {
+					m_eulerAngleInDegrees.y -= xDiff * m_rotationSpeed * _deltaTime; // Yaw
+				}
+
+				if(m_yAxisReversed) {
+					m_eulerAngleInDegrees.x -= yDiff * m_rotationSpeed * _deltaTime; // Reversed pitch
+				}
+				else {
+					m_eulerAngleInDegrees.x += yDiff * m_rotationSpeed * _deltaTime; // Pitch
+				}
+				
+				glm::vec3 CFront = glm::normalize(getCFront());
+				glm::vec3 CRight = glm::normalize(getCRight());
+
+				if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
+					m_position += CFront * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
+					m_position -= CFront * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
+					m_position += CRight * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
+					m_position -= CRight * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
+					m_position += glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
+					m_position -= glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
+				}
+		}
+		if(mode_cam==2){
+				glm::vec3 CFront = getCFront();
+				glm::vec3 CRight = getCRight();
+				CFront.y = 0; // Here, since we don't want to follow CFront height, we define its y component to 0 (little trick so we don't have to project on a plane)
+				CRight.y = 0;
+
+				if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
+					m_position += CFront * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
+					m_position -= CFront * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
+					m_position += CRight * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
+					m_position -= CRight * m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS) {
 					if(m_yAxisReversed) {
-						m_eulerAngleInDegrees.x -= yDiff * m_rotationSpeed * _deltaTime; // Reversed pitch
+						m_eulerAngleInDegrees.x += m_rotationSpeed * _deltaTime;
 					}
 					else {
-						m_eulerAngleInDegrees.x += yDiff * m_rotationSpeed * _deltaTime; // Pitch
-					}
-					
-					glm::vec3 CFront = glm::normalize(getCFront());
-					glm::vec3 CRight = glm::normalize(getCRight());
-
-					if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
-						m_position += CFront * m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
-						m_position -= CFront * m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
-						m_position += CRight * m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
-						m_position -= CRight * m_translationSpeed * _deltaTime;
+						m_eulerAngleInDegrees.x -= m_rotationSpeed * _deltaTime;
 					}
 				}
-			break;
-
-			case SECOND_MODE:
-				{
-					m_rotationSpeed = 50.0f; // Adapt rotation speed for this mode
-					glm::vec3 CFront = getCFront();
-					glm::vec3 CRight = getCRight();
-					CFront.y = 0; // Here, since we don't want to follow CFront height, we define its y component to 0 (little trick so we don't have to project on a plane)
-					CRight.y = 0;
-
-					if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
-						m_position += CFront * m_translationSpeed * _deltaTime;
+				if(glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+					if(m_yAxisReversed) {
+						m_eulerAngleInDegrees.x -= m_rotationSpeed * _deltaTime;
 					}
-					if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
-						m_position -= CFront * m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
-						m_position += CRight * m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
-						m_position -= CRight * m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS) {
-						if(m_yAxisReversed) {
-							m_eulerAngleInDegrees.x += m_rotationSpeed * _deltaTime;
-						}
-						else {
-							m_eulerAngleInDegrees.x -= m_rotationSpeed * _deltaTime;
-						}
-					}
-					if(glfwGetKey(_window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-						if(m_yAxisReversed) {
-							m_eulerAngleInDegrees.x -= m_rotationSpeed * _deltaTime;
-						}
-						else {
-							m_eulerAngleInDegrees.x += m_rotationSpeed * _deltaTime;
-						}
-					}
-					if(glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-						if(m_xAxisReversed) {
-							m_eulerAngleInDegrees.y -= m_rotationSpeed * _deltaTime;
-						}
-						else {
-							m_eulerAngleInDegrees.y += m_rotationSpeed * _deltaTime;
-						}
-					}
-					if(glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-						if(m_xAxisReversed) {
-							m_eulerAngleInDegrees.y += m_rotationSpeed * _deltaTime;
-						}
-						else {
-							m_eulerAngleInDegrees.y -= m_rotationSpeed * _deltaTime;
-						}
-					}
-					if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
-						m_position.y += m_translationSpeed * _deltaTime;
-					}
-					if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
-						m_position.y -= m_translationSpeed * _deltaTime;
+					else {
+						m_eulerAngleInDegrees.x += m_rotationSpeed * _deltaTime;
 					}
 				}
-			break;
-
-			default:
-			break;
+				if(glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+					if(m_xAxisReversed) {
+						m_eulerAngleInDegrees.y -= m_rotationSpeed * _deltaTime;
+					}
+					else {
+						m_eulerAngleInDegrees.y += m_rotationSpeed * _deltaTime;
+					}
+				}
+				if(glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+					if(m_xAxisReversed) {
+						m_eulerAngleInDegrees.y += m_rotationSpeed * _deltaTime;
+					}
+					else {
+						m_eulerAngleInDegrees.y -= m_rotationSpeed * _deltaTime;
+					}
+				}
+				if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
+					m_position.y += m_translationSpeed * _deltaTime;
+				}
+				if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
+					m_position.y -= m_translationSpeed * _deltaTime;
+				}
 		}
 
 	}

@@ -18,7 +18,6 @@ uniform float constant;
 uniform float linear;
 uniform float quadratic;
 
-
 uniform sampler2D texture_diffuse1;
 
 void main()

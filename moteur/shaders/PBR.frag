@@ -6,9 +6,6 @@ in vec3 FragPos;
 in vec3 Normal;  
 in vec2 TexCoords;
 
-
-
-
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform vec3 lightDir;
@@ -20,7 +17,6 @@ uniform vec3 lightspecular;
 uniform float constant;
 uniform float linear;
 uniform float quadratic;
-
 
 uniform vec3 camPos;
 
@@ -34,12 +30,10 @@ uniform vec3 lightPositions[4];
 
 const float PI = 3.14159265359;
 
-
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
 uniform sampler2D texture_diffuse3;
 uniform sampler2D texture_diffuse4;
-
 
 vec3 getNormalFromMap()
 {
