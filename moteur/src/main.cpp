@@ -232,7 +232,7 @@ int main(int argc, char* argv[]) {
 
             //std::cout<<model_node->model->collider.checkCollision(obst5_node->model->collider)<<std::endl;
 
-            pe.update(deltaTime);
+            
             
             // Avec rebonds (pour tests)
             
@@ -315,6 +315,8 @@ int main(int argc, char* argv[]) {
         obst5_node->transform.adjust_translation(glm::vec3(0.f, 0.f,-sin(temps_debut-currentFrame)*deltaTime*20));
         obst5_node->draw(view, proj);
         obst6_node->draw(view, proj);
+
+        pe.update(deltaTime);
 
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);

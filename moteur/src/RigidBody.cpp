@@ -8,10 +8,11 @@ void RigidBody::updatePhysics(float delta_time) {
     node->transform.transform_updated = true;
 }
 
-bool RigidBody::checkCollision(RigidBody* other) {
-    return this->node->model->collider.checkCollision(other->node->model->collider);
+bool RigidBody::checkCollision(RigidBody* other, float& collisionDepth, glm::vec3 &collisionNormal) {
+    return this->node->model->collider.checkCollision(other->node->model->collider, collisionDepth, collisionNormal);
 }
 
-void RigidBody::solveCollision(RigidBody* other) {
-    this->node->transform.set_translation(other->node->transform.get_translation() - glm::vec3(1.0f));
+void RigidBody::solveCollision(RigidBody* other, float& collisionDepth, glm::vec3 &collisionNormal) {
+    glm::vec3 correction = collisionDepth * (collisionNormal);
+    velocity = correction;
 }
