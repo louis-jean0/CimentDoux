@@ -7,12 +7,14 @@
 
 #include <Mesh.hpp>
 #include <Texture.hpp>
+#include <ModelCollider.hpp>
 
 class Model {
     public:
         // Public attributes
         std::vector<Mesh> meshes;
         AABB bounding_box;
+        ModelCollider collider;
         
         // Constructors
         Model();

@@ -1,0 +1,17 @@
+#include <RigidBody.hpp>
+
+void RigidBody::updatePhysics(float delta_time) {
+    glm::vec3 gravity = glm::vec3(0.0f,0.0f,0.0f);
+    glm::vec3 acceleration = gravity;
+    velocity += acceleration * delta_time;
+    node->transform.adjust_translation(velocity);
+    node->transform.transform_updated = true;
+}
+
+bool RigidBody::checkCollision(RigidBody* other) {
+    return this->node->model->collider.checkCollision(other->node->model->collider);
+}
+
+void RigidBody::solveCollision(RigidBody* other) {
+    this->node->transform.set_translation(other->node->transform.get_translation() - glm::vec3(1.0f));
+}

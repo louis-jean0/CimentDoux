@@ -1,13 +1,13 @@
 #include <Model.hpp>
 
 // Constructors
-Model::Model() {}
+Model::Model() : collider(bounding_box) {}
 
-Model::Model(std::string path) {
+Model::Model(std::string path) : collider(bounding_box) {
     load_model(path);
 }
 
-Model::Model(Mesh &mesh) {
+Model::Model(Mesh &mesh) : collider(bounding_box) {
     meshes.push_back(mesh);
 }
 

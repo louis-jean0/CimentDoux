@@ -22,10 +22,8 @@
 #include <Camera.hpp>
 #include <Cube.hpp>
 #include <ModelCollider.hpp>
-
-
-
 #include <Scene.hpp>
+#include <PhysicsEngine.hpp>
 
 // Functions prototypes
 void printUsage();
@@ -61,6 +59,7 @@ float hauteur = 3.0f;
 float vitesse = 0.5;
 glm::vec3 F = glm::vec3(0., 0., 0.);
 glm::vec3 a = glm::vec3(0., 0., 0.);
+PhysicsEngine pe;
 
 glm::mat4 view;
 glm::mat4 proj;
@@ -112,6 +111,8 @@ int main(int argc, char* argv[]) {
     model_node->transform.set_scale(glm::vec3(1.0f));
     model_node->transform.set_translation(glm::vec3(1.0f));
     model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
+    RigidBody* capsule = new RigidBody(model_node);
+    pe.add_entity(capsule);
 
     scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
     //scene.creationMap(shader);
@@ -121,7 +122,9 @@ int main(int argc, char* argv[]) {
     SceneNode* obst1_node = new SceneNode(&obst1);
     obst1_node->transform.set_scale(glm::vec3(300.0f));
     obst1_node->transform.set_translation(glm::vec3(15., 3.0f, 15.));
-
+    RigidBody* gb = new RigidBody(obst1_node);
+    pe.add_entity(gb);
+    
     myCamera.init();
     
     Model obst2("../data/models/cube/Cube.gltf");
@@ -147,6 +150,8 @@ int main(int argc, char* argv[]) {
     SceneNode* obst5_node = new SceneNode(&obst5);
     obst5_node->transform.set_scale(glm::vec3(3.0f,1.f,5.f));
     obst5_node->transform.set_translation(glm::vec3(15., 5.0f, 33));
+    RigidBody* body5 = new RigidBody(obst5_node);
+    pe.add_entity(body5);
 
     Model obst6("../data/models/cube/Cube.gltf");
     obst6.bind_shader_to_meshes(shader);
@@ -219,13 +224,16 @@ int main(int argc, char* argv[]) {
 
             v0_Vitesse -= deltaTime * vitesse;
             model_node->transform.adjust_translation(glm::vec3(0.0f,v0_Vitesse * deltaTime,0.0f));
-
             
             if (model_node->transform.get_translation().y <= 0.0f) {
                 model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,0.0f,model_node->transform.get_translation().z));
                 v0_Vitesse = 0.0f;
             }
 
+            //std::cout<<model_node->model->collider.checkCollision(obst5_node->model->collider)<<std::endl;
+
+            pe.update(deltaTime);
+            
             // Avec rebonds (pour tests)
             
             // if (model_node->transform.get_translation().y <= 0.0f) {
@@ -299,8 +307,7 @@ int main(int argc, char* argv[]) {
         //scene.draw();
         scene.draw_plan(view, proj);
 
-        model_node->draw(view, proj);
-              
+        model_node->draw(view, proj);              
         obst1_node->draw(view, proj);
         obst2_node->draw(view, proj);
         obst3_node->draw(view, proj);

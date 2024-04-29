@@ -17,8 +17,8 @@ class SceneNode {
 
         // Constructor
         SceneNode();
-        SceneNode(Mesh *mesh);
-        SceneNode(Model *model);
+        SceneNode(Mesh* mesh);
+        SceneNode(Model* model);
 
         // Destructor
         ~SceneNode();
