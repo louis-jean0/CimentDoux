@@ -60,7 +60,6 @@ float vitesse = 0.5;
 glm::vec3 F = glm::vec3(0., 0., 0.);
 glm::vec3 a = glm::vec3(0., 0., 0.);
 
-
 glm::mat4 view;
 glm::mat4 proj;
 
@@ -92,14 +91,10 @@ int main(int argc, char* argv[]) {
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
-
     glEnable(GL_DEPTH_TEST);
 
     Shader shader;
     shader.setShader("../shaders/LampeTorche.vert","../shaders/LampeTorche.frag");
-
-    Shader shaderMesh;
-    shaderMesh.setShader("../shaders/mesh.vert","../shaders/mesh.frag");
 
     Plane* plane = new Plane(100, 100, 100,0);
     Texture plane_texture("../data/textures/pavement.jpg");
@@ -112,19 +107,18 @@ int main(int argc, char* argv[]) {
     Model model("../data/models/capsule/capsule.gltf");
     model.bind_shader_to_meshes(shader);
     SceneNode* model_node = new SceneNode(&model);
-    model_node->transform.scale = glm::vec3(1.0f);
-    model_node->transform.translation = glm::vec3(1.0f);
-    model_node->transform.rotation.z = 90.0f;
+    model_node->transform.set_scale(glm::vec3(1.0f));
+    model_node->transform.set_translation(glm::vec3(1.0f));
+    model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
 
     Model obst1("../data/models/platform/GreyBricks.glb");
     obst1.bind_shader_to_meshes(shader);
     SceneNode* obst1_node = new SceneNode(&obst1);
-    obst1_node->transform.scale = glm::vec3(300.0f);
-    obst1_node->transform.translation = glm::vec3(15., 3.0f, 15.);
+    obst1_node->transform.set_scale(glm::vec3(300.0f));
+    obst1_node->transform.set_translation(glm::vec3(15., 3.0f, 15.));
 
     myCamera.init();
     
-
     // Render loop
     while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
@@ -155,24 +149,23 @@ int main(int argc, char* argv[]) {
 
         myCamera.updateInterface(deltaTime);
 
-
         while (lag >= MS_PER_UPDATE) {
             myCamera.update(deltaTime, window.get_window());  
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS) {
-                model_node->transform.translation += glm::vec3(PasTranslationCube, 0., 0.);
+                model_node->transform.adjust_translation(glm::vec3(PasTranslationCube, 0., 0.));
             }
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS) {
-                model_node->transform.translation -=  glm::vec3(PasTranslationCube, 0., 0.);
+                model_node->transform.adjust_translation(glm::vec3(-PasTranslationCube, 0., 0.));
             }
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
-                model_node->transform.translation +=  glm::vec3(0., 0., PasTranslationCube);
+               model_node->transform.adjust_translation(glm::vec3(0., 0., PasTranslationCube));
             }
 
             if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
-                model_node->transform.translation -=  glm::vec3(0., 0., PasTranslationCube);
+                model_node->transform.adjust_translation(glm::vec3(0., 0., -PasTranslationCube));
             }
 
             if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
@@ -184,7 +177,7 @@ int main(int argc, char* argv[]) {
             }
 
             v0_Vitesse -= deltaTime * vitesse;
-            model_node->transform.translation.y += v0_Vitesse * deltaTime;
+            model_node->transform.adjust_translation(glm::vec3(0.0f,v0_Vitesse * deltaTime,0.0f));
 
             /*
             if (model_node->transform.translation.y <= 0.0f) {
@@ -194,8 +187,8 @@ int main(int argc, char* argv[]) {
 
             // Avec rebonds (pour tests)
             
-            if (model_node->transform.translation.y <= 0.0f) {
-                model_node->transform.translation.y = -model_node->transform.translation.y;
+            if (model_node->transform.get_translation().y <= 0.0f) {
+                model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,-model_node->transform.get_translation().y,model_node->transform.get_translation().z));
                 v0_Vitesse = sqrt(2.0f * g * hauteur);
             }
             
@@ -213,8 +206,7 @@ int main(int argc, char* argv[]) {
         outerCutOff = glm::cos(glm::radians(cutOut));
 
         shader.useShader();
-        shader.setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));
-        shader.setBindMatrix4fv("projection", 1, 0, glm::value_ptr(proj));
+        shader.setVPMatrix(view,proj);
 
         // Phong + Flashlight
         shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
@@ -232,12 +224,10 @@ int main(int argc, char* argv[]) {
         shader.setBind1f("linear", linear);
         shader.setBind1f("quadratic", quadratic);
 
-
         // Scene
-        plane_node.draw();
-        model_node->draw();
-        obst1_node->draw();
-
+        plane_node.draw(view, proj);
+        model_node->draw(view, proj);
+        obst1_node->draw(view, proj);
 
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);
@@ -262,7 +252,7 @@ int main(int argc, char* argv[]) {
         ImGui::SliderFloat("NormalStrength", &NormalStrength, 0., 5.);
         */
 
-        std::cout << deltaTime << std::endl;
+        //std::cout << deltaTime << std::endl;
         ImGui::End();
 
         // Render window & ImGui
