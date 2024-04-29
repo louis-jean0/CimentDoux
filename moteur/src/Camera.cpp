@@ -144,11 +144,14 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 
 		lastShowMouseState = m_showMouse;
 
-		if(mode_cam==0){
+		if(mode_cam==0) {
 			m_position=pos_player+glm::vec3(0.,1.,1.);
 
 		}
-		if(mode_cam==1){
+		if(mode_cam==1) {
+
+			if(!m_showMouse) {
+
 				double cursorXPos,cursorYPos;
 				glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);
 
@@ -199,6 +202,7 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 				if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
 					m_position -= glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
 				}
+			}
 		}
 		if(mode_cam==2){
 				glm::vec3 CFront = getCFront();

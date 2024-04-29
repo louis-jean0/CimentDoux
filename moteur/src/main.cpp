@@ -124,7 +124,6 @@ int main(int argc, char* argv[]) {
 
     myCamera.init();
     
-
     Model obst2("../data/models/cube/Cube.gltf");
     obst2.bind_shader_to_meshes(shader);
     SceneNode* obst2_node = new SceneNode(&obst2);
@@ -221,18 +220,18 @@ int main(int argc, char* argv[]) {
             v0_Vitesse -= deltaTime * vitesse;
             model_node->transform.adjust_translation(glm::vec3(0.0f,v0_Vitesse * deltaTime,0.0f));
 
-            /*
-            if (model_node->transform.translation.y <= 0.0f) {
-                model_node->transform.translation.y = 0.0f;
+            
+            if (model_node->transform.get_translation().y <= 0.0f) {
+                model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,0.0f,model_node->transform.get_translation().z));
                 v0_Vitesse = 0.0f;
-            }*/
+            }
 
             // Avec rebonds (pour tests)
             
-            if (model_node->transform.get_translation().y <= 0.0f) {
-                model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,-model_node->transform.get_translation().y,model_node->transform.get_translation().z));
-                v0_Vitesse = sqrt(2.0f * g * hauteur);
-            }
+            // if (model_node->transform.get_translation().y <= 0.0f) {
+            //     model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,-model_node->transform.get_translation().y,model_node->transform.get_translation().z));
+            //     v0_Vitesse = sqrt(2.0f * g * hauteur);
+            // }
             
             lag -= MS_PER_UPDATE;    
         }
