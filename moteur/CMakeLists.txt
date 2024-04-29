@@ -39,7 +39,6 @@ target_include_directories(imgui PUBLIC ${IMGUI_DIR}/include ${IMGUI_DIR}/backen
 # OpenAL
 add_subdirectory(external/openal-soft-master)
 
-
 # Find and link OpenGL
 find_package(OpenGL REQUIRED)
 target_link_libraries(imgui PUBLIC ${OPENGL_gl_LIBRARY} glfw)
