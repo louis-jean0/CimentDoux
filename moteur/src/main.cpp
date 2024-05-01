@@ -24,6 +24,7 @@
 #include <ModelCollider.hpp>
 #include <Scene.hpp>
 #include <PhysicsEngine.hpp>
+#include <Player.hpp>
 
 // Functions prototypes
 void printUsage();
@@ -37,7 +38,7 @@ const unsigned int SCR_HEIGHT = 1080;
 bool showMouse = true;
 
 // Camera
-Camera myCamera;
+Camera* myCamera = new Camera();
 Scene scene;
 
 // Wireframe
@@ -112,9 +113,11 @@ int main(int argc, char* argv[]) {
     model_node->transform.set_translation(glm::vec3(1.0f));
     model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
     RigidBody* capsule = new RigidBody(model_node);
-    pe.add_entity(capsule);
-
-    scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
+    //pe.add_entity(capsule);
+    Player* player = new Player(model_node, window.get_window(), myCamera);
+    pe.add_entity(&player->player_node->rigid_body);
+    
+    //scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
     //scene.creationMap(shader);
 
     Model obst1("../data/models/platform/GreyBricks.glb");
@@ -125,7 +128,7 @@ int main(int argc, char* argv[]) {
     RigidBody* gb = new RigidBody(obst1_node);
     pe.add_entity(gb);
     
-    myCamera.init();
+    //myCamera->init();
     
     Model obst2("../data/models/cube/Cube.gltf");
     obst2.bind_shader_to_meshes(shader);
@@ -159,7 +162,7 @@ int main(int argc, char* argv[]) {
     obst6_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
     obst6_node->transform.set_translation(glm::vec3(15., 4.0f, 83.5));
 
-    myCamera.init();
+    myCamera->init();
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -193,67 +196,21 @@ int main(int argc, char* argv[]) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        myCamera.updateInterface(deltaTime);
+        //myCamera->updateInterface(deltaTime);
 
         while (lag >= MS_PER_UPDATE) {
-            myCamera.update(deltaTime, window.get_window());  
-
-            if(glfwGetKey(window.get_window(), GLFW_KEY_LEFT) == GLFW_PRESS && myCamera.mode_cam!=2) {
-                model_node->transform.adjust_translation(glm::vec3(PasTranslationCube, 0., 0.));
-            }
-
-            if(glfwGetKey(window.get_window(), GLFW_KEY_RIGHT) == GLFW_PRESS && myCamera.mode_cam!=2) {
-                model_node->transform.adjust_translation(glm::vec3(-PasTranslationCube, 0., 0.));
-            }
-
-            if(glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS && myCamera.mode_cam!=2) {
-               model_node->transform.adjust_translation(glm::vec3(0., 0., PasTranslationCube));
-            }
-
-            if(glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS && myCamera.mode_cam!=2) {
-                model_node->transform.adjust_translation(glm::vec3(0., 0., -PasTranslationCube));
-            }
-
-            if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
-                // Dérivée de la conservation de l'énergie
-                v0_Vitesse = sqrt(2.0f * g * hauteur);
-                Space = true;
-            } else if (glfwGetKey(window.get_window(), GLFW_KEY_SPACE) == GLFW_RELEASE) {
-                Space = false;
-            }
-
-            v0_Vitesse -= deltaTime * vitesse;
-            model_node->transform.adjust_translation(glm::vec3(0.0f,v0_Vitesse * deltaTime,0.0f));
-            
-            if (model_node->transform.get_translation().y <= 0.0f) {
-                model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,0.0f,model_node->transform.get_translation().z));
-                v0_Vitesse = 0.0f;
-            }
-
-            //std::cout<<model_node->model->collider.checkCollision(obst5_node->model->collider)<<std::endl;
-
-            
-            
-            // Avec rebonds (pour tests)
-            
-            // if (model_node->transform.get_translation().y <= 0.0f) {
-            //     model_node->transform.set_translation(glm::vec3(model_node->transform.get_translation().x,-model_node->transform.get_translation().y,model_node->transform.get_translation().z));
-            //     v0_Vitesse = sqrt(2.0f * g * hauteur);
-            // }
+            player->update(deltaTime);
             
             lag -= MS_PER_UPDATE;    
         }
-        
-        //gestion grossière de la cam pour l'instant
-        myCamera.pos_player = model_node->transform.get_translation();
 
-        view = myCamera.getViewMatrix();
-        proj = myCamera.getProjectionMatrix();  
+        view = myCamera->getViewMatrix();
+        proj = myCamera->getProjectionMatrix();  
 
         // Sending to shader
 
-        glm::vec3 camPos = myCamera.getPosition();
-        glm::vec3 camFront = myCamera.getCFront();
+        glm::vec3 camPos = myCamera->getPosition();
+        glm::vec3 camFront = myCamera->getCFront();
         cutOff = glm::cos(glm::radians(cutIn));
         outerCutOff = glm::cos(glm::radians(cutOut));
 
@@ -278,7 +235,7 @@ int main(int argc, char* argv[]) {
 
         // Scene
         //plane_node.draw(view, proj);
-        model_node->draw(view, proj);
+        //model_node->draw(view, proj);
         obst1_node->draw(view, proj);
 
         ImGui::Begin("Paramètres");
@@ -354,13 +311,13 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             }
         }
         if(key == GLFW_KEY_T) {
-            showMouse = myCamera.getShowMouse();
+            showMouse = myCamera->getShowMouse();
             showMouse = !showMouse;
-            myCamera.setShowMouse(showMouse);
+            myCamera->setShowMouse(showMouse);
         }
         if (key == GLFW_KEY_H) {
-            myCamera.mode_cam=(myCamera.mode_cam+1)%3;
-            myCamera.reset();
+            myCamera->mode_cam=(myCamera->mode_cam+1)%3;
+            myCamera->reset();
         }
     }
 }

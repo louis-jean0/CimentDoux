@@ -75,6 +75,7 @@ add_executable(main
     src/Scene.cpp
     src/RigidBody.cpp
     src/PhysicsEngine.cpp
+    src/Player.cpp
 )
 
 # Include directories for our project

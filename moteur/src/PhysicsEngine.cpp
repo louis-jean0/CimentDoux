@@ -1,20 +1,18 @@
-#include <iostream>
 #include <PhysicsEngine.hpp>
+#include <iostream>
 
 void PhysicsEngine::update(float delta_time) {
-    for (size_t i = 0; i < entities.size(); i++) {
-        entities[i]->updatePhysics(delta_time);
-        for (size_t j = i + 1; j < entities.size(); j++) {
-            float collisionDepth;
-            glm::vec3 collisionNormal;
-            if (entities[i]->checkCollision(entities[j], collisionDepth, collisionNormal)) {
-                std::cout << "Collision detected between model at index " << i << " and model at index " << j << std::endl;
-                entities[i]->solveCollision(entities[j], collisionDepth, collisionNormal);
-            }
+    entities[0]->updatePhysics(delta_time); // entities[0] is the player
+    for (size_t i = 1; i < entities.size(); ++i) {
+        float collisionDepth;
+        glm::vec3 collisionNormal;
+        if (entities[0]->checkCollision(entities[i], collisionDepth, collisionNormal)) {
+            std::cout << "Collision detected between model at index " << 0 << " and model at index " << i << std::endl;
+            entities[0]->solveCollision(entities[i], collisionDepth, collisionNormal);
         }
     }
 }
 
-void PhysicsEngine::add_entity(RigidBody* entity) {
-    entities.push_back(entity);
+void PhysicsEngine::add_entity(RigidBody *entity) {
+  entities.push_back(entity);
 }

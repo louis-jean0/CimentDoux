@@ -1,21 +1,16 @@
-#include "AABB.hpp"
+#include "RigidBody.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
-#include <Transform.hpp>
 #include <SceneNode.hpp>
-#include <Mesh.hpp>
 #include <ShaderManager.hpp>
+#include <AABB.hpp>
 
 // Constructors
-SceneNode::SceneNode() {}
+SceneNode::SceneNode() : parent(nullptr), mesh(nullptr), model(nullptr), rigid_body(this) {}
 
-SceneNode::SceneNode(Mesh *mesh) {
-    this->mesh = mesh;
-}
+SceneNode::SceneNode(Mesh* mesh) : parent(nullptr), mesh(mesh), model(nullptr), rigid_body(this) {}
 
-SceneNode::SceneNode(Model *model) {
-    this->model = model;
-}
+SceneNode::SceneNode(Model* model) : parent(nullptr), mesh(nullptr), model(model), rigid_body(this) {}
 
 // Destructor
 SceneNode::~SceneNode() {
@@ -74,4 +69,8 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
     for(SceneNode* child : children) {
         child->draw(view, projection);
     }
+}
+
+void SceneNode::enable_physics(bool use_gravity) {
+    rigid_body.use_gravity = use_gravity;
 }

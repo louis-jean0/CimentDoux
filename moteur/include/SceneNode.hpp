@@ -5,6 +5,7 @@
 
 #include <Model.hpp>
 #include <Transform.hpp>
+#include <RigidBody.hpp>
 
 class SceneNode {
     public:
@@ -13,6 +14,7 @@ class SceneNode {
         Mesh *mesh = nullptr;
         Model *model = nullptr;
         Transform transform = Transform();
+        RigidBody rigid_body;
         std::vector<SceneNode*> children;
 
         // Constructor
@@ -28,4 +30,5 @@ class SceneNode {
         void add_child(SceneNode *child);
         glm::mat4 get_world_transform();
         void draw(glm::mat4& view, glm::mat4& projection);
+        void enable_physics(bool use_gravity);
 };
