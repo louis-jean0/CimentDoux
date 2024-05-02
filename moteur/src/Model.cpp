@@ -30,6 +30,12 @@ void Model::bind_shader_to_meshes(const GLchar* vertex_path, const GLchar* fragm
     }
 }
 
+void Model::bind_texture_to_meshes(Texture texture) {
+    for(auto& mesh : meshes) {
+        mesh.add_texture(texture);
+    }
+}
+
 void Model::computeBoundingBox() {
     if(meshes.empty()) {
         return;

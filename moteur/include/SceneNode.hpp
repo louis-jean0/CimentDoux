@@ -30,5 +30,7 @@ class SceneNode {
         void add_child(SceneNode *child);
         glm::mat4 get_world_transform();
         void draw(glm::mat4& view, glm::mat4& projection);
+        void drawAABB(glm::mat4& view, glm::mat4& projection);
         void enable_physics(bool use_gravity);
+        void updateAABB();
 };

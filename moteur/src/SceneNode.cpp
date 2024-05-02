@@ -47,6 +47,8 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
             mesh.shader.setMVPMatrix(model_matrix, view, projection);
             mesh.draw();
         }
+        updateAABB();
+        //drawAABB(view, projection);
     }
     else if(mesh) {
         mesh->shader.useShader();
@@ -54,21 +56,23 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
         mesh->draw();
     }
 
-    Shader& aabbShader = ShaderManager::getAABBShader();
-    aabbShader.useShader();
-    aabbShader.setVPMatrix(view, projection); // No need to send model since we transform the AABB with model when updating
-
-    if(model) {
-        if(transform.transform_updated) {
-                model->updateGlobalBoundingBox(model_matrix);
-                transform.transform_updated = false;
-        }
-        model->bounding_box.drawBox();
-    }
-
     for(SceneNode* child : children) {
         child->draw(view, projection);
     }
+}
+
+void SceneNode::updateAABB() {
+    if(transform.transform_updated) {
+        glm::mat4 model_matrix = get_world_transform();
+        model->updateGlobalBoundingBox(model_matrix);
+    }
+}
+
+void SceneNode::drawAABB(glm::mat4& view, glm::mat4& projection) {
+    Shader& aabbShader = ShaderManager::getAABBShader();
+    aabbShader.useShader();
+    aabbShader.setVPMatrix(view, projection); // No need to send model since we transform the AABB with model when updating
+    model->bounding_box.drawBox();
 }
 
 void SceneNode::enable_physics(bool use_gravity) {
