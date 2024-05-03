@@ -148,6 +148,10 @@ void Shader::setBind1i(const GLchar* name, GLint v0)
     glUniform1i(glGetUniformLocation(this->Program, name), v0);
 }
 
+void Shader::setVec3(const GLchar* name, glm::vec3 vector) {
+    this->setBind3f(name, vector.x, vector.y, vector.z);
+}
+
 void Shader::setMVPMatrix(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection) {
     this->setBindMatrix4fv("model", 1, 0, glm::value_ptr(model));
     this->setBindMatrix4fv("view", 1, 0, glm::value_ptr(view));

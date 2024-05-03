@@ -24,6 +24,7 @@ class Shader
         void setBindMatrix4fv(const GLchar* name, GLsizei count, GLboolean transpose, const GLfloat *value);
         void setBindMatrix3fv(const GLchar* name, GLsizei count, GLboolean transpose, const GLfloat *value);
         void setBind1i(const GLchar* name, GLint v0);
+        void setVec3(const GLchar* name, glm::vec3 vector);
         void setMVPMatrix(const glm::mat4& model, const glm::mat4& view, const glm::mat4& projection);
         void setVPMatrix(const glm::mat4& view, const glm::mat4& projection);
 };

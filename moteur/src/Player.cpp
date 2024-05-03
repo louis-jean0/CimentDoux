@@ -49,7 +49,7 @@ void Player::handleInput(float delta_time) {
 
 void Player::syncCamera() {
     glm::vec3 playerPosition = player_node->transform.get_translation();
-    camera->setPosition(playerPosition + glm::vec3(0.0f,3.0f,0.0f));
+    camera->setPosition(playerPosition + glm::vec3(0.0f,1.8f,0.0f));
 }
 
 void Player::handleSingleInput(int key, int scancode, int action, int mods) {

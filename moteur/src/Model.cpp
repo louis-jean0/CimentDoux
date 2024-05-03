@@ -82,7 +82,7 @@ void Model::updateGlobalBoundingBox(const glm::mat4& modelMatrix) {
 // Private methods
 void Model::load_model(std::string path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenBoundingBoxes);
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenBoundingBoxes); //| aiProcess_OptimizeMeshes | aiProcessPreset_TargetRealtime_Fast);
     if(!scene || scene->mFlags && AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout<<"ERROR::ASSIMP"<<importer.GetErrorString()<<std::endl;
     }
@@ -101,31 +101,37 @@ void Model::process_node(aiNode *node, const aiScene *scene)  {
     }
 }
 
-std::vector<Texture> Model::load_material_textures(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name) {
-    std::vector<Texture> textures;
+Material Model::load_material_textures(aiMaterial *material) {
+    Material mat;
+    load_textures_from_material(material, aiTextureType_DIFFUSE, "texture_diffuse", mat);
+    load_textures_from_material(material, aiTextureType_SPECULAR, "texture_specular", mat);
+    return mat;
+}
+
+void Model::load_textures_from_material(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name, Material& mat) {
     for(unsigned int i = 0; i < material->GetTextureCount(tex_type); i++) {
         aiString str;
         material->GetTexture(tex_type, i, &str);
         bool skip = false;
-        for(unsigned int j = 0; j < textures_loaded.size(); j++) {
-            if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
-                textures.push_back(textures_loaded[j]);
+        for(auto& loaded_tex : textures_loaded) {
+            if(std::strcmp(loaded_tex.path.data(), str.C_Str()) == 0) {
+                mat.add_texture(loaded_tex);
                 skip = true;
                 break;
             }
         }
         if(!skip) {
-            Texture texture(str.C_Str(),directory,tex_type_name);
-            textures.push_back(texture);
+            Texture texture(str.C_Str(), directory, tex_type_name);
+            mat.add_texture(texture);
+            textures_loaded.push_back(texture);
         }
     }
-    return textures;
 }
 
 Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
+    Material material;
     AABB bounding_box;
     // Vertices data
     for(unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -159,13 +165,11 @@ Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     }
     // Textures data
     if(mesh->mMaterialIndex >= 0) {
-        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-        std::vector<Texture> diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(),diffuse_maps.begin(),diffuse_maps.end());
-        std::vector<Texture> specular_maps = load_material_textures(material, aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(),specular_maps.begin(),specular_maps.end());
+        aiMaterial *mat = scene->mMaterials[mesh->mMaterialIndex];
+        material = load_material_textures(mat);
     }
+    // AABB
     aiAABB aabb = mesh->mAABB;
     bounding_box.processAABB(glm::vec3(aabb.mMin.x, aabb.mMin.y, aabb.mMin.z), glm::vec3(aabb.mMax.x, aabb.mMax.y, aabb.mMax.z));
-    return Mesh(vertices, indices, textures, bounding_box);
+    return Mesh(vertices, indices, material, bounding_box);
 }

@@ -38,5 +38,6 @@ class Model {
         void load_model(std::string path);
         void process_node(aiNode *node, const aiScene *scene);
         Mesh process_mesh(aiMesh *mesh, const aiScene *scene);
-        std::vector<Texture> load_material_textures(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name);
+        Material load_material_textures(aiMaterial *material);
+        void load_textures_from_material(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name, Material& mat);
 };

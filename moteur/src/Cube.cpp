@@ -1,4 +1,4 @@
-#include "SceneNode.hpp"
+#include <SceneNode.hpp>
 #include <Cube.hpp>
 #include <glm/geometric.hpp>
 

@@ -48,7 +48,7 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
             mesh.draw();
         }
         updateAABB();
-        //drawAABB(view, projection);
+        drawAABB(view, projection);
     }
     else if(mesh) {
         mesh->shader.useShader();

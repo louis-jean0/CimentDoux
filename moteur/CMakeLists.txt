@@ -76,6 +76,9 @@ add_executable(main
     src/RigidBody.cpp
     src/PhysicsEngine.cpp
     src/Player.cpp
+    src/PointLight.cpp
+    src/DirectionalLight.cpp
+    src/Material.cpp
 )
 
 # Include directories for our project

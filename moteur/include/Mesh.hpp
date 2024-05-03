@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <Shader.hpp>
-#include <Texture.hpp>
+#include <Material.hpp>
 #include <AABB.hpp>
 
 struct Vertex {
@@ -20,13 +20,13 @@ class Mesh {
         // Public attributes
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        std::vector<Texture> textures;
+        Material material;
         AABB bounding_box;
         Shader shader;
 
         // Constructors
         Mesh();
-        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, AABB bounding_box);
+        Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material& material, AABB bounding_box);
 
         void bind_shader(Shader shader);
         void bind_shader(const GLchar* vertex_path, const GLchar* fragment_path);
