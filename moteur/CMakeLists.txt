@@ -73,6 +73,9 @@ add_executable(main
     src/ModelCollider.cpp
     src/ShaderManager.cpp
     src/Scene.cpp
+    src/RigidBody.cpp
+    src/PhysicsEngine.cpp
+    src/Player.cpp
 )
 
 # Include directories for our project

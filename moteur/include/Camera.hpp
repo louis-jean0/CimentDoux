@@ -52,12 +52,14 @@ public:
 	glm::mat4 getProjectionMatrix() const {return m_projectionMatrix;}
 	glm::vec3 getPosition() const {return m_position;}
 	glm::vec3 getRotationDegrees() const {return m_eulerAngleInDegrees;}
+	float getFOV() const {return m_fovDegree;}
 	bool getShowMouse() const {return m_showMouse;}
 	glm::vec3 getCFront() const;
 	glm::vec3 getCUp() const;
 	glm::vec3 getCRight() const;
 	void setPosition(glm::vec3 position) {this->m_position = position;}
 	void setRotationDegrees(glm::vec3 degrees) {this->m_eulerAngleInDegrees = degrees;}
+	void setFOV(float FOV) {this->m_fovDegree = FOV;}
 	void setShowMouse(bool m_showMouse) {this->m_showMouse = m_showMouse;} // For callback (in TP.cpp) purpose
 	void transition(float delta_time);
 

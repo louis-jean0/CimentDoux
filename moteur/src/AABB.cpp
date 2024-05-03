@@ -56,3 +56,11 @@ void AABB::drawBox() {
     glDrawArrays(GL_LINES, 0, 24); // 24 sommets au total
     glBindVertexArray(0);
 };
+
+glm::vec3 AABB::getCenter() {
+    return glm::vec3((min.x + max.x)/2, (min.y + max.y)/2, (min.z + max.z)/2);
+}
+
+glm::vec3 AABB::getHalfWidths() {
+    return glm::vec3((max.x - min.x)/2, (max.y - min.y)/2, (max.z - min.z)/2);
+}

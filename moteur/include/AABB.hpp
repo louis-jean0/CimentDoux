@@ -15,4 +15,6 @@ class AABB {
 
         void processAABB(const glm::vec3 min, const glm::vec3 max);
         void drawBox();
+        glm::vec3 getCenter();
+        glm::vec3 getHalfWidths();
 };

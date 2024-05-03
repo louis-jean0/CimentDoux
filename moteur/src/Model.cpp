@@ -1,13 +1,13 @@
 #include <Model.hpp>
 
 // Constructors
-Model::Model() {}
+Model::Model() : collider(bounding_box) {}
 
-Model::Model(std::string path) {
+Model::Model(std::string path) : collider(bounding_box) {
     load_model(path);
 }
 
-Model::Model(Mesh &mesh) {
+Model::Model(Mesh &mesh) : collider(bounding_box) {
     meshes.push_back(mesh);
 }
 
@@ -27,6 +27,12 @@ void Model::bind_shader_to_meshes(Shader shader) {
 void Model::bind_shader_to_meshes(const GLchar* vertex_path, const GLchar* fragment_path) {
     for(auto &mesh : meshes) {
         mesh.bind_shader(vertex_path,fragment_path);
+    }
+}
+
+void Model::bind_texture_to_meshes(Texture texture) {
+    for(auto& mesh : meshes) {
+        mesh.add_texture(texture);
     }
 }
 
