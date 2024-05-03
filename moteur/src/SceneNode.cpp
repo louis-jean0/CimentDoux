@@ -5,13 +5,6 @@
 #include <ShaderManager.hpp>
 #include <AABB.hpp>
 
-// Constructors
-SceneNode::SceneNode() : parent(nullptr), mesh(nullptr), model(nullptr), rigid_body(this) {}
-
-SceneNode::SceneNode(Mesh* mesh) : parent(nullptr), mesh(mesh), model(nullptr), rigid_body(this) {}
-
-SceneNode::SceneNode(Model* model) : parent(nullptr), mesh(nullptr), model(model), rigid_body(this) {}
-
 // Destructor
 SceneNode::~SceneNode() {
     for(SceneNode* child : children) {
@@ -20,13 +13,14 @@ SceneNode::~SceneNode() {
 }
 
 // Public methods
-void SceneNode::set_parent(SceneNode *parent) {
-    this->parent = parent;
-    parent->children.push_back(this);
+void SceneNode::set_parent(std::shared_ptr<SceneNode> p) {
+    parent = p;  // Stocke un std::weak_ptr vers le parent
+    p->children.push_back(std::unique_ptr<SceneNode>(this));
 }
 
-void SceneNode::add_child(SceneNode *child) {
-    child->set_parent(this);
+void SceneNode::add_child(std::unique_ptr<SceneNode> child) {
+    child->set_parent(shared_from_this());  // `shared_from_this()` fournit un std::shared_ptr à partir de this
+    children.push_back(std::move(child));  // Ajoute l'enfant tout en transférant la propriété
 }
 
 glm::mat4 SceneNode::get_world_transform() {
