@@ -110,15 +110,10 @@ int main(int argc, char* argv[]) {
 
     Model model("../data/models/capsule/capsule.gltf");
     model.bind_shader_to_meshes(shader);
-
     SceneNode* model_node = new SceneNode(&model);
     model_node->transform.set_scale(glm::vec3(1.0f));
-    glm::vec3 center = model.getMin();
-    std::cout << center.x << std::endl;
-
-    model_node->transform.set_translation(glm::vec3(5.0f, .0f, 1.f));
+    model_node->transform.set_translation(glm::vec3(5.0f));
     model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
-    ModelCollider colider(model.bounding_box);
     player = new Player(model_node, window.get_window(), myCamera);
     pe.add_entity(&player->player_node->rigid_body);
     
@@ -133,14 +128,13 @@ int main(int argc, char* argv[]) {
     plane_node->transform.set_scale(glm::vec3(5000.0f,1.f,5000.f));
     pe.add_entity(&plane_node->rigid_body);
     
-    Model obst1("../data/models/plane/plane.gltf");
+    Model obst1("../data/models/platform/GreyBricks.glb");
     obst1.bind_shader_to_meshes(shader);
     SceneNode* obst1_node = new SceneNode(&obst1);
     obst1_node->transform.set_scale(glm::vec3(300.0f));
     obst1_node->transform.set_translation(glm::vec3(15., 3.0f, 15.));
     pe.add_entity(&obst1_node->rigid_body);
-        ModelCollider colider1(obst1.bounding_box);
-
+    
     //myCamera->init();
     
     Model obst2("../data/models/cube/Cube.gltf");
@@ -226,15 +220,9 @@ int main(int argc, char* argv[]) {
             
             lag -= MS_PER_UPDATE;    
         }
-        
-        //gestion grossière de la cam pour l'instant
-        myCamera.pos_player = model_node->transform.get_translation();
 
-
-        std::cout << colider.checkCollision(colider1) << std::endl;
-
-        view = myCamera.getViewMatrix();
-        proj = myCamera.getProjectionMatrix();  
+        view = myCamera->getViewMatrix();
+        proj = myCamera->getProjectionMatrix();  
 
         // Sending to shader
 

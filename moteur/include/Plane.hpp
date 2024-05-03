@@ -11,6 +11,7 @@ class Plane : public Mesh {
         unsigned int size;
         float x;
         float z;
+
         unsigned int grid_x;
         unsigned int grid_z;
         unsigned int height_scale;

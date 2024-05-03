@@ -27,6 +27,8 @@ void Player::handleInput(float delta_time) {
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         moveDirection -= camera->getCRight();
     }
+
+    /*
     moveDirection.y = 0;
     float acceleration = 0.1f;
     player_node->rigid_body.velocity += moveDirection * acceleration * delta_time;
@@ -34,10 +36,40 @@ void Player::handleInput(float delta_time) {
     if(glm::length(player_node->rigid_body.velocity) > max_speed) {
         player_node->rigid_body.velocity = glm::normalize(player_node->rigid_body.velocity) * max_speed;
     }
-    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        float jumpStrength = 0.1f;
-        player_node->rigid_body.velocity.y += jumpStrength;
+
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
+        v0_Vitesse = sqrt(2.0f * g * hauteur);
+        Space = true;
+        player_node->rigid_body.velocity += v0_Vitesse;
+    } else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+        Space = false;
+    }*/
+
+
+    if(glm::length(glm::vec2(player_node->rigid_body.velocity.x, player_node->rigid_body.velocity.z)) > max_speed) {
+        glm::vec2 horizontal_velocity = glm::normalize(glm::vec2(player_node->rigid_body.velocity.x, player_node->rigid_body.velocity.z)) * max_speed;
+        player_node->rigid_body.velocity.x = horizontal_velocity.x;
+        player_node->rigid_body.velocity.z = horizontal_velocity.y;
     }
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !Space) {
+        // Dérivée de la conservation de l'énergie
+        player_node->rigid_body.velocity.y = sqrt(2.0f * g * hauteur);
+        Space = true;
+    } else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+        Space = false;
+    }
+
+    if(player_node->transform.get_translation().y <= 0.0f) {
+        player_node->transform.set_translation(glm::vec3(
+            player_node->transform.get_translation().x,
+            1.0f,
+            player_node->transform.get_translation().z
+        ));
+        player_node->rigid_body.velocity.y = 0.0f;     
+    }
+
+
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         fov += 50.0f * delta_time;
         if(fov > 90.0f) fov = 90.0f;

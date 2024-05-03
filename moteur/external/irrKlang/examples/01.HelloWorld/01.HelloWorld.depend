@@ -1,0 +1,117 @@
+# depslib dependency file v1.0
+1517210338 source:/home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/examples/01.HelloWorld/main.cpp
+	<stdio.h>
+	<irrKlang.h>
+	<conio.h>
+	"../common/conio.h"
+
+1517295846 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/irrKlang.h
+	"ik_irrKlangTypes.h"
+	"ik_vec3d.h"
+	"ik_IRefCounted.h"
+	"ik_IVirtualRefCounted.h"
+	"ik_ESoundOutputDrivers.h"
+	"ik_ESoundEngineOptions.h"
+	"ik_EStreamModes.h"
+	"ik_SAudioStreamFormat.h"
+	"ik_ISoundEngine.h"
+	"ik_ISoundSource.h"
+	"ik_ISound.h"
+	"ik_IAudioStream.h"
+	"ik_IAudioStreamLoader.h"
+	"ik_ISoundEffectControl.h"
+	"ik_ISoundStopEventReceiver.h"
+	"ik_IFileFactory.h"
+	"ik_IFileReader.h"
+	"ik_ISoundDeviceList.h"
+	"ik_IAudioRecorder.h"
+	"ik_ISoundMixedOutputReceiver.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_irrKlangTypes.h
+	<wchar.h>
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_vec3d.h
+	<math.h>
+	"ik_irrKlangTypes.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IRefCounted.h
+	"ik_irrKlangTypes.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IVirtualRefCounted.h
+	"ik_irrKlangTypes.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ESoundOutputDrivers.h
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ESoundEngineOptions.h
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_EStreamModes.h
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_SAudioStreamFormat.h
+	"ik_IRefCounted.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISoundEngine.h
+	"ik_IRefCounted.h"
+	"ik_vec3d.h"
+	"ik_ISoundSource.h"
+	"ik_ISound.h"
+	"ik_EStreamModes.h"
+	"ik_IFileFactory.h"
+	"ik_ISoundMixedOutputReceiver.h"
+
+1517216432 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISoundSource.h
+	"ik_IVirtualRefCounted.h"
+	"ik_vec3d.h"
+	"ik_EStreamModes.h"
+	"ik_SAudioStreamFormat.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISound.h
+	"ik_IVirtualRefCounted.h"
+	"ik_ISoundEffectControl.h"
+	"ik_vec3d.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISoundEffectControl.h
+	"ik_IVirtualRefCounted.h"
+	"ik_vec3d.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IFileFactory.h
+	"ik_IRefCounted.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISoundMixedOutputReceiver.h
+	"ik_IRefCounted.h"
+	"ik_SAudioStreamFormat.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IAudioStream.h
+	"ik_IRefCounted.h"
+	"ik_SAudioStreamFormat.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IAudioStreamLoader.h
+	"ik_IRefCounted.h"
+	"ik_IFileReader.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IFileReader.h
+	"ik_IRefCounted.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISoundStopEventReceiver.h
+	"ik_IRefCounted.h"
+	"ik_SAudioStreamFormat.h"
+
+1517216408 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_ISoundDeviceList.h
+	"ik_IRefCounted.h"
+
+1517216424 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/include/ik_IAudioRecorder.h
+	"ik_IRefCounted.h"
+	"ik_ISoundSource.h"
+
+1517210338 /home/e20230010816/Bureau/M1/Sem2/Projet_MDJ/HAI819I-moteurjeux/moteur/external/irrKlang/examples/common/conio.h
+	<termios.h>
+	<unistd.h>
+	<stdio.h>
+	<memory.h>
+	<stdlib.h>
+	<termios.h>
+	<unistd.h>
+	<stdio.h>
+	<memory.h>
+	<stdlib.h>
+	<sys/ioctl.h>
+

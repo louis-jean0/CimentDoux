@@ -36,8 +36,8 @@ file(GLOB IMGUI_SOURCES ${IMGUI_DIR}/src/*.cpp)
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR}/include ${IMGUI_DIR}/backends)
 
-# OpenAL
-add_subdirectory(external/openal-soft-master)
+# IrrKlang
+add_subdirectory(external/irrKlang)
 
 # Find and link OpenGL
 find_package(OpenGL REQUIRED)
@@ -84,13 +84,12 @@ include_directories(
     external/glfw-3.3.9/include
     external/glad/include
     external/assimp/include
-    external/assimp/include
-    external/openal-soft-master/include/AL
+    external/irrKlang/include
     external
 )
 
 # Linking libraries
-target_link_libraries(main glfw glad imgui assimp OpenAL)
+target_link_libraries(main glfw glad imgui assimp irrKlang)
 
 # Output directories
 set_target_properties(glad imgui PROPERTIES
