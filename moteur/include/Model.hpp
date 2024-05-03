@@ -22,7 +22,7 @@ class Model {
         Model(std::string path) : collider(bounding_box) {
             load_model(path);
         }
-        Model(Mesh& mesh) : collider(bounding_box), 
+        Model(Mesh& mesh) : collider(bounding_box) {}
         
         // Public methods
         void draw();
