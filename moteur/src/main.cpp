@@ -26,6 +26,7 @@
 #include <PhysicsEngine.hpp>
 #include <Player.hpp>
 #include <PointLight.hpp>
+#include <memory>
 
 // Functions prototypes
 void printUsage();
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]) {
 
     plane->bind_shader(shader);
     SceneNode plane_node(plane);*/
-
+    std::make_unique();
     Model model("../data/models/capsule/capsule.gltf");
     model.bind_shader_to_meshes(shader);
     SceneNode* model_node = new SceneNode(&model);
