@@ -324,9 +324,9 @@ int main(int argc, char* argv[]) {
             Volume_up = true;
         }
 
-        distance = std::max(distance, AL_REFERENCE_DISTANCE);
-        volume = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (distance - AL_REFERENCE_DISTANCE));
-        volume = std::max(0.0f, std::min(1.0f, volume));
+        //distance = std::max(distance, AL_REFERENCE_DISTANCE);
+        //volume = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (distance - AL_REFERENCE_DISTANCE));
+        //volume = std::max(0.0f, std::min(1.0f, volume));
 
         std::cout << "Volume: " << volume << std::endl;
         alSourcef(source, AL_GAIN, volume);
