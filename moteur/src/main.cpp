@@ -12,25 +12,38 @@
 #include <sstream>
 #include <fstream>
 #include <unistd.h>
+#include <cmath>
+#include <iostream>
 
-#include <Window.hpp>
-#include <SceneNode.hpp>
-#include <Texture.hpp>
-#include <Plane.hpp>
-#include <Sphere.hpp>
-#include <PlaneCollider.hpp>
-#include <Camera.hpp>
-#include <Cube.hpp>
-#include <ModelCollider.hpp>
-#include <Scene.hpp>
-#include <PhysicsEngine.hpp>
-#include <Player.hpp>
+#include "Window.hpp"
+#include "SceneNode.hpp"
+#include "Texture.hpp"
+#include "Plane.hpp"
+#include "Sphere.hpp"
+#include "PlaneCollider.hpp"
+#include "Camera.hpp"
+#include "Cube.hpp"
+#include "ModelCollider.hpp"
+#include "Scene.hpp"
+#include "PhysicsEngine.hpp"
+#include "Player.hpp"
+
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <sndfile.h>
+#include <vector>
+#include <iostream>
+#include <cstring>
+
+bool Volume_up = false;
+bool Volume_down = false;
+float volume = 1.0f;
+float distance, distanceMin = 1., distanceMax = 500.;
 
 // Functions prototypes
 void printUsage();
 void processInput(GLFWwindow *window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
 
 // Window settings
 const unsigned int SCR_WIDTH = 1440;
@@ -82,9 +95,45 @@ float quadratic = 0.032;
 
 Player* player;
 
+
+// Fonction utilitaire pour charger un fichier audio à l'aide de libsndfile
+bool loadAudioFile(const char* filename, std::vector<ALshort>& samples, SF_INFO& info) {
+    SNDFILE* file = sf_open(filename, SFM_READ, &info);
+    if (!file) {
+        std::cerr << "Impossible de charger le fichier audio: " << filename << std::endl;
+        return false;
+    }
+
+    samples.resize(info.frames * info.channels);
+    sf_read_short(file, samples.data(), samples.size());
+    sf_close(file);
+
+    return true;
+}
+
+static void list_audio_devices(const ALCchar *devices)
+{
+	const ALCchar *device = devices, *next = devices + 1;
+	size_t len = 0;
+
+	fprintf(stdout, "Devices list:\n");
+	fprintf(stdout, "----------\n");
+	while (device && *device != '\0' && next && *next != '\0') {
+		fprintf(stdout, "%s\n", device);
+		len = strlen(device);
+		device += (len + 1);
+		next += (len + 2);
+	}
+	fprintf(stdout, "----------\n");
+}
+
+
+
+
+
 int main(int argc, char* argv[]) {
     // Initialize window
-    Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux - TP Mouvement",true);
+    Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux",true);
     window.setup_GLFW();
 
     // Initialize ImGui
@@ -98,7 +147,7 @@ int main(int argc, char* argv[]) {
     glEnable(GL_DEPTH_TEST);
 
     Shader shader;
-    shader.setShader("../shaders/LampeTorche.vert","../shaders/LampeTorche.frag");
+    shader.setShader("../shaders/vs.vert","../shaders/fs.frag");
     /*
     Plane* plane = new Plane(100, 100, 100,0);
     Texture plane_texture("../data/textures/pavement.jpg");
@@ -112,33 +161,35 @@ int main(int argc, char* argv[]) {
     model.bind_shader_to_meshes(shader);
     SceneNode* model_node = new SceneNode(&model);
     model_node->transform.set_scale(glm::vec3(1.0f));
-    model_node->transform.set_translation(glm::vec3(5.0f));
+    model_node->transform.set_translation(glm::vec3(20.0f));
     model_node->transform.set_rotation(glm::vec3(0.0f,0.0f,90.0f));
     player = new Player(model_node, window.get_window(), myCamera);
     pe.add_entity(&player->player_node->rigid_body);
     
     //scene.creation_plan("../data/textures/2k_neptune.jpg",100, 100, 100,0,shader);
-    scene.creationMap(shader);
+    //scene.creationMap(shader);
 
     Model plane("../data/models/plane/plane.gltf");
     plane.bind_shader_to_meshes(shader);
-    Texture texture("../data/textures/pierre_diffuse.jpg");
+    Texture texture("../data/textures/rubber.jpg");
     plane.bind_texture_to_meshes(texture);
     SceneNode* plane_node = new SceneNode(&plane);
     plane_node->transform.set_scale(glm::vec3(5000.0f,1.f,5000.f));
     pe.add_entity(&plane_node->rigid_body);
     
-    Model obst1("../data/models/platform/GreyBricks.glb");
+    Model obst1("../data/models/cube/Cube.gltf");
     obst1.bind_shader_to_meshes(shader);
+    //obst1.bind_texture_to_meshes(texture);
     SceneNode* obst1_node = new SceneNode(&obst1);
-    obst1_node->transform.set_scale(glm::vec3(300.0f));
-    obst1_node->transform.set_translation(glm::vec3(15., 3.0f, 15.));
-    pe.add_entity(&obst1_node->rigid_body);
+    obst1_node->transform.set_scale(glm::vec3(1.0f));
+    obst1_node->transform.set_translation(glm::vec3(15., 1.0f, 15.));
+    //pe.add_entity(&obst1_node->rigid_body);
     
     //myCamera->init();
     
     Model obst2("../data/models/cube/Cube.gltf");
     obst2.bind_shader_to_meshes(shader);
+    //obst2.bind_texture_to_meshes(texture);
     SceneNode* obst2_node = new SceneNode(&obst2);
     obst2_node->transform.set_scale(glm::vec3(1.0f));
     obst2_node->transform.set_translation(glm::vec3(15., 2.0f, 17));
@@ -146,6 +197,7 @@ int main(int argc, char* argv[]) {
 
     Model obst3("../data/models/cube/Cube.gltf");
     obst3.bind_shader_to_meshes(shader);
+    //obst3.bind_texture_to_meshes(texture);
     SceneNode* obst3_node = new SceneNode(&obst3);
     obst3_node->transform.set_scale(glm::vec3(1.0f));
     obst3_node->transform.set_translation(glm::vec3(15., 3.0f, 19));
@@ -153,6 +205,7 @@ int main(int argc, char* argv[]) {
 
     Model obst4("../data/models/cube/Cube.gltf");
     obst4.bind_shader_to_meshes(shader);
+    //obst4.bind_texture_to_meshes(texture);
     SceneNode* obst4_node = new SceneNode(&obst4);
     obst4_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
     obst4_node->transform.set_translation(glm::vec3(15., 4.0f, 23));
@@ -160,6 +213,7 @@ int main(int argc, char* argv[]) {
 
     Model obst5("../data/models/cube/Cube.gltf");
     obst5.bind_shader_to_meshes(shader);
+    //obst5.bind_texture_to_meshes(texture);
     SceneNode* obst5_node = new SceneNode(&obst5);
     obst5_node->transform.set_scale(glm::vec3(3.0f,1.f,5.f));
     obst5_node->transform.set_translation(glm::vec3(15., 5.0f, 33));
@@ -167,23 +221,84 @@ int main(int argc, char* argv[]) {
 
     Model obst6("../data/models/cube/Cube.gltf");
     obst6.bind_shader_to_meshes(shader);
+    //obst6.bind_texture_to_meshes(texture);
     SceneNode* obst6_node = new SceneNode(&obst6);
     obst6_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
     obst6_node->transform.set_translation(glm::vec3(15., 4.0f, 83.5));
     pe.add_entity(&obst6_node->rigid_body);
+    
+    //myCamera->init();
 
     Model plante("../data/models/plant1/eb_house_plant_01.fbx");
     plante.bind_shader_to_meshes(shader);
+    plante.bind_texture_to_meshes(texture);
     SceneNode* plante_node = new SceneNode(&plante);
     plante_node->transform.set_scale(glm::vec3(0.1f));
     plante_node->transform.set_translation(glm::vec3(10.0f,0.0f,10.0f));
     pe.add_entity(&plante_node->rigid_body);
 
-    myCamera->init();
+    glm::vec3 ambient = glm::vec3(1.0f,1.0f,1.0f);
+    glm::vec3 diffuse = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 specular = glm::vec3(0.2f,0.2f,0.2f);
+    glm::vec3 position = glm::vec3(-1.0f,1.0f,1.0f);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     float temps_debut=glfwGetTime();
+
+    // Obtenir une liste des périphériques audio disponibles
+    const ALCchar* devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+    if (!devices) {
+        std::cerr << "Aucun périphérique audio trouvé" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+
+    // Choisissez le périphérique audio que vous souhaitez utiliser (par exemple, le premier périphérique de la liste)
+    const char* deviceName = devices;
+    std::cout << deviceName << std::endl;
+
+    // Spécifiez le chemin du périphérique audio dans alcOpenDevice()
+    ALCdevice* device = alcOpenDevice(deviceName);
+    if (!device) {
+        std::cerr << "Impossible d'ouvrir le périphérique audio spécifié" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+
+    ALCcontext* context = alcCreateContext(device, NULL);
+    alcMakeContextCurrent(context);
+
+    // Charger le fichier audio
+    std::vector<ALshort> samples;
+    SF_INFO info;
+    if (!loadAudioFile("../data/sounds/retro.wav", samples, info)) {
+        alcDestroyContext(context);
+        alcCloseDevice(device);
+        glfwTerminate();
+        return -1;
+    }
+
+    // Générer et remplir un buffer OpenAL
+    ALuint buffer;
+    alGenBuffers(1, &buffer);
+    alBufferData(buffer, (info.channels == 2) ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16, samples.data(),
+                 static_cast<ALsizei>(samples.size() * sizeof(ALshort)), info.samplerate);
+
+    // Créer une source audio OpenAL
+    ALuint source;
+    alGenSources(1, &source);
+
+    alSourcef(source, AL_GAIN, volume);
+    alSourcei(source, AL_BUFFER, buffer);
+    alSourcei(source, AL_LOOPING, true);
+    alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
+    alSource3f(source, AL_POSITION, 0., 0., 0.);
+    alSource3f(source, AL_VELOCITY, 1., 1., 1.);
+    alSourcef(source, AL_PITCH, 1);
+
+    // Jouer le son
+    alSourcePlay(source);
 
     // Render loop
     while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
@@ -191,6 +306,31 @@ int main(int argc, char* argv[]) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         lag += deltaTime;
+
+        if (glfwGetKey(window.get_window(), GLFW_KEY_DOWN) == GLFW_PRESS) {
+            volume -= 0.005;
+
+            if(volume <= 0.0f) {
+                volume = 0.0f;
+            }
+            Volume_down = true;
+        }
+        if (glfwGetKey(window.get_window(), GLFW_KEY_UP) == GLFW_PRESS) {
+            volume += 0.005;
+
+            if(volume >= 1.0f) {
+                volume = 1.0f;
+            }
+            Volume_up = true;
+        }
+
+        distance = std::max(distance, AL_REFERENCE_DISTANCE);
+        volume = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (distance - AL_REFERENCE_DISTANCE));
+        volume = std::max(0.0f, std::min(1.0f, volume));
+
+        std::cout << "Volume: " << volume << std::endl;
+        alSourcef(source, AL_GAIN, volume);
+
 
         glfwSetKeyCallback(window.get_window(), keyCallback);
     
@@ -235,23 +375,24 @@ int main(int argc, char* argv[]) {
         shader.setVPMatrix(view,proj);
 
         // Phong + Flashlight
-        shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
+        // shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
         shader.setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
-        shader.setBind3f("lightDir", camFront[0], camFront[1], camFront[2]);
-        shader.setBind1f("cutOff", cutOff);
-        shader.setBind1f("outerCutOff", outerCutOff);
+        // shader.setBind3f("lightDir", camFront[0], camFront[1], camFront[2]);
+        // shader.setBind1f("cutOff", cutOff);
+        // shader.setBind1f("outerCutOff", outerCutOff);
 
-        shader.setBind3f("lightambient", lightAmbiant[0], lightAmbiant[1], lightAmbiant[2]);
-        shader.setBind3f("lightdiffuse", lightDiffuse[0], lightDiffuse[1], lightDiffuse[2]);
-        shader.setBind3f("lightspecular", lightSpecular[0], lightSpecular[1], lightSpecular[2]);
-        shader.setBind3f("camPos", camPos[0], camPos[1], camPos[2]);
+        // shader.setBind3f("lightambient", lightAmbiant[0], lightAmbiant[1], lightAmbiant[2]);
+        // shader.setBind3f("lightdiffuse", lightDiffuse[0], lightDiffuse[1], lightDiffuse[2]);
+        // shader.setBind3f("lightspecular", lightSpecular[0], lightSpecular[1], lightSpecular[2]);
+        // shader.setBind3f("camPos", camPos[0], camPos[1], camPos[2]);
 
-        shader.setBind1f("constant", constant);
-        shader.setBind1f("linear", linear);
-        shader.setBind1f("quadratic", quadratic);
+        // shader.setBind1f("constant", constant);
+        // shader.setBind1f("linear", linear);
+        // shader.setBind1f("quadratic", quadratic);
 
         // Scene
         plane_node->draw(view, proj);
+        obst1_node->draw(view, proj);
         //model_node->draw(view, proj);
         //obst1_node->draw(view, proj);
 
@@ -281,8 +422,8 @@ int main(int argc, char* argv[]) {
         //scene.draw(view, proj);
         //scene.draw_plan(view, proj);
 
-        //model_node->draw(view, proj);              
-        obst1_node->draw(view, proj);
+        //model_node->draw(view, proj);    
+        obst1_node->draw(view, proj);          
         obst2_node->draw(view, proj);
         obst3_node->draw(view, proj);
         obst4_node->draw(view, proj);
@@ -311,6 +452,12 @@ int main(int argc, char* argv[]) {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    alSourceStop(source);
+    alDeleteSources(1, &source);
+    alDeleteBuffers(1, &buffer);
+    alcDestroyContext(context);
+    alcCloseDevice(device);
+    glfwTerminate();
 
     window.~Window();
 
