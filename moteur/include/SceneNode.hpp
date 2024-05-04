@@ -10,24 +10,24 @@
 class SceneNode {
     public:
         // Public attributes
-        std::weak_ptr<SceneNode> parent;
-        std::unique_ptr<Mesh> mesh;
-        std::unique_ptr<Model> model;
+        SceneNode *parent = nullptr;
+        Mesh *mesh = nullptr;
+        Model *model = nullptr;
         Transform transform = Transform();
         RigidBody rigid_body;
-        std::vector<std::unique_ptr<SceneNode>> children;
+        std::vector<SceneNode*> children;
 
         // Constructor
-        SceneNode() : parent(nullptr), mesh(nullptr), model(nullptr), rigid_body(this) {}
-        SceneNode(Mesh& mesh) : parent(nullptr), mesh(std::make_unique<Mesh>(mesh)), model(nullptr), rigid_body(this) {}
-        SceneNode(Model& model) : parent(nullptr), mesh(nullptr), model(std::make_unique<Model>(model)), rigid_body(this) {}
+        SceneNode();
+        SceneNode(Mesh* mesh);
+        SceneNode(Model* model);
 
         // Destructor
-        ~SceneNode() = default;
+        ~SceneNode();
 
         // Public methods
-        void set_parent(std::shared_ptr<SceneNode> parent);
-        void add_child(std::unique_ptr<SceneNode> child);
+        void set_parent(SceneNode *parent);
+        void add_child(SceneNode *child);
         glm::mat4 get_world_transform();
         void draw(glm::mat4& view, glm::mat4& projection);
         void drawAABB(glm::mat4& view, glm::mat4& projection);

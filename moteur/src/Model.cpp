@@ -1,5 +1,16 @@
 #include <Model.hpp>
 
+// Constructors
+Model::Model() : collider(bounding_box) {}
+
+Model::Model(std::string path) : collider(bounding_box) {
+    load_model(path);
+}
+
+Model::Model(Mesh &mesh) : collider(bounding_box) {
+    meshes.push_back(mesh);
+}
+
 // Public methods
 void Model::draw() {
     for(auto &mesh : meshes) {
@@ -97,23 +108,27 @@ Material Model::load_material_textures(aiMaterial *material) {
     return mat;
 }
 
-void Model::load_textures_from_material(aiMaterial* material, aiTextureType tex_type, const std::string& tex_type_name, Material& mat) {
-    for (unsigned int i = 0; i < material->GetTextureCount(tex_type); i++) {
+void Model::load_textures_from_material(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name, Material& mat) {
+    for(unsigned int i = 0; i < material->GetTextureCount(tex_type); i++) {
         aiString str;
         material->GetTexture(tex_type, i, &str);
-        std::string texture_path = directory + "/" + str.C_Str();
-        auto it = textures_loaded.find(texture_path);
-        if (it == textures_loaded.end()) {
-            auto texture = std::make_shared<Texture>(texture_path, tex_type_name);
-            textures_loaded[texture_path] = texture;
+        bool skip = false;
+        for(auto& loaded_tex : textures_loaded) {
+            if(std::strcmp(loaded_tex.path.data(), str.C_Str()) == 0) {
+                mat.add_texture(loaded_tex);
+                skip = true;
+                break;
+            }
+        }
+        if(!skip) {
+            Texture texture(str.C_Str(), directory, tex_type_name);
             mat.add_texture(texture);
-        } else {
-            mat.add_texture(it->second);
+            textures_loaded.push_back(texture);
         }
     }
 }
 
-std::unique_ptr<Mesh> Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
+Mesh Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     Material material;
@@ -156,5 +171,5 @@ std::unique_ptr<Mesh> Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     // AABB
     aiAABB aabb = mesh->mAABB;
     bounding_box.processAABB(glm::vec3(aabb.mMin.x, aabb.mMin.y, aabb.mMin.z), glm::vec3(aabb.mMax.x, aabb.mMax.y, aabb.mMax.z));
-    return std::make_unique<Mesh>(std::move(vertices), std::move(indices), std::move(material), std::move(bounding_box));
+    return Mesh(vertices, indices, material, bounding_box);
 }

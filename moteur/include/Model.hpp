@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <memory>
 #include <assimp/material.h>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
@@ -13,16 +12,14 @@
 class Model {
     public:
         // Public attributes
-        std::vector<std::unique_ptr<Mesh>> meshes;
+        std::vector<Mesh> meshes;
         AABB bounding_box;
         ModelCollider collider;
         
         // Constructors
-        Model() : collider(bounding_box) {}
-        Model(std::string path) : collider(bounding_box) {
-            load_model(path);
-        }
-        Model(Mesh& mesh) : collider(bounding_box), 
+        Model();
+        Model(Mesh &mesh);
+        Model(std::string path);
         
         // Public methods
         void draw();
@@ -35,7 +32,7 @@ class Model {
     private:
         // Private attributes
         std::string directory;
-        std::vector<std::string, std::shared_ptr<Texture>> textures_loaded;
+        std::vector<Texture> textures_loaded;
 
         // Private methods
         void load_model(std::string path);
