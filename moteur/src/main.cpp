@@ -38,7 +38,24 @@
 bool Volume_up = false;
 bool Volume_down = false;
 float volume = 1.0f;
-float distance, distanceMin = 1., distanceMax = 500.;
+float distance;
+float referenceDistance = 1.0f; 
+float rolloffFactor = 1.0f;
+
+float Distance(ALuint source, ALuint listener) {
+    ALfloat sourcePos[3], listenerPos[3];
+    alGetSourcefv(source, AL_POSITION, sourcePos);
+    alGetListenerfv(listener, listenerPos);
+
+    // Calculer la distance euclidienne entre la source et l'écouteur
+    float dx = sourcePos[0] - listenerPos[0];
+    float dy = sourcePos[1] - listenerPos[1];
+    float dz = sourcePos[2] - listenerPos[2];
+    float distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+
+    return distance;
+}
+
 
 // Functions prototypes
 void printUsage();
@@ -327,6 +344,7 @@ int main(int argc, char* argv[]) {
         //distance = std::max(distance, AL_REFERENCE_DISTANCE);
         //volume = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (distance - AL_REFERENCE_DISTANCE));
         //volume = std::max(0.0f, std::min(1.0f, volume));
+
 
         std::cout << "Volume: " << volume << std::endl;
         alSourcef(source, AL_GAIN, volume);
