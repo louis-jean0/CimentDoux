@@ -1,23 +1,26 @@
 #include <RigidBody.hpp>
 #include <SceneNode.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <memory>
 
 void RigidBody::updatePhysics(float delta_time) {
-    is_on_ground = false;
-    if(use_gravity) {
+    if(use_gravity && !is_on_ground) {
         glm::vec3 gravity = glm::vec3(0.0f,-1.00f,0.0f);
         glm::vec3 acceleration = gravity;
         velocity += acceleration * delta_time;
-        auto shared_node = node.lock();
-        if(shared_node) {
-            shared_node->transform.adjust_translation(velocity);
-            shared_node->transform.transform_updated = true;
-        }
-        else {
-            std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
-        }
     }
+    applyAirResistance();
+    auto shared_node = node.lock();
+    if(shared_node) {
+        shared_node->transform.adjust_translation(velocity);
+        shared_node->transform.transform_updated = true;
+    }
+    else {
+        std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
+    }
+    is_on_ground = false;
 }
+    
 
 bool RigidBody::checkCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {
     auto shared_node = node.lock();
@@ -55,10 +58,22 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
             velocity.y = 0;
         }
         //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal; // * restitution_coefficient;
-        velocity.x *= (1.0f - other->friction_coefficient);
-        velocity.z *= (1.0f - other->friction_coefficient);
+        applyGroundFriction(other);
     }
     else {
         std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
+    }
+}
+
+void RigidBody::applyAirResistance() {
+    float air_resistance = 0.05;
+    velocity.x *= (1.0f - air_resistance);
+    velocity.z *= (1.0f - air_resistance);
+}
+
+void RigidBody::applyGroundFriction(std::shared_ptr<RigidBody> other) {
+    if(is_on_ground) {
+        velocity.x *= (1.0f - other->friction_coefficient);
+        velocity.z *= (1.0f - other->friction_coefficient);
     }
 }

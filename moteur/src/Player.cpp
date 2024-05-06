@@ -18,8 +18,8 @@ void Player::update(float delta_time) {
 void Player::handleInput(float delta_time) {
     float fov = camera->getFOV();
     fov -= 10.0f * delta_time;
-    if(fov < 45.0f) {
-        fov = 45.0f;
+    if(fov < 90.0f) {
+        fov = 90.0f;
     }
     camera->setFOV(fov);
     glm::vec3 moveDirection = glm::vec3(0.0f);
@@ -59,53 +59,19 @@ void Player::handleInput(float delta_time) {
     //std::cout<<player_node->rigid_body.velocity.y<<std::endl;
 }
 
-// void Player::handleInput(float delta_time) {
-//     glm::vec3 moveDirection = glm::vec3(0.0f);
-//     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-//         moveDirection += camera->getCFront();
-//     }
-//     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-//         moveDirection -= camera->getCFront();
-//     }
-//     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-//         moveDirection += camera->getCRight();
-//     }
-//     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-//         moveDirection -= camera->getCRight();
-//     }
-//     moveDirection.y = 0;
-//     moveDirection = glm::normalize(moveDirection);
-
-//     player_node->rigid_body->velocity += moveDirection * ACCELERATION * delta_time;
-//     if(glm::length(player_node->rigid_body->velocity) > MAX_SPEED) {
-//         player_node->rigid_body->velocity = glm::normalize(player_node->rigid_body->velocity) * MAX_SPEED;
-//     }
-//     float fov = camera->getFOV();
-//     fov -= 10.0f * delta_time;
-//     if(fov < 45.0f) {
-//         fov = 45.0f;
-//     }
-//     camera->setFOV(fov);
-//     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-//         fov += 50.0f * delta_time;
-//         if(fov > 90.0f) fov = 90.0f;
-//         camera->setFOV(fov);
-//     }
-// }
-
 void Player::syncCamera() {
     glm::vec3 playerPosition = player_node->transform.get_translation();
     camera->setPosition(playerPosition + glm::vec3(0.0f,CAMERA_HEIGHT,0.0f));
 }
 
-void Player::handleSingleInput(int key, int scancode, int action, int mods) {
-    if(action == GLFW_PRESS) {
-        if(key == GLFW_KEY_SPACE) {
-            float jumpStrength = 1.0f;
-            player_node->rigid_body->velocity.y += jumpStrength;
-        }
-    }
-}
+// void Player::handleSingleInput(int key, int scancode, int action, int mods) {
+//     if(action == GLFW_PRESS) {
+//         if(key == GLFW_KEY_SPACE) {
+//             float jumpStrength = 1.0f;
+//             player_node->rigid_body->velocity.y += jumpStrength;
+//         }
+//     }
+// }
 
 std::shared_ptr<Camera> Player::get_camera() {
     return camera;

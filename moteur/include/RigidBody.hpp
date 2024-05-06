@@ -16,7 +16,7 @@ class RigidBody {
         bool is_on_ground;
 
         RigidBody() = default;
-        RigidBody(std::weak_ptr<SceneNode> node) : node(node), velocity(0.0f), mass(1.0f), use_gravity(false), friction_coefficient(0.1f), restitution_coefficient(0.0f) {}
+        RigidBody(std::weak_ptr<SceneNode> node) : node(node), velocity(0.0f), mass(1.0f), use_gravity(false), is_on_ground(false), friction_coefficient(0.1f), restitution_coefficient(0.0f) {}
         ~RigidBody() = default;
 
         void updatePhysics(float delta_time);
