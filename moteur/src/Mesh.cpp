@@ -31,7 +31,6 @@ void Mesh::setup_mesh() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
     glBindVertexArray(0);
-
 }
 
 void Mesh::add_texture(std::shared_ptr<Texture> texture) {

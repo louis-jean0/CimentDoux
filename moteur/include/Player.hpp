@@ -18,7 +18,7 @@ class Player {
         auto p_model = Model::create("../data/models/capsule/capsule.gltf", ShaderManager::getShader());
         auto p_node = SceneNode::create(p_model);
         p_node->set_scale(glm::vec3(1.0f));
-        //p_node->set_translation(glm::vec3(-20.0f, 50.0f, 20.0f));
+        p_node->set_translation(glm::vec3(-20.0f, 500.0f, 20.0f));
         p_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
         p_node->enable_physics(true);
         this->player_node = p_node;

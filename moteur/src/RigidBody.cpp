@@ -3,8 +3,9 @@
 #include <glm/gtx/string_cast.hpp>
 
 void RigidBody::updatePhysics(float delta_time) {
+    is_on_ground = false;
     if(use_gravity) {
-        glm::vec3 gravity = glm::vec3(0.0f,-9.81f,0.0f);
+        glm::vec3 gravity = glm::vec3(0.0f,-1.00f,0.0f);
         glm::vec3 acceleration = gravity;
         velocity += acceleration * delta_time;
         auto shared_node = node.lock();
@@ -49,9 +50,13 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
     if(shared_node) {
         shared_node->transform.adjust_translation(correction);
         shared_node->transform.transform_updated = true;
-        velocity -= glm::dot(velocity, collisionNormal) * collisionNormal; // * restitution_coefficient;
-        velocity.x *= (1.0f - friction_coefficient);
-        velocity.z *= (1.0f - friction_coefficient);
+        if(collisionNormal.y > 0.1f) {
+            is_on_ground = true;
+            velocity.y = 0;
+        }
+        //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal; // * restitution_coefficient;
+        velocity.x *= (1.0f - other->friction_coefficient);
+        velocity.z *= (1.0f - other->friction_coefficient);
     }
     else {
         std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;

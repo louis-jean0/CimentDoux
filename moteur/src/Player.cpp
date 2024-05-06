@@ -2,12 +2,17 @@
 #include <glm/gtx/string_cast.hpp>
 #include <memory>
 
+const float MAX_SPEED = 2.0f;
+const float ACCELERATION = 0.5f;
+const float JUMP_STRENGTH = 1.0f;
+const float CAMERA_HEIGHT = 1.8f;
+
 void Player::update(float delta_time) {
     handleInput(delta_time);
     syncCamera();
     player_node->updateAABB();
     camera->update(delta_time, window);
-    //std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
+    std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
 }
 
 void Player::handleInput(float delta_time) {
@@ -31,15 +36,19 @@ void Player::handleInput(float delta_time) {
         moveDirection -= camera->getCRight();
     }
     moveDirection.y = 0;
-    float acceleration = 0.5f;
-    player_node->rigid_body->velocity += moveDirection * acceleration * delta_time;
-    float max_speed = 2.0f;
+    float acceleration = 0.2f;
+    if(glm::length(moveDirection) > 0) {
+        moveDirection = glm::normalize(moveDirection);
+        player_node->rigid_body->velocity += moveDirection * acceleration * delta_time;
+    }
+    float max_speed = 1.0f;
     if(glm::length(player_node->rigid_body->velocity) > max_speed) {
         player_node->rigid_body->velocity = glm::normalize(player_node->rigid_body->velocity) * max_speed;
     }
-    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        float jumpStrength = 0.1f;
-        player_node->rigid_body->velocity.y += jumpStrength;
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && player_node->rigid_body->is_on_ground) {
+        float jumpStrength = sqrt(2.0f * 9.81 * 0.5f);
+        float vitesse = 0.01f;
+        player_node->rigid_body->velocity.y += jumpStrength * vitesse;
     }
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         fov += 50.0f * delta_time;
@@ -50,9 +59,43 @@ void Player::handleInput(float delta_time) {
     //std::cout<<player_node->rigid_body.velocity.y<<std::endl;
 }
 
+// void Player::handleInput(float delta_time) {
+//     glm::vec3 moveDirection = glm::vec3(0.0f);
+//     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+//         moveDirection += camera->getCFront();
+//     }
+//     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+//         moveDirection -= camera->getCFront();
+//     }
+//     if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+//         moveDirection += camera->getCRight();
+//     }
+//     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+//         moveDirection -= camera->getCRight();
+//     }
+//     moveDirection.y = 0;
+//     moveDirection = glm::normalize(moveDirection);
+
+//     player_node->rigid_body->velocity += moveDirection * ACCELERATION * delta_time;
+//     if(glm::length(player_node->rigid_body->velocity) > MAX_SPEED) {
+//         player_node->rigid_body->velocity = glm::normalize(player_node->rigid_body->velocity) * MAX_SPEED;
+//     }
+//     float fov = camera->getFOV();
+//     fov -= 10.0f * delta_time;
+//     if(fov < 45.0f) {
+//         fov = 45.0f;
+//     }
+//     camera->setFOV(fov);
+//     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+//         fov += 50.0f * delta_time;
+//         if(fov > 90.0f) fov = 90.0f;
+//         camera->setFOV(fov);
+//     }
+// }
+
 void Player::syncCamera() {
     glm::vec3 playerPosition = player_node->transform.get_translation();
-    camera->setPosition(playerPosition + glm::vec3(0.0f,1.8f,0.0f));
+    camera->setPosition(playerPosition + glm::vec3(0.0f,CAMERA_HEIGHT,0.0f));
 }
 
 void Player::handleSingleInput(int key, int scancode, int action, int mods) {
