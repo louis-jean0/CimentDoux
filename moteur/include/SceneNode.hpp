@@ -53,7 +53,6 @@ class SceneNode : public std::enable_shared_from_this<SceneNode> {
             std::vector<std::shared_ptr<SceneNode>> instances;
             for(auto& entry : model->entries) {
                 auto instance = SceneNode::create(entry.mesh, entry.transform);
-                std::cout<<glm::to_string(entry.transform)<<std::endl;
                 instances.push_back(instance);
             }
             return instances;

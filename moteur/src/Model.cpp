@@ -69,7 +69,7 @@ void Model::load_model(const std::string& path) {
 
 void Model::process_node(aiNode *node, const aiScene *scene, glm::mat4 parent_transform)  {
     glm::mat4 node_transform = parent_transform * aiMatrixToGlm(node->mTransformation);
-    std::cout << "Processing node: " << node->mName.C_Str() << std::endl;
+    //std::cout << "Processing node: " << node->mName.C_Str() << std::endl;
     for(unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         auto mesh_data = process_mesh(mesh, scene);

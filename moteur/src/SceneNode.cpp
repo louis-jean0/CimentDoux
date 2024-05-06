@@ -43,7 +43,7 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
 
     if (mesh) {
         updateAABB();
-        //drawMeshAABB(view, projection);    
+        //drawMeshAABB(view, projection);
         mesh->shader->useShader();
         mesh->shader->setMVPMatrix(model_matrix, view, projection);
         mesh->draw();              

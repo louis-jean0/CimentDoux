@@ -69,21 +69,6 @@ glm::vec3 a = glm::vec3(0., 0., 0.);
 glm::mat4 view;
 glm::mat4 proj;
 
-bool appuyer = false;
-bool DebAnim = true;
-bool Space = false;
-
-// Phong
-float cutIn = 25., cutOut = 35.;
-float cutOff;
-float outerCutOff;
-glm::vec3 lightAmbiant = glm::vec3(0.1);
-glm::vec3 lightSpecular = glm::vec3(1.);
-glm::vec3 lightDiffuse = glm::vec3(0.8);
-float constant = 1.;
-float linear = 0.09;
-float quadratic = 0.032;
-
 int main(int argc, char* argv[]) {
     // Initialize window
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux",true);
@@ -109,13 +94,6 @@ int main(int argc, char* argv[]) {
     // Player
     player = Player::create(window.get_window());
     pe->add_player(player);
-
-    // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
-    // auto capsule_node = SceneNode::create(capsule);
-    // capsule_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
-    // capsule_node->set_translation(glm::vec3(0.0f,1.0f,0.0f));
-    //capsule_node->enable_physics(true);
-    //pe->add_entity(capsule_node);
 
     // Scene
     auto scene = Scene::create();
@@ -147,11 +125,10 @@ int main(int argc, char* argv[]) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //myCamera->updateInterface(deltaTime);
+        pe->update(deltaTime);
 
         while (lag >= MS_PER_UPDATE) {
             player->update(deltaTime);
-            pe->update(deltaTime);
             lag -= MS_PER_UPDATE;    
         }
 
@@ -162,8 +139,6 @@ int main(int argc, char* argv[]) {
 
         glm::vec3 camPos = player->get_position();
         glm::vec3 camFront = player->getCFront();
-        cutOff = glm::cos(glm::radians(cutIn));
-        outerCutOff = glm::cos(glm::radians(cutOut));
 
         shader->useShader();
         shader->setVPMatrix(view,proj);
@@ -177,29 +152,8 @@ int main(int argc, char* argv[]) {
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 
-
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);
-        ImGui::SliderFloat("Vitesse du saut", &vitesse, 0.01, 5.);
-        ImGui::InputFloat("// Vitesse du saut", &vitesse, 0.1);
-        ImGui::SliderFloat("Hauteur du saut", &hauteur, 0., 10.);
-        ImGui::InputFloat("// Hauteur du saut", &hauteur, 0.1);
-        ImGui::Spacing();
-        ImGui::SliderFloat("cutOff", &cutIn, 0., 180.);
-        ImGui::SliderFloat("outerCutOff", &cutOut, 0., 180.);
-        ImGui::SliderFloat3("Light Ambiant", &lightAmbiant[0], 0., 1.);
-        ImGui::SliderFloat3("Light Diffuse", &lightDiffuse[0], 0., 1.);
-        ImGui::SliderFloat3("Light Specular", &lightSpecular[0], 0., 1.);
-        ImGui::SliderFloat("constant", &constant, 0., 1.);
-        ImGui::SliderFloat("linear", &linear, 0., 0.1);
-        ImGui::SliderFloat("quadratic", &quadratic, 0., 0.01);
-
-        ImGui::Begin("Paramètres");
-        ImGui::Text("Delta time : %f", deltaTime);
-        //std::cout << deltaTime << std::endl;
-        ImGui::End();
-
-        //std::cout << deltaTime << std::endl;
         ImGui::End();
 
         // Render window & ImGui

@@ -10,9 +10,9 @@ void Scene::setup_scene() {
     add_meshes_from_model(map);
     
     // Directional light
-    glm::vec3 ambient = glm::vec3(0.7f,0.7f,0.7f);
-    glm::vec3 diffuse = glm::vec3(0.5f,0.5f,0.5f);
-    glm::vec3 specular = glm::vec3(0.2f,0.2f,0.2f);
+    glm::vec3 ambient = glm::vec3(1.0f,1.0f,1.0f);
+    glm::vec3 diffuse = glm::vec3(1.0f,1.0f,1.0f);
+    glm::vec3 specular = glm::vec3(1.0f,1.0f,1.0f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
     lights->add_light(directionalLight);
@@ -29,7 +29,7 @@ void Scene::setup_scene() {
     for(auto& scene_node : scene_nodes) {
         auto& mesh = scene_node->mesh;
         if(mesh->material->emissive != glm::vec3(0.0f,0.0f,0.0f)) {
-            //std::cout<<glm::to_string(scene_node->get_position())<<std::endl;
+            std::cout<<glm::to_string(scene_node->get_position())<<std::endl;
         }
     }
 }
@@ -46,7 +46,7 @@ void Scene::add_model(std::shared_ptr<Model> model) {
 void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
     auto nodes = SceneNode::create_node_meshes_from_model(model);
     for(auto& node : nodes) {
-        node->set_scale(glm::vec3(10.0f));
+        node->set_scale(glm::vec3(2.0f));
         scene_nodes.push_back(node);
     }
 }
