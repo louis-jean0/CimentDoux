@@ -33,7 +33,7 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
 
     if (model) {
         updateAABB();
-        drawModelAABB(view, projection);
+        //drawModelAABB(view, projection);
         for (const auto entry : model->entries) {
             entry.mesh->shader->useShader();
             entry.mesh->shader->setMVPMatrix(model_matrix, view, projection);
@@ -43,7 +43,7 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
 
     if (mesh) {
         updateAABB();
-        drawMeshAABB(view, projection);    
+        //drawMeshAABB(view, projection);    
         mesh->shader->useShader();
         mesh->shader->setMVPMatrix(model_matrix, view, projection);
         mesh->draw();              

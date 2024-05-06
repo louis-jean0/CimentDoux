@@ -49,7 +49,7 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
     if(shared_node) {
         shared_node->transform.adjust_translation(correction);
         shared_node->transform.transform_updated = true;
-        velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * restitution_coefficient;
+        velocity -= glm::dot(velocity, collisionNormal) * collisionNormal; // * restitution_coefficient;
         velocity.x *= (1.0f - friction_coefficient);
         velocity.z *= (1.0f - friction_coefficient);
     }

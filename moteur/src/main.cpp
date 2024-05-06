@@ -65,7 +65,6 @@ float hauteur = 3.0f;
 float vitesse = 0.5;
 glm::vec3 F = glm::vec3(0., 0., 0.);
 glm::vec3 a = glm::vec3(0., 0., 0.);
-PhysicsEngine pe;
 
 glm::mat4 view;
 glm::mat4 proj;
@@ -104,20 +103,22 @@ int main(int argc, char* argv[]) {
     // Shader
     auto shader = ShaderManager::getShader();
 
+    // Physics engine
+    auto pe = std::make_shared<PhysicsEngine>();
+
     // Player
     player = Player::create(window.get_window());
-    pe.add_player(player);
+    pe->add_player(player);
 
-    auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
-    auto capsule_node = SceneNode::create(capsule);
-    capsule_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
-    capsule_node->set_translation(glm::vec3(0.0f,1.0f,0.0f));
+    // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
+    // auto capsule_node = SceneNode::create(capsule);
+    // capsule_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
+    // capsule_node->set_translation(glm::vec3(0.0f,1.0f,0.0f));
     //capsule_node->enable_physics(true);
-    pe.add_entity(capsule_node);
+    //pe->add_entity(capsule_node);
 
     // Scene
-    Scene* scene = new Scene();
-    scene->setup_scene();
+    auto scene = Scene::create();
     scene->add_entities_into_physics_engine(pe);
 
     float temps_debut=glfwGetTime();
@@ -128,8 +129,6 @@ int main(int argc, char* argv[]) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         lag += deltaTime;
-
-        pe.update(deltaTime);
     
         // Input
         if(showMouse) {
@@ -152,7 +151,7 @@ int main(int argc, char* argv[]) {
 
         while (lag >= MS_PER_UPDATE) {
             player->update(deltaTime);
-            
+            pe->update(deltaTime);
             lag -= MS_PER_UPDATE;    
         }
 
@@ -175,7 +174,7 @@ int main(int argc, char* argv[]) {
 
         // Scene
         scene->draw(view, proj);
-        capsule_node->draw(view, proj);
+        //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 
 
