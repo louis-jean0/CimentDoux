@@ -157,6 +157,9 @@ int main(int argc, char* argv[]) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImFont* font = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 65.0f);
+    ImFont* fontDefault = io.Fonts->AddFontDefault();
+
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
     ImGui_ImplOpenGL3_Init("#version 410");
@@ -413,7 +416,7 @@ int main(int argc, char* argv[]) {
         obst1_node->draw(view, proj);
         //model_node->draw(view, proj);
         //obst1_node->draw(view, proj);
-
+        /*
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);
         ImGui::SliderFloat("Vitesse du saut", &vitesse, 0.01, 5.);
@@ -429,6 +432,72 @@ int main(int argc, char* argv[]) {
         ImGui::SliderFloat("constant", &constant, 0., 1.);
         ImGui::SliderFloat("linear", &linear, 0., 0.1);
         ImGui::SliderFloat("quadratic", &quadratic, 0., 0.01);
+        */
+
+        // | ImGuiWindowFlags_NoResize
+        ImGui::Begin("Clock", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
+        ImGui::PushFont(font);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+
+        double currentTime = glfwGetTime();
+
+        int jours = static_cast<int>(currentTime / 24);
+        int heures = static_cast<int>(currentTime / 3600);
+        int minutes = static_cast<int>((currentTime - heures * 3600) / 60);
+        int secondes = static_cast<int>(currentTime - heures * 3600 - minutes * 60);
+
+        char TempsFormater[12];
+        snprintf(TempsFormater, sizeof(TempsFormater), "%02d:%02d:%02d:%02d", jours, heures, minutes, secondes);
+
+        char chaineTemps[16];
+        snprintf(chaineTemps, sizeof(chaineTemps), "%.02f", glfwGetTime());
+
+        float longueurTexte = ImGui::CalcTextSize(TempsFormater).x;
+        float hauteurTexte = ImGui::CalcTextSize(TempsFormater).y;
+
+        float longueurFenetre = ImGui::GetWindowWidth();
+        float hauteurFenetre = ImGui::GetWindowHeight();
+
+        float posX = (longueurFenetre - longueurTexte) * 0.5f;
+        float posY = (hauteurFenetre - hauteurTexte) * 1.f;
+
+        ImGui::SetCursorPosX(posX);
+        ImGui::SetCursorPosY(posY);
+
+        ImGui::Text("%s", TempsFormater);
+
+        ImGui::PopFont();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::End();
+
+
+        ImGui::Begin("Clocke", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
+        ImGui::PushFont(font);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+
+        int hauteur = 0;
+
+        char HauteurFormater[5];
+        snprintf(HauteurFormater, sizeof(HauteurFormater), "%dM", hauteur);
+
+        ImVec2 textSize = ImGui::CalcTextSize(HauteurFormater);
+        float posXX = (ImGui::GetWindowWidth() - textSize.x) * 0.5f;
+        float posYY = (ImGui::GetWindowHeight() - textSize.y) * 1.f;
+
+        ImGui::SetCursorPosX(posXX);
+        ImGui::SetCursorPosY(posYY);
+
+        ImGui::Text("%s", HauteurFormater);
+
+        ImGui::PopFont();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+        ImGui::End();
+
+
         /*
         ImGui::Spacing();
         ImGui::SliderFloat("Metallic", &metallic, 0., 1.);
@@ -453,12 +522,17 @@ int main(int argc, char* argv[]) {
         pe.update(deltaTime);
 
         ImGui::Begin("Paramètres");
+        ImGui::PushFont(fontDefault);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
         ImGui::Text("Delta time : %f", deltaTime);
         //std::cout << deltaTime << std::endl;
+        ImGui::PopFont();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
         ImGui::End();
 
         //std::cout << deltaTime << std::endl;
-        ImGui::End();
 
         // Render window & ImGui
         ImGui::Render();
