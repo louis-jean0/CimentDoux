@@ -154,6 +154,8 @@ int main(int argc, char* argv[]) {
 
         ImGui::Begin("Paramètres");
         ImGui::Text("Delta time : %f", deltaTime);
+        ImGui::SliderFloat("Hauteur du saut", player.get_hauteur(), 0., 5.);
+        //ImGui::SliderFloat("Vitesse du saut", player.vitesse, 0., 5.);
         ImGui::End();
 
         // Render window & ImGui

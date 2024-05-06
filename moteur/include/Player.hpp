@@ -61,10 +61,18 @@ class Player {
       glm::vec3 getCFront();
       glm::vec3 getCRight();
       glm::vec3 get_position();
+      void set_vitesse(float vitesse);
+      void set_hauteur(float hauteur);
+      float get_vitesse();
+      float get_hauteur();
 
     private:
 		  std::shared_ptr<Camera> camera;
       GLFWwindow* window; // Lazy to rework this with smart pointers
       bool is_on_ground;
       bool is_jumping;
+
+      float g = 9.81;
+      float hauteur;
+      float vitesse;
 };
