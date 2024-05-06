@@ -5,11 +5,6 @@
 #include <sstream>
 #include <GLFW/glfw3.h>
 
-Shader::Shader()
-{
-
-}
-
 void Shader::setShader(const GLchar* vertexPath, const GLchar* fragmentPath)
 {
     // Shaders reading
@@ -146,6 +141,10 @@ void Shader::setBindMatrix3fv(const GLchar* name, GLsizei count, GLboolean trans
 void Shader::setBind1i(const GLchar* name, GLint v0)
 {
     glUniform1i(glGetUniformLocation(this->Program, name), v0);
+}
+
+void Shader::setBool(const GLchar* name, GLboolean v0) { // Just for verbosity purposes lol
+    setBind1i(name, v0); 
 }
 
 void Shader::setVec3(const GLchar* name, glm::vec3 vector) {

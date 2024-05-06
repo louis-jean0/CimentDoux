@@ -18,6 +18,32 @@ void AABB::processAABB(const glm::vec3 min, const glm::vec3 max) {
     this->originalMax = max;
 }
 
+void AABB::updateAABB(const glm::mat4& modelMatrix) {
+    glm::vec3 minWorld = glm::vec3(modelMatrix * glm::vec4(originalMin, 1.0));
+    glm::vec3 maxWorld = glm::vec3(modelMatrix * glm::vec4(originalMax, 1.0));
+
+    glm::vec3 corners[8] = {
+        glm::vec3(minWorld.x, minWorld.y, minWorld.z),
+        glm::vec3(maxWorld.x, minWorld.y, minWorld.z),
+        glm::vec3(minWorld.x, maxWorld.y, minWorld.z),
+        glm::vec3(maxWorld.x, maxWorld.y, minWorld.z),
+        glm::vec3(minWorld.x, minWorld.y, maxWorld.z),
+        glm::vec3(maxWorld.x, minWorld.y, maxWorld.z),
+        glm::vec3(minWorld.x, maxWorld.y, maxWorld.z),
+        glm::vec3(maxWorld.x, maxWorld.y, maxWorld.z)
+    };
+
+    glm::vec3 newMin = corners[0];
+    glm::vec3 newMax = corners[0];
+
+    for (int i = 1; i < 8; ++i) {
+        newMin = glm::min(newMin, corners[i]);
+        newMax = glm::max(newMax, corners[i]);
+    }
+    min = newMin;
+    max = newMax;
+}
+
 void AABB::drawBox() {
     GLfloat vertices[] = {
     // Bas de la boîte

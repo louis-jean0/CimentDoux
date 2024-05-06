@@ -1,77 +1,68 @@
 #include <Scene.hpp>
+#include <glm/gtx/string_cast.hpp>
 
-Scene::Scene(){};
+void Scene::setup_scene() {
+    // Support plane
+    auto shader = shaders.getShader();
+    auto plane = Model::create("../data/models/plane/plane.gltf", shader);
+    auto plane_node = SceneNode::create(plane);
+    plane_node->set_scale(glm::vec3(100.0f));
+    add_node(plane_node);
 
-void Scene::creation_plan(const char* image_path,unsigned int grid_x, unsigned int grid_z, unsigned int size, unsigned int height_scale,Shader &shader){
-	Plane* plane = new Plane(grid_x,grid_z,size,height_scale);
-	Texture plane_texture(image_path);
-    plane->add_texture(plane_texture);
-    plane->bind_shader(shader);
-    list_plane.push_back(plane);
-    SceneNode plane_node(plane);
-    list_scene.push_back(plane_node);
+    // Map
+    auto map = Model::create("../data/models/map/map.obj", shader);
+    add_meshes_from_model(map);
+    
+    // Directional light
+    glm::vec3 ambient = glm::vec3(0.7f,0.7f,0.7f);
+    glm::vec3 diffuse = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 specular = glm::vec3(0.2f,0.2f,0.2f);
+    glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+    auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
+    //lights.add_light(directionalLight);
+
+    std::cout<<scene_nodes.size()<<std::endl;
+    glm::vec3 position = glm::vec3(-12.0f,3.2f,8.0f);
+    glm::vec3 ambient2 = glm::vec3(0.3f,0.3f,0.3f);
+    glm::vec3 diffuse2 = glm::vec3(0.1f,0.1f,0.1f);
+    glm::vec3 specular2 = glm::vec3(0.1f,0.1f,0.1f);
+    auto pointLight = PointLight::create(ambient2, diffuse2, specular2, position, 1.0f, 0.09f, 0.032f);
+    lights.add_light(pointLight);
+
+    // // Point lights
+    // for(auto& scene_node : scene_nodes) {
+    //     auto& mesh = scene_node->mesh;
+    //     if(mesh->material->emissive != glm::vec3(0.0f,0.0f,0.0f)) {
+    //         std::cout<<glm::to_string(scene_node->get_position())<<std::endl;
+    //     }
+    // }
 }
 
-void Scene::creationMap(Shader &shader){
-	
-    Model obst1("../data/models/cube/Cube.gltf");
-    obst1.bind_shader_to_meshes(shader);
-    SceneNode* obst1_node = new SceneNode(&obst1);
-    obst1_node->transform.set_scale(glm::vec3(1.0f));
-    obst1_node->transform.set_translation(glm::vec3(15., 1.0f, 15.));
-    list_model.push_back(obst1_node);
-
-    Model obst2("../data/models/cube/Cube.gltf");
-    obst2.bind_shader_to_meshes(shader);
-    SceneNode* obst2_node = new SceneNode(&obst2);
-    obst2_node->transform.set_scale(glm::vec3(1.0f));
-    obst2_node->transform.set_translation(glm::vec3(15., 2.0f, 17));
-    list_model.push_back(obst2_node);
-
-    Model obst3("../data/models/cube/Cube.gltf");
-    obst3.bind_shader_to_meshes(shader);
-    SceneNode* obst3_node = new SceneNode(&obst3);
-    obst3_node->transform.set_scale(glm::vec3(1.0f));
-    obst3_node->transform.set_translation(glm::vec3(15., 3.0f, 19));
-    list_model.push_back(obst3_node);
-
-    Model obst4("../data/models/cube/Cube.gltf");
-    obst4.bind_shader_to_meshes(shader);
-    SceneNode* obst4_node = new SceneNode(&obst4);
-    obst4_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
-    obst4_node->transform.set_translation(glm::vec3(15., 4.0f, 23));
-    list_model.push_back(obst4_node);
-
-    Model obst5("../data/models/cube/Cube.gltf");
-    obst5.bind_shader_to_meshes(shader);
-    SceneNode* obst5_node = new SceneNode(&obst5);
-    obst5_node->transform.set_scale(glm::vec3(3.0f,1.f,5.f));
-    obst5_node->transform.set_translation(glm::vec3(15., 5.0f, 33));
-    list_model.push_back(obst5_node);
-
-    Model obst6("../data/models/cube/Cube.gltf");
-    obst6.bind_shader_to_meshes(shader);
-    SceneNode* obst6_node = new SceneNode(&obst6);
-    obst6_node->transform.set_scale(glm::vec3(2.0f,1.f,3.f));
-    obst6_node->transform.set_translation(glm::vec3(15., 4.0f, 83.5));
-    list_model.push_back(obst6_node);
+void Scene::add_node(std::shared_ptr<SceneNode> node) {
+    scene_nodes.push_back(node);
 }
 
-void Scene::draw_plan(glm::mat4 &view, glm::mat4 &projection){
-	int t=list_scene.size();
-	for(int i=0;i<t;++i){
-		list_scene[i].draw(view, projection);
-	}
+void Scene::add_model(std::shared_ptr<Model> model) {
+    auto node = SceneNode::create(model);
+    scene_nodes.push_back(node);
 }
 
-void Scene::draw_model(glm::mat4 &view, glm::mat4 &projection){
-	int t=list_model.size();
-	for(int i=0;i<t;++i){
-		list_model[i]->draw(view, projection);
-	}
+void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
+    auto nodes = SceneNode::create_node_meshes_from_model(model);
+    for(auto& node : nodes) {
+        scene_nodes.push_back(node);
+    }
 }
 
-void Scene::draw(glm::mat4 &view, glm::mat4 &projection){
-	draw_plan(view, projection);
-	draw_model(view, projection);
+void Scene::add_entities_into_physics_engine(PhysicsEngine& pe) {
+    for(auto& scene_node : scene_nodes) {
+        pe.add_entity(scene_node);
+    }
+}
+
+void Scene::draw(glm::mat4& view, glm::mat4& projection) {
+    for(auto& scene_node : scene_nodes) {
+        scene_node->draw(view, projection);
+    }
+    lights.setup_lights(shaders.getShader());
 }

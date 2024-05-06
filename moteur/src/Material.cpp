@@ -1,5 +1,7 @@
 #include <Material.hpp>
 
-void Material::add_texture(Texture texture) {
-    textures.push_back(texture);
+void Material::add_texture(std::shared_ptr<Texture> texture) {
+    if(texture) {
+        textures.push_back(texture);
+    }
 }

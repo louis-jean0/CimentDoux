@@ -1,22 +1,31 @@
 #pragma once
 
-#include <Plane.hpp>
 #include <SceneNode.hpp>
-#include <Shader.hpp>
+#include <LightManager.hpp>
+#include <ShaderManager.hpp>
+#include <PhysicsEngine.hpp>
+#include <memory>
 
-class Scene{
-public:
+class Scene {
+    public:
+        std::vector<std::shared_ptr<SceneNode>> scene_nodes;
+        Scene() {}
 
-	Scene();
-	void creation_plan(const char* image_path,unsigned int grid_x, unsigned int grid_z, unsigned int size, unsigned int height_scale,Shader &s);
-	void creationMap(Shader &s);
-	void draw_plan(glm::mat4 &view, glm::mat4 &projection);
-	void draw_model(glm::mat4 &view, glm::mat4 &projection);
-	void draw(glm::mat4 &view, glm::mat4 &projection);
+        // Factory
+        static std::shared_ptr<Scene> create() {
+            auto instance = std::make_shared<Scene>();
+            instance->setup_scene();
+            return instance;
+        }
 
-private: 
-	std::vector<Plane*> list_plane;
-	std::vector<SceneNode> list_scene;
-	std::vector<SceneNode*> list_model;
-
+        void setup_scene();
+        void add_node(std::shared_ptr<SceneNode> node);
+        void add_model(std::shared_ptr<Model> model);
+        void add_meshes_from_model(std::shared_ptr<Model> model);
+        void add_entities_into_physics_engine(PhysicsEngine& pe);
+        void draw(glm::mat4& view, glm::mat4& projection);
+    
+    private:
+        LightManager lights;
+        ShaderManager shaders;
 };

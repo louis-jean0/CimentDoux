@@ -2,8 +2,6 @@
 
 #include <Texture.hpp>
 
-Texture::Texture() {}
-
 Texture::Texture(const char* image_path) {
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
@@ -105,4 +103,8 @@ unsigned int Texture::texture_from_file(const char* image_path, const std::strin
 
 void Texture::use() {
     glBindTexture(GL_TEXTURE_2D,ID);
+}
+
+void Texture::unbind() {
+    glBindTexture(GL_TEXTURE_2D,0);
 }

@@ -6,9 +6,7 @@
 
 class ModelCollider {
     public:
+        AABB& bounding_box;
         ModelCollider(AABB& bounding_box);
         bool checkCollision(ModelCollider& other, float& collisionDepth, glm::vec3& collisionNormal);
-
-    private:
-        AABB& bounding_box;
 };

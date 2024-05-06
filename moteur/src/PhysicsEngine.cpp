@@ -14,6 +14,10 @@ void PhysicsEngine::update(float delta_time) {
     }
 }
 
-void PhysicsEngine::add_entity(RigidBody *entity) {
-  entities.push_back(entity);
+void PhysicsEngine::add_player(std::shared_ptr<Player> player) {
+    entities.push_back(player->player_node->rigid_body);
+}
+
+void PhysicsEngine::add_entity(std::shared_ptr<SceneNode> node) {
+    entities.push_back(node->rigid_body);
 }
