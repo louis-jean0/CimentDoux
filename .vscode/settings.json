@@ -76,6 +76,7 @@
         "valarray": "cpp",
         "variant": "cpp",
         "__nullptr": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "filesystem": "cpp"
     }
 }

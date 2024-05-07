@@ -178,3 +178,16 @@ glm::mat4 Model::aiMatrixToGlm(aiMatrix4x4 from) {
     to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
     return to;
 }
+
+
+glm::vec3 Model::getMin() {
+    return bounding_box.min;
+}
+
+glm::vec3 Model::getMax() {
+    return bounding_box.max;
+}
+
+glm::vec3 Model::getCenter() {
+    return glm::vec3((bounding_box.min.x + bounding_box.min.x) / 2., (bounding_box.min.y + bounding_box.min.y) / 2., (bounding_box.min.z + bounding_box.min.z) / 2.);
+}

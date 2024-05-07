@@ -60,7 +60,15 @@ class Model {
         void bind_texture_to_meshes(std::shared_ptr<Texture> texture);
         void computeBoundingBox();
         void updateGlobalBoundingBox(const glm::mat4 &modelMatrix);
+<<<<<<< HEAD
         glm::mat4 aiMatrixToGlm(aiMatrix4x4 from);
+=======
+
+
+        glm::vec3 getMin();
+        glm::vec3 getMax();
+        glm::vec3 getCenter();     
+>>>>>>> Evan
     
     private:
         // Private attributes
