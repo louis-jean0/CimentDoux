@@ -13,6 +13,10 @@ struct PointLight {
     float constant;
     float linear;
     float quadratic;
+    bool is_torch_light;
+    vec3 direction;
+    float cut_off;
+    float outer_cut_off;
 };
 
 // DirectionalLight
@@ -43,7 +47,7 @@ uniform sampler2D texture_specular2;
 
 uniform vec3 viewPos;
 
-#define NB_POINT_LIGHTS_MAX 100
+#define NB_POINT_LIGHTS_MAX 20
 uniform int nb_point_lights;
 uniform PointLight pointLights[NB_POINT_LIGHTS_MAX];
 vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -64,24 +68,6 @@ void main() {
     result += material.emissive;
     FragColor = vec4(result,1.0);
 }
-
-// void main() {
-//     vec3 viewDir = normalize(viewPos - fragPos);
-//     vec3 result = computeDirectionalLightContribution(directionalLight, normal, viewDir);
-//     for(int i = 0; i < nb_point_lights; ++i) {
-//         result += computePointLightsContribution(pointLights[i], normal, fragPos, viewDir);
-//     }
-//     result += material.emissive;
-
-//     // Calcul de la distance et de l'atténuation pour la première point light
-//     float distance = length(pointLights[0].position - fragPos);
-//     float attenuation = 1.0 / (pointLights[0].constant + (pointLights[0].linear * distance) + (pointLights[0].quadratic * distance * distance));
-
-//     // Utiliser l'atténuation pour moduler le résultat
-//     vec3 color = attenuation * result; // Assurez-vous que `attenuation` ne rend pas tout trop sombre ou trop lumineux
-
-//     FragColor = vec4(color, 1.0);
-// }
 
 vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir) {
     vec3 lightDir = normalize(pointLight.position - fragPos);
@@ -114,7 +100,14 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
     float distance = length(pointLight.position - fragPos);
     float attenuation = 1.0 / (pointLight.constant + (pointLight.linear * distance) + (pointLight.quadratic * distance * distance));
 
-    return (ambient + diffuse + specular);// * attenuation;
+    if(pointLight.is_torch_light) {
+        float theta = dot(lightDir, normalize(-pointLight.direction));
+        float epsilon = pointLight.cut_off - pointLight.outer_cut_off;
+        float intensity = clamp((theta - pointLight.outer_cut_off) / epsilon, 0.0, 1.0);
+        attenuation *= intensity;
+    }
+
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir) {

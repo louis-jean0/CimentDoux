@@ -3,6 +3,7 @@
 #include <Light.hpp>
 #include <PointLight.hpp>
 #include <DirectionalLight.hpp>
+#include <TorchLight.hpp>
 #include <vector>
 
 class LightManager {

@@ -12,7 +12,8 @@ void Player::update(float delta_time) {
     syncCamera();
     player_node->updateAABB();
     camera->update(delta_time, window);
-    std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
+    //std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
+    //std::cout<<player_node->rigid_body->velocity.y<<std::endl;
 }
 
 void Player::handleInput(float delta_time) {

@@ -15,23 +15,16 @@ void Scene::setup_scene() {
     glm::vec3 specular = glm::vec3(1.0f,1.0f,1.0f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
-    lights->add_light(directionalLight);
+    //lights->add_light(directionalLight);
 
     //std::cout<<scene_nodes.size()<<std::endl;
     glm::vec3 position = glm::vec3(-12.0f,3.2f,8.0f);
     glm::vec3 ambient2 = glm::vec3(0.3f,0.3f,0.3f);
     glm::vec3 diffuse2 = glm::vec3(0.1f,0.1f,0.1f);
     glm::vec3 specular2 = glm::vec3(0.1f,0.1f,0.1f);
-    auto pointLight = PointLight::create(ambient2, diffuse2, specular2, position, 1.0f, 0.09f, 0.032f);
-    //lights->add_light(pointLight);
-
-    // Point lights
-    for(auto& scene_node : scene_nodes) {
-        auto& mesh = scene_node->mesh;
-        if(mesh->material->emissive != glm::vec3(0.0f,0.0f,0.0f)) {
-            std::cout<<glm::to_string(scene_node->get_position())<<std::endl;
-        }
-    }
+    glm::vec3 directionTorchLight = glm::vec3(1.0f,0.0f,0.0f);
+    auto pointLight = TorchLight::create(ambient2, diffuse2, specular2, position, 0.1f, 0.09f, 0.032f, directionTorchLight, 45.0f, 90.0f);
+    lights->add_light(pointLight);
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {

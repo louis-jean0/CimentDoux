@@ -4,7 +4,7 @@
 #include <memory>
 
 void RigidBody::updatePhysics(float delta_time) {
-    if(use_gravity && !is_on_ground) {
+    if(use_gravity) {
         glm::vec3 gravity = glm::vec3(0.0f,-1.00f,0.0f);
         glm::vec3 acceleration = gravity;
         velocity += acceleration * delta_time;
@@ -20,7 +20,6 @@ void RigidBody::updatePhysics(float delta_time) {
     }
     is_on_ground = false;
 }
-    
 
 bool RigidBody::checkCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {
     auto shared_node = node.lock();
@@ -51,13 +50,13 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
     glm::vec3 correction = (collisionDepth + safetyOffset) * collisionNormal;
     auto shared_node = node.lock();
     if(shared_node) {
-        shared_node->transform.adjust_translation(correction);
-        shared_node->transform.transform_updated = true;
         if(collisionNormal.y > 0.1f) {
             is_on_ground = true;
             velocity.y = 0;
         }
-        //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal; // * restitution_coefficient;
+        shared_node->transform.adjust_translation(correction);
+        shared_node->transform.transform_updated = true;
+        velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * restitution_coefficient;
         applyGroundFriction(other);
     }
     else {
