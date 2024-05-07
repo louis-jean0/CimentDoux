@@ -37,7 +37,7 @@ class Camera
 public: 
 
 	//gestion plusieurs cam
-	int mode_cam=1;
+	int mode_cam=0;
 	glm::vec3 pos_player;
 
 	void init();
