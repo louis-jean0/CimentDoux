@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
         ImGui::PopStyleVar();
         ImGui::End();
 
-        ImGui::Begin("Clocke", NULL, ImGuiWindowFlags_NoTitleBar | | ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin("Clocke", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
         ImGui::PushFont(font);
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
