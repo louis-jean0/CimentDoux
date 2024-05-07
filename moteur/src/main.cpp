@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(action == GLFW_PRESS) {
-        if(key == GLFW_KEY_Z) {
+        if(key == GLFW_KEY_Z && player->get_camera()->mode_cam!=0) {
             wireframe = !wireframe;
             if(wireframe) {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
