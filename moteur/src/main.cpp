@@ -155,20 +155,19 @@ int main(int argc, char* argv[]) {
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 
-        ImGui::Begin("Clock", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin("Clock", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
         ImGui::PushFont(font);
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
 
         double currentTime = glfwGetTime();
 
-        int jours = static_cast<int>(currentTime / 24);
         int heures = static_cast<int>(currentTime / 3600);
         int minutes = static_cast<int>((currentTime - heures * 3600) / 60);
         int secondes = static_cast<int>(currentTime - heures * 3600 - minutes * 60);
 
-        char TempsFormater[12];
-        snprintf(TempsFormater, sizeof(TempsFormater), "%02d:%02d:%02d:%02d", jours, heures, minutes, secondes);
+        char TempsFormater[9];
+        snprintf(TempsFormater, sizeof(TempsFormater), "%02d:%02d:%02d", heures, minutes, secondes);
 
         char chaineTemps[16];
         snprintf(chaineTemps, sizeof(chaineTemps), "%.02f", glfwGetTime());

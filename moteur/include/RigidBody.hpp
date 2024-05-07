@@ -23,5 +23,6 @@ class RigidBody {
         bool checkCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3& collisionNormal);
         void solveCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3& collisionNormal);
         void applyAirResistance();
+        void applyGroundFriction();
         void applyGroundFriction(std::shared_ptr<RigidBody> other);
 };

@@ -52,11 +52,24 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
     if(shared_node) {
         if(collisionNormal.y > 0.1f) {
             is_on_ground = true;
-            velocity.y = 0;
+            if(other->restitution_coefficient == 0.0f) {
+                velocity.y = 0;
+            }
+            else {
+                float velocity_normal_component = glm::dot(velocity, collisionNormal);
+                if (velocity_normal_component < 0) {
+                    glm::vec3 velocity_perpendicular = velocity_normal_component * collisionNormal;
+                    glm::vec3 velocity_tangential = velocity - velocity_perpendicular;
+
+                    // Inverser la composante perpendiculaire pour le rebond et appliquer le coefficient
+                    velocity = velocity_tangential - other->restitution_coefficient * velocity_perpendicular;
+                }
+            }
         }
+        
         shared_node->transform.adjust_translation(correction);
         shared_node->transform.transform_updated = true;
-        velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * restitution_coefficient;
+        //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * other->restitution_coefficient;
         applyGroundFriction(other);
     }
     else {

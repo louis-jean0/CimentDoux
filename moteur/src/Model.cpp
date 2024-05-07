@@ -58,8 +58,8 @@ void Model::updateGlobalBoundingBox(const glm::mat4& modelMatrix) {
 // Private methods
 void Model::load_model(const std::string& path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals | aiProcess_GenBoundingBoxes | aiProcess_OptimizeMeshes);
-    if(!scene || scene->mFlags && AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_GenBoundingBoxes);
+    if(!scene || (scene->mFlags && AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
         std::cout<<"ERROR::ASSIMP"<<importer.GetErrorString()<<std::endl;
     }
     directory = path.substr(0, path.find_last_of('/'));

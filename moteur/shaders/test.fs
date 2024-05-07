@@ -62,10 +62,12 @@ out vec4 FragColor;
 void main() {
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 result = computeDirectionalLightContribution(directionalLight, normal, viewDir);
-    for(int i = 0; i < nb_point_lights; ++i) {
+    for(int i = 0; i < nb_point_lights - 1; ++i) {
         result += computePointLightsContribution(pointLights[i], normal, fragPos, viewDir);
     }
     result += material.emissive;
+    vec3 norm = normalize(normal);
+    //(norm + 1.0) * 0.5
     FragColor = vec4(result,1.0);
 }
 
@@ -112,7 +114,6 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
 
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir) {
     vec3 lightDir = normalize(-directionalLight.direction); // - because we specify a direction from the light to the scene and not the other way around
-    vec3 reflectDir = reflect(-lightDir, normal);
     
     // Ambient
     vec3 ambient = directionalLight.ambient * material.ambient * vec3(texture(texture_diffuse1, uvs));
@@ -128,6 +129,7 @@ vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3
     }
 
     // Specular
+    vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir),0.0),material.shininess);
     vec3 specular;
     if(hasSpecular) {

@@ -6,7 +6,7 @@ void Scene::setup_scene() {
     auto shader = shaders->getShader();
 
     // Map
-    auto map = Model::create("../data/models/map2/map2.obj", shader);
+    auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
     add_meshes_from_model(map);
     
     // Directional light
@@ -31,7 +31,8 @@ void Scene::setup_scene() {
 
     //spot2
     glm::vec3 position2 = glm::vec3(-12.0f,0.5f,0.8f);
-    auto pointLight2 = PointLight::create(ambient2, diffuse2, specular2, position2, 0.10f, 0.001f, 0.152f);
+    glm::vec3 directionTest = glm::vec3(1.0f,0.5f,0.0f);
+    auto pointLight2 = TorchLight::create(ambient2, diffuse2, specular2, position2, 0.10f, 0.001f, 0.152f, directionTest, 45.0f, 90.0f);
     lights->add_light(pointLight2);
 
     //lumiere 3
@@ -75,8 +76,6 @@ void Scene::setup_scene() {
     auto pointLight11 = PointLight::create(ambient2, diffuse2, specular2, position11, 0.10f, 0.001f, 0.152f);
     lights->add_light(pointLight11);
 
-
-
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
@@ -90,15 +89,24 @@ void Scene::add_model(std::shared_ptr<Model> model) {
 
 void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
     auto nodes = SceneNode::create_node_meshes_from_model(model);
+    //int i = 100;
     for(auto& node : nodes) {
         node->set_scale(glm::vec3(2.0f));
         scene_nodes.push_back(node);
+        // if(i == 100) {
+        //     std::cout<<"Caca"<<std::endl;
+        //     node->mesh->material->emissive = glm::vec3(1.0f,0.0f,0.0f);
+        //     node->rigid_body->friction_coefficient = 1.0f;
+        // } 
+        // i++;
     }
 }
 
 void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) {
     for(auto& scene_node : scene_nodes) {
-        pe->add_entity(scene_node);
+        if(scene_node->mesh->material->diffuse != glm::vec3(0.074825,0.454437,0.037416)) {
+            pe->add_entity(scene_node);
+        }
     }
 }
 
