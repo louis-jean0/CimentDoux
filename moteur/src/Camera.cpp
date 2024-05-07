@@ -144,11 +144,7 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 
 		lastShowMouseState = m_showMouse;
 
-		if(mode_cam==0) {
-			m_position=pos_player+glm::vec3(0.,1.,1.);
-
-		}
-		if(mode_cam==1) {
+		if(mode_cam==0 || mode_cam==1) {
 
 			if(!m_showMouse) {
 
@@ -181,27 +177,6 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 					m_eulerAngleInDegrees.x += yDiff * m_rotationSpeed * _deltaTime; // Pitch
 				}
 				
-				// glm::vec3 CFront = glm::normalize(getCFront());
-				// glm::vec3 CRight = glm::normalize(getCRight());
-
-				// if(glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS) {
-				// 	m_position += CFront * m_translationSpeed * _deltaTime;
-				// }
-				// if(glfwGetKey(_window, GLFW_KEY_S) == GLFW_PRESS) {
-				// 	m_position -= CFront * m_translationSpeed * _deltaTime;
-				// }
-				// if(glfwGetKey(_window, GLFW_KEY_A) == GLFW_PRESS) {
-				// 	m_position += CRight * m_translationSpeed * _deltaTime;
-				// }
-				// if(glfwGetKey(_window, GLFW_KEY_D) == GLFW_PRESS) {
-				// 	m_position -= CRight * m_translationSpeed * _deltaTime;
-				// }
-				// if(glfwGetKey(_window, GLFW_KEY_Q) == GLFW_PRESS) {
-				// 	m_position += glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
-				// }
-				// if(glfwGetKey(_window, GLFW_KEY_E) == GLFW_PRESS) {
-				// 	m_position -= glm::vec3(0.,1.,0.) * m_translationSpeed * _deltaTime;
-				// }
 			}
 		}
 		if(mode_cam==2){

@@ -114,7 +114,7 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
     float distance = length(pointLight.position - fragPos);
     float attenuation = 1.0 / (pointLight.constant + (pointLight.linear * distance) + (pointLight.quadratic * distance * distance));
 
-    return (ambient + diffuse + specular);// * attenuation;
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir) {

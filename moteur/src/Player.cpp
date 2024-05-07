@@ -23,18 +23,37 @@ void Player::handleInput(float delta_time) {
     }
     camera->setFOV(fov);
     glm::vec3 moveDirection = glm::vec3(0.0f);
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+
+    if(camera->mode_cam==0){
+        if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
         moveDirection += camera->getCFront();
+        }
+        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            moveDirection -= camera->getCFront();
+        }
+        if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+            moveDirection += camera->getCRight();
+        }
+        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            moveDirection -= camera->getCRight();
+        }
     }
-    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        moveDirection -= camera->getCFront();
+    if(camera->mode_cam==1){
+        if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        moveDirection += camera->getCFront();
+        }
+        if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            moveDirection -= camera->getCFront();
+        }
+        if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            moveDirection += camera->getCRight();
+        }
+        if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            moveDirection -= camera->getCRight();
+        }
     }
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        moveDirection += camera->getCRight();
-    }
-    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        moveDirection -= camera->getCRight();
-    }
+
+
     moveDirection.y = 0;
     float acceleration = 0.2f;
     if(glm::length(moveDirection) > 0) {

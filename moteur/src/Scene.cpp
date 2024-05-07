@@ -15,23 +15,68 @@ void Scene::setup_scene() {
     glm::vec3 specular = glm::vec3(1.0f,1.0f,1.0f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
-    lights->add_light(directionalLight);
+    //lights->add_light(directionalLight);
 
     //std::cout<<scene_nodes.size()<<std::endl;
-    glm::vec3 position = glm::vec3(-12.0f,3.2f,8.0f);
+        
+    glm::vec3 reglage = glm::vec3(1.0f, 0.09f, 0.032f);   
     glm::vec3 ambient2 = glm::vec3(0.3f,0.3f,0.3f);
     glm::vec3 diffuse2 = glm::vec3(0.1f,0.1f,0.1f);
     glm::vec3 specular2 = glm::vec3(0.1f,0.1f,0.1f);
-    auto pointLight = PointLight::create(ambient2, diffuse2, specular2, position, 1.0f, 0.09f, 0.032f);
-    //lights->add_light(pointLight);
 
-    // Point lights
-    for(auto& scene_node : scene_nodes) {
-        auto& mesh = scene_node->mesh;
-        if(mesh->material->emissive != glm::vec3(0.0f,0.0f,0.0f)) {
-            std::cout<<glm::to_string(scene_node->get_position())<<std::endl;
-        }
-    }
+    //lumire 1
+    glm::vec3 position = glm::vec3(-23.6f,6.5f,14.4f);
+    auto pointLight = PointLight::create(ambient2, diffuse2, specular2, position, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight);
+
+    //spot2
+    glm::vec3 position2 = glm::vec3(-12.0f,0.5f,0.8f);
+    auto pointLight2 = PointLight::create(ambient2, diffuse2, specular2, position2, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight2);
+
+    //lumiere 3
+    glm::vec3 position3 = glm::vec3(30.0f,16.f,15.3f);
+    auto pointLight3 = PointLight::create(ambient2, diffuse2, specular2, position3, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight3);
+
+    //lumiere 2
+    glm::vec3 position4 = glm::vec3(0.2f,9.f,28.3f);
+    auto pointLight4 = PointLight::create(ambient2, diffuse2, specular2, position4, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight4);
+
+    //spot1 bétoniere
+    glm::vec3 position5 = glm::vec3(-27.7f,0.5f,24.f);
+    auto pointLight5 = PointLight::create(ambient2, diffuse2, specular2, position5, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight5);
+
+    //neon1
+    glm::vec3 position6 = glm::vec3(-10.5f,6.5f,0.1f);
+    auto pointLight6 = PointLight::create(ambient2, diffuse2, specular2, position6, 0.10f, 0.001f, 0.352f);
+    lights->add_light(pointLight6);
+    glm::vec3 position7 = glm::vec3(-9.5f,7.f,0.1f);
+    auto pointLight7 = PointLight::create(ambient2, diffuse2, specular2, position7, 0.10f, 0.001f, 0.352f);
+    lights->add_light(pointLight7);
+
+    //neon2
+    glm::vec3 position8 = glm::vec3(-10.5f,6.5f,-4.f);
+    auto pointLight8 = PointLight::create(ambient2, diffuse2, specular2, position8, 0.10f, 0.001f, 0.352f);
+    lights->add_light(pointLight8);
+    glm::vec3 position9 = glm::vec3(-9.5f,7.f,-4.f);
+    auto pointLight9 = PointLight::create(ambient2, diffuse2, specular2, position9, 0.10f, 0.001f, 0.352f);
+    lights->add_light(pointLight9);
+
+    //lumière 4 
+    glm::vec3 position10 = glm::vec3(8.9f,8.f,10.5f);
+    auto pointLight10 = PointLight::create(ambient2, diffuse2, specular2, position10, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight10);
+
+    //lumière 5 
+    glm::vec3 position11 = glm::vec3(-28.f,20.f,-11.f);
+    auto pointLight11 = PointLight::create(ambient2, diffuse2, specular2, position11, 0.10f, 0.001f, 0.152f);
+    lights->add_light(pointLight11);
+
+
+
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
