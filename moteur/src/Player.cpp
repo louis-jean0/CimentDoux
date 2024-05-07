@@ -70,6 +70,7 @@ void Player::handleInput(float delta_time) {
         float vitesse = 0.01f;
         player_node->rigid_body->velocity.y += jumpStrength * vitesse;
     }
+    
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         fov += 50.0f * delta_time;
         if(fov > 90.0f) fov = 90.0f;
@@ -115,4 +116,17 @@ glm::vec3 Player::getCRight() {
 
 glm::vec3 Player::get_position() {
     return player_node->get_position();
+}
+
+void Player::set_vitesse(float vitesse) {
+    this->vitesse = vitesse;
+}
+void Player::set_hauteur(float hauteur) {
+    this->hauteur = hauteur;
+}
+float Player::get_vitesse() {
+    this->vitesse = vitesse;
+}
+float Player::get_hauteur() {
+    return this->hauteur;
 }
