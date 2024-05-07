@@ -47,7 +47,7 @@ uniform sampler2D texture_specular2;
 
 uniform vec3 viewPos;
 
-#define NB_POINT_LIGHTS_MAX 20
+#define NB_POINT_LIGHTS_MAX 30
 uniform int nb_point_lights;
 uniform PointLight pointLights[NB_POINT_LIGHTS_MAX];
 vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -61,10 +61,12 @@ out vec4 FragColor;
 
 void main() {
     vec3 viewDir = normalize(viewPos - fragPos);
-    vec3 result = computeDirectionalLightContribution(directionalLight, normal, viewDir);
-    for(int i = 0; i < nb_point_lights - 1; ++i) {
+    vec3 result =computeDirectionalLightContribution(directionalLight, normal, viewDir);
+    //vec3 result = vec3(0.,0.,0.);
+    for(int i = 0; i < nb_point_lights; ++i) {
         result += computePointLightsContribution(pointLights[i], normal, fragPos, viewDir);
     }
+
     result += material.emissive;
     vec3 norm = normalize(normal);
     //(norm + 1.0) * 0.5
@@ -116,7 +118,7 @@ vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3
     vec3 lightDir = normalize(-directionalLight.direction); // - because we specify a direction from the light to the scene and not the other way around
     
     // Ambient
-    vec3 ambient = directionalLight.ambient * material.ambient * vec3(texture(texture_diffuse1, uvs));
+    vec3 ambient = directionalLight.ambient * material.ambient ;
 
     // Diffuse
     float diff = max(dot(normal, lightDir),0.0);

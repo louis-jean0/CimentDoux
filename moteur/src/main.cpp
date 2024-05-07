@@ -242,6 +242,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
         }
+        if(key == GLFW_KEY_A && player->get_camera()->mode_cam==0) {
+            wireframe = !wireframe;
+            if(wireframe) {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+            else {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }
+        }
         if(key == GLFW_KEY_T) {
             showMouse = player->get_camera()->getShowMouse();
             showMouse = !showMouse;
