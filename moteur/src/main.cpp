@@ -104,60 +104,6 @@ int main(int argc, char* argv[]) {
 
     float temps_debut=glfwGetTime();
 
-    // Obtenir une liste des périphériques audio disponibles
-    const ALCchar* devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
-    if (!devices) {
-        std::cerr << "Aucun périphérique audio trouvé" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    // Choisissez le périphérique audio que vous souhaitez utiliser (par exemple, le premier périphérique de la liste)
-    const char* deviceName = devices;
-    std::cout << deviceName << std::endl;
-
-    // Spécifiez le chemin du périphérique audio dans alcOpenDevice()
-    ALCdevice* device = alcOpenDevice(deviceName);
-    if (!device) {
-        std::cerr << "Impossible d'ouvrir le périphérique audio spécifié" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    ALCcontext* context = alcCreateContext(device, NULL);
-    alcMakeContextCurrent(context);
-
-    // Charger le fichier audio
-    std::vector<ALshort> samples;
-    SF_INFO info;
-    if (!loadAudioFile("../data/sounds/retro.wav", samples, info)) {
-        alcDestroyContext(context);
-        alcCloseDevice(device);
-        glfwTerminate();
-        return -1;
-    }
-
-    // Générer et remplir un buffer OpenAL
-    ALuint buffer;
-    alGenBuffers(1, &buffer);
-    alBufferData(buffer, (info.channels == 2) ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16, samples.data(),
-                 static_cast<ALsizei>(samples.size() * sizeof(ALshort)), info.samplerate);
-
-    // Créer une source audio OpenAL
-    ALuint source;
-    alGenSources(1, &source);
-
-    alSourcef(source, AL_GAIN, volume);
-    alSourcei(source, AL_BUFFER, buffer);
-    alSourcei(source, AL_LOOPING, true);
-    alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
-    alSource3f(source, AL_POSITION, 0., 0., 0.);
-    alSource3f(source, AL_VELOCITY, 1., 1., 1.);
-    alSourcef(source, AL_PITCH, 1);
-
-    // Jouer le son
-    alSourcePlay(source);
-
     // Render loop
     while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
