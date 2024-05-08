@@ -63,6 +63,8 @@ public:
 	void setShowMouse(bool m_showMouse) {this->m_showMouse = m_showMouse;} // For callback (in TP.cpp) purpose
 	void transition(float delta_time);
 
+	void set_sensitivity(float sensitivity);
+    float get_sensivity();
 
 private:
 

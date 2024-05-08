@@ -61,13 +61,22 @@ float PasTranslationCube = 0.01;
 // Physique
 double v0_Vitesse = 0.01f;
 float g = 9.81;
-float hauteur = 3.0f;
 float vitesse = 0.5;
 glm::vec3 F = glm::vec3(0., 0., 0.);
 glm::vec3 a = glm::vec3(0., 0., 0.);
 
 glm::mat4 view;
 glm::mat4 proj;
+
+
+
+// Permet d'aficher ou non (métrage + timer)
+bool principal = true;
+bool settings = false;
+bool ESCAPE;
+
+bool aa = false;
+
 
 int main(int argc, char* argv[]) {
     // Initialize window
@@ -80,7 +89,9 @@ int main(int argc, char* argv[]) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 65.0f);
+    ImFont* fontMenu = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf",50.0f);
     ImFont* fontDefault = io.Fonts->AddFontDefault();
+
 
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window.get_window(), true);
@@ -102,11 +113,22 @@ int main(int argc, char* argv[]) {
     auto scene = Scene::create();
     scene->add_entities_into_physics_engine(pe);
 
-    float temps_debut=glfwGetTime();
+
+    // Variables menu
+    double hauteur = 0.;
+    double MaxHeight = 0.;
+    int currentRun = 0;
+
+    double timing = 0.1;
+    float fov = player->get_camera()->getFOV();
+    float sensi = player->get_camera()->get_sensivity();
 
     // Render loop
-    while (glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window.get_window()) == 0) {
+    while (glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
+        double elapsedTime = currentFrame - timing;
+        timing = currentFrame;
+
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         lag += deltaTime;
@@ -131,7 +153,10 @@ int main(int argc, char* argv[]) {
         pe->update(deltaTime);
 
         while (lag >= MS_PER_UPDATE) {
-            player->update(deltaTime);
+            if(principal == true) {
+                player->update(deltaTime);
+            }
+            
             lag -= MS_PER_UPDATE;    
         }
 
@@ -155,68 +180,399 @@ int main(int argc, char* argv[]) {
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 
-        ImGui::Begin("Clock", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-        ImGui::PushFont(font);
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-
-        double currentTime = glfwGetTime();
-
-        int heures = static_cast<int>(currentTime / 3600);
-        int minutes = static_cast<int>((currentTime - heures * 3600) / 60);
-        int secondes = static_cast<int>(currentTime - heures * 3600 - minutes * 60);
-
         char TempsFormater[9];
-        snprintf(TempsFormater, sizeof(TempsFormater), "%02d:%02d:%02d", heures, minutes, secondes);
+        char TempsFormaterMenu[9];
 
-        char chaineTemps[16];
-        snprintf(chaineTemps, sizeof(chaineTemps), "%.02f", glfwGetTime());
+        if(principal == true) {
+            ImGui::SetNextWindowBgAlpha(0.5f);
+            ImGui::Begin("Metrage_main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(font);
+            //hauteur = std::floor(player->player_node->transform.get_translation().y - 3.0 * 1.54);
+            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 1.54;
+            if(hauteur >= MaxHeight) {
+                MaxHeight = std::max(hauteur, MaxHeight);
+            }
+            
+            
+            std::cout << hauteur << std::endl;
+            std::cout << MaxHeight << std::endl;
 
-        float longueurTexte = ImGui::CalcTextSize(TempsFormater).x;
-        float hauteurTexte = ImGui::CalcTextSize(TempsFormater).y;
 
-        float longueurFenetre = ImGui::GetWindowWidth();
-        float hauteurFenetre = ImGui::GetWindowHeight();
+            char HauteurFormater[6];
+            if((int)hauteur == 0) {
+                snprintf(HauteurFormater, sizeof(HauteurFormater), "0M");
+            } else {
+                snprintf(HauteurFormater, sizeof(HauteurFormater), "%.0lfM", hauteur);
+            }
 
-        float posX = (longueurFenetre - longueurTexte) * 0.5f;
-        float posY = (hauteurFenetre - hauteurTexte) * 1.f;
+            ImVec2 textSize = ImGui::CalcTextSize(HauteurFormater);
+            float posX_TimerMain = (ImGui::GetWindowWidth() - textSize.x) * 0.5f;
+            float posY_TimerMain = (ImGui::GetWindowHeight() - textSize.y) * 0.5f;
 
-        ImGui::SetCursorPosX(posX);
-        ImGui::SetCursorPosY(posY);
+            ImGui::SetCursorPosX(posX_TimerMain);
+            ImGui::SetCursorPosY(posY_TimerMain);
+            ImGui::SetWindowPos(ImVec2(0, 0));        
 
-        ImGui::Text("%s", TempsFormater);
+            ImGui::Text("%s", HauteurFormater);
 
-        ImGui::PopFont();
-        ImGui::PopStyleColor();
-        ImGui::PopStyleVar();
-        ImGui::End();
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
 
-        ImGui::Begin("Clocke", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-        ImGui::PushFont(font);
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
 
-        int hauteur = 0;
+            ImGui::SetNextWindowBgAlpha(0.5f);
+            ImGui::Begin("Timer_main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1., 0., 0., 0.5));
+            ImGui::PushFont(font);
 
-        char HauteurFormater[5];
-        snprintf(HauteurFormater, sizeof(HauteurFormater), "%dM", hauteur);
+            int heures = static_cast<int>(elapsedTime / 3600);
+            int minutes = static_cast<int>((elapsedTime - heures * 3600) / 60);
+            int secondes = static_cast<int>(elapsedTime - heures * 3600 - minutes * 60);
 
-        ImVec2 textSize = ImGui::CalcTextSize(HauteurFormater);
-        float posXX = (ImGui::GetWindowWidth() - textSize.x) * 0.5f;
-        float posYY = (ImGui::GetWindowHeight() - textSize.y) * 1.f;
+            snprintf(TempsFormater, sizeof(TempsFormater), "%02d:%02d:%02d", heures, minutes, secondes);
 
-        ImGui::SetCursorPosX(posXX);
-        ImGui::SetCursorPosY(posYY);
+            char chaineTemps[16];
+            snprintf(chaineTemps, sizeof(chaineTemps), "%.02f", elapsedTime);
 
-        ImGui::Text("%s", HauteurFormater);
+            float longueurTexte = ImGui::CalcTextSize(TempsFormater).x;
+            float hauteurTexte = ImGui::CalcTextSize(TempsFormater).y;
 
-        ImGui::PopFont();
-        ImGui::PopStyleColor();
-        ImGui::PopStyleVar();
-        ImGui::End();
+            float longueurFenetre = ImGui::GetWindowWidth();
+            float hauteurFenetre = ImGui::GetWindowHeight();
 
-        //std::cout << deltaTime << std::endl;
+            float posX_MetrageMain = (longueurFenetre - longueurTexte) * 0.5f;
+            float posY_MetrageMain = (hauteurFenetre - hauteurTexte) * 0.5f;
 
+            ImGui::SetCursorPosX(posX_MetrageMain);
+            ImGui::SetCursorPosY(posY_MetrageMain);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth(), 0));      
+
+            ImGui::Text("%s", TempsFormater);
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();        
+        }
+
+
+        // Menu
+        ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
+        if (ESCAPE && settings == false) {
+            principal = false;
+            showMouse = true;
+
+            // 1er affichage
+            ImGui::SetNextWindowBgAlpha(0.7f);
+            ImGui::Begin("Current_run", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(font);
+
+            char RunFormater[4];
+            snprintf(RunFormater, sizeof(RunFormater), "#%d", currentRun);
+
+            ImVec2 textSizerun = ImGui::CalcTextSize(RunFormater);
+            float posXrun = (ImGui::GetWindowWidth() - textSizerun.x) * 0.5f;
+            float posYrun = (ImGui::GetWindowHeight() - textSizerun.y) * 0.5f;
+
+            ImGui::SetCursorPosX(posXrun);
+            ImGui::SetCursorPosY(posYrun);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, SCR_HEIGHT / 6));
+
+            ImGui::Text("%s", RunFormater);
+
+            ImGui::PushFont(fontMenu);
+            ImGui::SetCursorPosX(5);
+            ImGui::SetCursorPosY(2);
+            ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "Current run");
+            ImGui::PopFont();
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+            // 2ème affichage
+            ImGui::SetNextWindowBgAlpha(0.7f);
+            ImGui::Begin("Curr_height", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(font);
+
+            char CHFormater[6];
+            if((int)hauteur == 0) {
+                snprintf(CHFormater, sizeof(CHFormater), "0M");
+            } else {
+                snprintf(CHFormater, sizeof(CHFormater), "%.0lfM", hauteur);
+            }
+
+            ImVec2 textSizech = ImGui::CalcTextSize(CHFormater);
+            float posXcurrheight = (ImGui::GetWindowWidth() - textSizech.x) * 0.5f;
+            float posYcurrheight = (ImGui::GetWindowHeight() - textSizech.y) * 0.5f;
+
+            ImGui::SetCursorPosX(posXcurrheight);
+            ImGui::SetCursorPosY(posYcurrheight);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, (SCR_HEIGHT / 6) * 2));
+
+            ImGui::Text("%s", CHFormater);
+
+            ImGui::PushFont(fontMenu);
+            ImGui::SetCursorPosX(5);
+            ImGui::SetCursorPosY(2);
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Current height");
+            ImGui::PopFont();
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+            // 3ème affichage
+            ImGui::SetNextWindowBgAlpha(0.7f);
+            ImGui::Begin("Max_height", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(font);
+
+            char MXFormater[6];
+            if((int)MaxHeight == 0) {
+                snprintf(MXFormater, sizeof(MXFormater), "0M");
+            } else {
+                snprintf(MXFormater, sizeof(MXFormater), "%.0lfM", MaxHeight);
+            }
+
+            ImVec2 textSizemh = ImGui::CalcTextSize(MXFormater);
+            float posXmaxheight = (ImGui::GetWindowWidth() - textSizemh.x) * 0.5f;
+            float posYmaxheight = (ImGui::GetWindowHeight() - textSizemh.y) * 0.5f;
+
+            ImGui::SetCursorPosX(posXmaxheight);
+            ImGui::SetCursorPosY(posYmaxheight);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, (SCR_HEIGHT / 6) * 3));
+
+            ImGui::Text("%s", MXFormater);
+
+            ImGui::PushFont(fontMenu);
+            ImGui::SetCursorPosX(5);
+            ImGui::SetCursorPosY(2);
+            ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.0f, 1.0f), "Max height");
+            ImGui::PopFont();
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+            // 4ème affichage
+            ImGui::SetNextWindowBgAlpha(0.7f);
+            ImGui::Begin("Timer_menu", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1., 0., 0., 0.5));
+            ImGui::PushFont(font);
+
+            int heures_menu = static_cast<int>(elapsedTime / 3600);
+            int minutes_menu = static_cast<int>((elapsedTime - heures_menu * 3600) / 60);
+            int secondes_menu = static_cast<int>(elapsedTime - heures_menu * 3600 - minutes_menu * 60);
+
+            snprintf(TempsFormaterMenu, sizeof(TempsFormaterMenu), "%02d:%02d:%02d", heures_menu, minutes_menu, secondes_menu);
+
+            char chaineTempsMenu[16];
+            snprintf(chaineTempsMenu, sizeof(chaineTempsMenu), "%.02f", elapsedTime);
+
+            float longueurTexte = ImGui::CalcTextSize(TempsFormaterMenu).x;
+            float hauteurTexte = ImGui::CalcTextSize(TempsFormaterMenu).y;
+
+            float longueurFenetre = ImGui::GetWindowWidth();
+            float hauteurFenetre = ImGui::GetWindowHeight();
+
+            float posX_MetrageMain = (longueurFenetre - longueurTexte) * 0.5f;
+            float posY_MetrageMain = (hauteurFenetre - hauteurTexte) * 0.5f;
+
+            ImGui::SetCursorPosX(posX_MetrageMain);
+            ImGui::SetCursorPosY(posY_MetrageMain);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, (SCR_HEIGHT / 6) * 4));
+
+            ImGui::Text("%s", TempsFormaterMenu);
+
+
+            ImGui::PushFont(fontMenu);
+            ImGui::SetCursorPosX(5);
+            ImGui::SetCursorPosY(2);
+            ImGui::TextColored(ImVec4(0.0f, 0.6f, 1.0f, 1.0f), "Current time");
+            ImGui::PopFont();
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End(); 
+
+
+            // Paramètres
+            ImGui::SetNextWindowBgAlpha(1.f);
+            ImGui::Begin("Play", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(fontMenu);
+
+
+            float xPos = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Play").x) * 0.5f;
+            float yPos = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Play").y) * 0.5f;
+            ImGui::SetCursorPosX(xPos);
+            ImGui::SetCursorPosY(yPos);
+            ImGui::SetWindowPos(ImVec2(5, SCR_HEIGHT / 6));        
+            
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            if (ImGui::Button("Play"))
+            {
+                ESCAPE = false;
+            }
+            ImGui::PopStyleColor();
+
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+    
+            ImGui::SetNextWindowBgAlpha(1.f);
+            ImGui::Begin("Restart run", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(fontMenu);
+
+
+            float xPos_res = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Restart run").x) * 0.5f;
+            float yPos_res = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Restart run").y) * 0.5f;
+            ImGui::SetCursorPosX(xPos_res);
+            ImGui::SetCursorPosY(yPos_res);
+            ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 1.35));            
+            
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            if (ImGui::Button("Restart run"))
+            {
+                currentRun += 1;
+                player->player_node->transform.set_translation(glm::vec3(0.0f, 80.0f, -10.0f));
+                elapsedTime = 0.;
+                ESCAPE = false;
+            }
+            ImGui::PopStyleColor();
+
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+
+            ImGui::SetNextWindowBgAlpha(1.f);
+            ImGui::Begin("Settings", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(fontMenu);
+
+
+            float xPos_set = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Settings").x) * 0.5f;
+            float yPos_set = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Settings").y) * 0.5f;
+            ImGui::SetCursorPosX(xPos_set);
+            ImGui::SetCursorPosY(yPos_set);
+            ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 1.7));        
+            
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            if (ImGui::Button("Settings"))
+            {
+                settings = true;
+            }
+            ImGui::PopStyleColor();
+
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+
+            ImGui::SetNextWindowBgAlpha(1.f);
+            ImGui::Begin("Credits", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(fontMenu);
+
+
+            float xPos_cred = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Credits").x) * 0.5f;
+            float yPos_cred = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Credits").y) * 0.5f;
+            ImGui::SetCursorPosX(xPos_cred);
+            ImGui::SetCursorPosY(yPos_cred);
+            ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 2.05));        
+            
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            if (ImGui::Button("Credits"))
+            {
+            }
+            ImGui::PopStyleColor();
+
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+
+
+            ImGui::SetNextWindowBgAlpha(1.f);
+            ImGui::Begin("Exit", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(fontMenu);
+
+
+            float xPos_exit = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Exit").x) * 0.5f;
+            float yPos_exit = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Exit").y) * 0.5f;
+            ImGui::SetCursorPosX(xPos_exit);
+            ImGui::SetCursorPosY(yPos_exit);
+            ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 2.4));        
+            
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            if (ImGui::Button("Exit"))
+            {
+                glfwTerminate();
+                exit(0);
+            }
+            ImGui::PopStyleColor();
+
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
+  
+        } else if(ESCAPE && settings == true) {
+            
+            ImGui::SliderFloat("FOV", &fov, 45.f, 120.f);
+            player->get_camera()->setFOV(fov);
+
+
+            ImGui::SliderFloat("Sensi", &sensi, 0.01f, 10.f);
+            player->get_camera()->set_sensitivity(sensi);
+
+
+        } else {
+            principal = true; 
+            showMouse = false;          
+        }
+
+
+        if(glfwGetKey(window.get_window(), GLFW_KEY_C) == GLFW_PRESS && !aa) {
+
+
+            ImGui::Begin("Exit", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+            ImGui::End();
+
+            aa = true;
+        } 
         // Render window & ImGui
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
