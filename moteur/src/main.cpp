@@ -558,7 +558,6 @@ int main(int argc, char* argv[]) {
             ImGui::SliderFloat("Sensi", &sensi, 0.01f, 10.f);
             player->get_camera()->set_sensitivity(sensi);
 
-
         } else {
             principal = true; 
             showMouse = false;          
