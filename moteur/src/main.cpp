@@ -73,10 +73,11 @@ glm::mat4 proj;
 // Permet d'aficher ou non (métrage + timer)
 bool principal = true;
 bool settings = false;
+bool credits = false;
 bool ESCAPE;
 
-bool aa = false;
-
+bool toucheCPresseePrecedemment = false;
+bool afficherMenu = false;
 
 int main(int argc, char* argv[]) {
     // Initialize window
@@ -119,20 +120,27 @@ int main(int argc, char* argv[]) {
     double MaxHeight = 0.;
     int currentRun = 0;
 
-    double timing = 0.1;
+    double timing = 0.0, acc;
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
 
     // Render loop
     while (glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
-        double elapsedTime = currentFrame - timing;
-        timing = currentFrame;
 
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         lag += deltaTime;
-    
+
+        if(ESCAPE == false) {
+            acc += deltaTime;
+
+            if (acc >= 1.) {
+                timing += 1.0;
+            }            
+        } 
+
+
         // Input
         if(showMouse) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -195,10 +203,8 @@ int main(int argc, char* argv[]) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
             
-            
             std::cout << hauteur << std::endl;
             std::cout << MaxHeight << std::endl;
-
 
             char HauteurFormater[6];
             if((int)hauteur == 0) {
@@ -214,6 +220,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(posX_TimerMain);
             ImGui::SetCursorPosY(posY_TimerMain);
             ImGui::SetWindowPos(ImVec2(0, 0));        
+            ImGui::SetWindowSize(ImVec2(200, 60));  
 
             ImGui::Text("%s", HauteurFormater);
 
@@ -229,14 +236,14 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1., 0., 0., 0.5));
             ImGui::PushFont(font);
 
-            int heures = static_cast<int>(elapsedTime / 3600);
-            int minutes = static_cast<int>((elapsedTime - heures * 3600) / 60);
-            int secondes = static_cast<int>(elapsedTime - heures * 3600 - minutes * 60);
+            int heures = static_cast<int>(timing / 3600);
+            int minutes = static_cast<int>((timing - heures * 3600) / 60);
+            int secondes = static_cast<int>(timing - heures * 3600 - minutes * 60);
 
             snprintf(TempsFormater, sizeof(TempsFormater), "%02d:%02d:%02d", heures, minutes, secondes);
 
             char chaineTemps[16];
-            snprintf(chaineTemps, sizeof(chaineTemps), "%.02f", elapsedTime);
+            snprintf(chaineTemps, sizeof(chaineTemps), "%.02f", timing);
 
             float longueurTexte = ImGui::CalcTextSize(TempsFormater).x;
             float hauteurTexte = ImGui::CalcTextSize(TempsFormater).y;
@@ -250,6 +257,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(posX_MetrageMain);
             ImGui::SetCursorPosY(posY_MetrageMain);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth(), 0));      
+            ImGui::SetWindowSize(ImVec2(200, 60));  
 
             ImGui::Text("%s", TempsFormater);
 
@@ -261,8 +269,16 @@ int main(int argc, char* argv[]) {
 
 
         // Menu
-        ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
-        if (ESCAPE && settings == false) {
+        //ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
+
+        bool toucheEscapePressee = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
+        if (toucheEscapePressee && !toucheCPresseePrecedemment) {
+            ESCAPE = !ESCAPE;
+        }
+        toucheCPresseePrecedemment = toucheEscapePressee;
+
+
+        if (ESCAPE && settings == false && credits == false) {
             principal = false;
             showMouse = true;
 
@@ -283,6 +299,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(posXrun);
             ImGui::SetCursorPosY(posYrun);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, SCR_HEIGHT / 6));
+            ImGui::SetWindowSize(ImVec2(1000, 175));  
 
             ImGui::Text("%s", RunFormater);
 
@@ -318,6 +335,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(posXcurrheight);
             ImGui::SetCursorPosY(posYcurrheight);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, (SCR_HEIGHT / 6) * 2));
+            ImGui::SetWindowSize(ImVec2(1000, 175));  
 
             ImGui::Text("%s", CHFormater);
 
@@ -353,6 +371,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(posXmaxheight);
             ImGui::SetCursorPosY(posYmaxheight);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, (SCR_HEIGHT / 6) * 3));
+            ImGui::SetWindowSize(ImVec2(1000, 175));  
 
             ImGui::Text("%s", MXFormater);
 
@@ -374,14 +393,14 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1., 0., 0., 0.5));
             ImGui::PushFont(font);
 
-            int heures_menu = static_cast<int>(elapsedTime / 3600);
-            int minutes_menu = static_cast<int>((elapsedTime - heures_menu * 3600) / 60);
-            int secondes_menu = static_cast<int>(elapsedTime - heures_menu * 3600 - minutes_menu * 60);
+            int heures_menu = static_cast<int>(timing / 3600);
+            int minutes_menu = static_cast<int>((timing - heures_menu * 3600) / 60);
+            int secondes_menu = static_cast<int>(timing - heures_menu * 3600 - minutes_menu * 60);
 
             snprintf(TempsFormaterMenu, sizeof(TempsFormaterMenu), "%02d:%02d:%02d", heures_menu, minutes_menu, secondes_menu);
 
             char chaineTempsMenu[16];
-            snprintf(chaineTempsMenu, sizeof(chaineTempsMenu), "%.02f", elapsedTime);
+            snprintf(chaineTempsMenu, sizeof(chaineTempsMenu), "%.02f", timing);
 
             float longueurTexte = ImGui::CalcTextSize(TempsFormaterMenu).x;
             float hauteurTexte = ImGui::CalcTextSize(TempsFormaterMenu).y;
@@ -395,6 +414,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(posX_MetrageMain);
             ImGui::SetCursorPosY(posY_MetrageMain);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth() - 6, (SCR_HEIGHT / 6) * 4));
+            ImGui::SetWindowSize(ImVec2(1000, 175));  
 
             ImGui::Text("%s", TempsFormaterMenu);
 
@@ -424,11 +444,14 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(xPos);
             ImGui::SetCursorPosY(yPos);
             ImGui::SetWindowPos(ImVec2(5, SCR_HEIGHT / 6));        
-            
+            ImGui::SetWindowSize(ImVec2(205, 55));  
+
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             if (ImGui::Button("Play"))
             {
                 ESCAPE = false;
+                player->get_camera()->setPosition(player->get_camera()->getPosition());
+                player->get_camera()->setRotationDegrees(player->get_camera()->getRotationDegrees());
             }
             ImGui::PopStyleColor();
 
@@ -451,13 +474,16 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(xPos_res);
             ImGui::SetCursorPosY(yPos_res);
             ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 1.35));            
-            
+            ImGui::SetWindowSize(ImVec2(205, 55));  
+
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             if (ImGui::Button("Restart run"))
             {
                 currentRun += 1;
+                MaxHeight = std::min(0., hauteur);
                 player->player_node->transform.set_translation(glm::vec3(0.0f, 80.0f, -10.0f));
-                elapsedTime = 0.;
+                timing = 0.;
+                acc = 0.0;
                 ESCAPE = false;
             }
             ImGui::PopStyleColor();
@@ -481,6 +507,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(xPos_set);
             ImGui::SetCursorPosY(yPos_set);
             ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 1.7));        
+            ImGui::SetWindowSize(ImVec2(205, 55));  
             
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             if (ImGui::Button("Settings"))
@@ -508,10 +535,12 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(xPos_cred);
             ImGui::SetCursorPosY(yPos_cred);
             ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 2.05));        
+            ImGui::SetWindowSize(ImVec2(205, 55));  
             
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             if (ImGui::Button("Credits"))
             {
+                credits = true;
             }
             ImGui::PopStyleColor();
 
@@ -534,6 +563,7 @@ int main(int argc, char* argv[]) {
             ImGui::SetCursorPosX(xPos_exit);
             ImGui::SetCursorPosY(yPos_exit);
             ImGui::SetWindowPos(ImVec2(5, (SCR_HEIGHT / 6) * 2.4));        
+            ImGui::SetWindowSize(ImVec2(205, 55));  
             
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             if (ImGui::Button("Exit"))
@@ -549,29 +579,100 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleVar();
             ImGui::End();
   
-        } else if(ESCAPE && settings == true) {
-            
-            ImGui::SliderFloat("FOV", &fov, 45.f, 120.f);
+        } else if(ESCAPE == true && settings == true) {
+            ImGui::SetNextWindowBgAlpha(0.7f);
+            ImGui::Begin("Slides", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 9.2, SCR_HEIGHT / 6));
+            ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 700));  
+
+            float contentWidth = ImGui::GetContentRegionAvail().x;
+            float contentHeight = ImGui::GetContentRegionAvail().y;
+
+            float textHeight = ImGui::GetTextLineHeightWithSpacing(); 
+            float posY = (contentHeight - textHeight * 5) * 0.5f;
+
+            float sliderWidth = 200.0f;
+            float textWidthFOV = ImGui::CalcTextSize("FOV").x;
+            float textWidthSensi = ImGui::CalcTextSize("Sensibilité de la souris").x;
+
+            float textPosXFOV = (contentWidth - textWidthFOV) * 0.5f;
+            float textPosXSensi = (contentWidth - textWidthSensi) * 0.5f;
+            float sliderPosX = (contentWidth - sliderWidth) * 0.5f;
+
+            ImGui::SetCursorPosX(textPosXFOV);
+            ImGui::SetCursorPosY(posY);
+            ImGui::Text("FOV");
+
+            float imguiWindowSize = ImGui::GetWindowSize().x;
+            float sliderPosOffsetFOV = imguiWindowSize / 4;
+            float sliderPosXFOV = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetFOV;
+            ImGui::SetCursorPosX(sliderPosXFOV);
+            ImGui::SliderFloat("##FOV", &fov, 45.f, 120.f);
             player->get_camera()->setFOV(fov);
 
+            ImGui::SetCursorPosX(textPosXSensi);
+            ImGui::SetCursorPosY(posY + textHeight + 110);
+            ImGui::Text("Sensibilité de la souris");
 
-            ImGui::SliderFloat("Sensi", &sensi, 0.01f, 10.f);
+            float imguiWindowSizee = ImGui::GetWindowSize().x;
+            float sliderPosOffsetSensi = imguiWindowSizee / 4;
+            float sliderPosXSensi = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetSensi;
+            ImGui::SetCursorPosX(sliderPosXSensi);;
+            ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 10.f);
             player->get_camera()->set_sensitivity(sensi);
 
+            ImGui::End();
+        } else if(ESCAPE == true && credits == true) {
+            ImGui::SetNextWindowBgAlpha(0.7f);
+            ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+            ImGui::PushFont(font);
+
+            char CHFormater1[] = "SERVA Benjamin";
+            char CHFormater2[] = "JEAN Louis";
+            char CHFormater3[] = "COMBOT Evan";
+
+            ImVec2 textSizech1 = ImGui::CalcTextSize(CHFormater1);
+            ImVec2 textSizech2 = ImGui::CalcTextSize(CHFormater2);
+            ImVec2 textSizech3 = ImGui::CalcTextSize(CHFormater3);
+
+            float posX1 = (ImGui::GetWindowWidth() - textSizech1.x) * 0.5f;
+            float posY1 = (ImGui::GetWindowHeight() - 3 * textSizech1.y) * 0.5f;
+
+            float posX2 = (ImGui::GetWindowWidth() - textSizech2.x) * 0.5f;
+            float posY2 = (ImGui::GetWindowHeight() - textSizech2.y) * 0.5f;
+
+            float posX3 = (ImGui::GetWindowWidth() - textSizech3.x) * 0.5f;
+            float posY3 = (ImGui::GetWindowHeight() + textSizech3.y) * 0.5f;
+
+            ImGui::SetCursorPosX(posX1);
+            ImGui::SetCursorPosY(posY1);
+            ImGui::Text("%s", CHFormater1);
+
+            ImGui::SetCursorPosX(posX2);
+            ImGui::SetCursorPosY(posY2);
+            ImGui::Text("%s", CHFormater2);
+
+            ImGui::SetCursorPosX(posX3);
+            ImGui::SetCursorPosY(posY3);
+            ImGui::Text("%s", CHFormater3);
+
+            ImGui::PopFont();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+            ImGui::End();
         } else {
+            player->get_camera()->setPosition(player->get_camera()->getPosition());
+            player->get_camera()->setRotationDegrees(player->get_camera()->getRotationDegrees());
+
             principal = true; 
-            showMouse = false;          
+            showMouse = false;  
+            settings = false;    
+            credits = false;    
         }
 
 
-        if(glfwGetKey(window.get_window(), GLFW_KEY_C) == GLFW_PRESS && !aa) {
-
-
-            ImGui::Begin("Exit", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
-            ImGui::End();
-
-            aa = true;
-        } 
         // Render window & ImGui
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
