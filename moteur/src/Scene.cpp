@@ -6,23 +6,23 @@ void Scene::setup_scene() {
     auto shader = shaders->getShader();
 
     // Map
-    auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
+    auto map = Model::create("../data/models/test_text/test_text.obj", shader);
     add_meshes_from_model(map);
     
     // Directional light
     glm::vec3 ambient = glm::vec3(0.1f,0.1f,0.1f);
     glm::vec3 diffuse = glm::vec3(1.0f,1.0f,1.0f);
-    glm::vec3 specular = glm::vec3(1.0f,1.0f,1.0f);
+    glm::vec3 specular = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
-    //lights->add_light(directionalLight);
+    lights->add_light(directionalLight);
 
     //std::cout<<scene_nodes.size()<<std::endl;
 
     glm::vec3 reglage = glm::vec3(1.0f, 0.09f, 0.032f);   
-    glm::vec3 ambient2 = glm::vec3(1.0f,1.0f,1.0f);
-    glm::vec3 diffuse2 = glm::vec3(1.0f,1.0f,1.0f);
-    glm::vec3 specular2 = glm::vec3(1.0f,1.0f,1.0f);
+    glm::vec3 ambient2 = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 diffuse2 = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 specular2 = glm::vec3(0.5f,0.5f,0.5f);
           
     //neon----------------------------------------------------
     //neon1
@@ -35,7 +35,6 @@ void Scene::setup_scene() {
     glm::vec3 position8 = glm::vec3(-10.5f,6.5f,-4.f);
     auto pointLight8 = PointLight::create(ambient2, diffuse2, specular2, position8, reglage_neon.x, reglage_neon.y, reglage_neon.z);
     lights->add_light(pointLight8);
-
 
     //neon3
     glm::vec3 position14 = glm::vec3(-28.7f,47.5f,-0.13f);
@@ -114,7 +113,6 @@ void Scene::setup_scene() {
     auto pointLight12 = TorchLight::create(ambient2, diffuse2, specular2, position12, 1.5f, 0.2f, 0.012f,direction3,40.f,50.f);
     lights->add_light(pointLight12);
 
-
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
@@ -128,22 +126,25 @@ void Scene::add_model(std::shared_ptr<Model> model) {
 
 void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
     auto nodes = SceneNode::create_node_meshes_from_model(model);
-    //int i = 100;
+    //nodes[42]->mesh->material->emissive = glm::vec3(1.0f,0.0f,0.0f);
     for(auto& node : nodes) {
         node->set_scale(glm::vec3(2.0f));
+        if(node->mesh->material->name == "Echelle") { // Ladders
+            node->rigid_body->is_ladder = true;
+        }
+        if(node->mesh->material->name == "Trampoline") { // Trampolines
+            node->rigid_body->restitution_coefficient = 1.0f;
+        }
+        if(node->mesh->material->name == "Glace") { // Ice
+            node->rigid_body->friction_coefficient = -0.1f;
+        }
         scene_nodes.push_back(node);
-        // if(i == 100) {
-        //     std::cout<<"Caca"<<std::endl;
-        //     node->mesh->material->emissive = glm::vec3(1.0f,0.0f,0.0f);
-        //     node->rigid_body->friction_coefficient = 1.0f;
-        // } 
-        // i++;
     }
 }
 
 void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) {
     for(auto& scene_node : scene_nodes) {
-        if(scene_node->mesh->material->diffuse != glm::vec3(0.074825,0.454437,0.037416)) {
+        if(scene_node->mesh->material->name != "Plante" && scene_node->mesh->material->name != "Clou" && scene_node->mesh->material->name != "UnderTrampoline") { // To prevent plants collisions and under trampoline AABB bug
             pe->add_entity(scene_node);
         }
     }

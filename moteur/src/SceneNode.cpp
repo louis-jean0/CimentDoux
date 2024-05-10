@@ -1,9 +1,11 @@
 #include <SceneNode.hpp>
 #include <ShaderManager.hpp>
+#include <glm/ext/quaternion_common.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/matrix.hpp>
 #include <glm/trigonometric.hpp>
 
 // Public methods
@@ -37,6 +39,8 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
         for (const auto entry : model->entries) {
             entry.mesh->shader->useShader();
             entry.mesh->shader->setMVPMatrix(model_matrix, view, projection);
+            glm::mat3 normal_matrix = glm::inverse(glm::transpose(model_matrix));
+            entry.mesh->shader->setBindMatrix3fv("normal_matrix", 1, 0, glm::value_ptr(normal_matrix));
             entry.mesh->draw();
         }
     }
@@ -46,6 +50,8 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
         //drawMeshAABB(view, projection);
         mesh->shader->useShader();
         mesh->shader->setMVPMatrix(model_matrix, view, projection);
+        glm::mat3 normal_matrix = glm::inverse(glm::transpose(glm::mat3(model_matrix)));
+        mesh->shader->setBindMatrix3fv("normal_matrix", 1, 0, glm::value_ptr(normal_matrix));
         mesh->draw();              
     }
 

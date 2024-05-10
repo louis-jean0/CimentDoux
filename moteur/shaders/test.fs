@@ -1,6 +1,8 @@
 #version 410 core
 
 in vec3 normal;
+in vec3 tangent;
+in vec3 bitangent;
 in vec2 uvs;
 in vec3 fragPos;
 
@@ -38,14 +40,13 @@ struct Material {
 
 uniform bool hasDiffuse;
 uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_diffuse2;
-uniform sampler2D texture_diffuse3;
 
 uniform bool hasSpecular;
 uniform sampler2D texture_specular1;
-uniform sampler2D texture_specular2;
 
-uniform vec3 viewPos;
+uniform bool hasNormalMap;
+uniform sampler2D normal_map1;
+vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal);
 
 #define NB_POINT_LIGHTS_MAX 30
 uniform int nb_point_lights;
@@ -57,19 +58,25 @@ vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3
 
 uniform Material material;
 
+uniform vec3 viewPos;
+
 out vec4 FragColor;
 
 void main() {
     vec3 viewDir = normalize(viewPos - fragPos);
-    vec3 result =computeDirectionalLightContribution(directionalLight, normal, viewDir);
-    //vec3 result = vec3(0.,0.,0.);
-    for(int i = 0; i < nb_point_lights; ++i) {
-        result += computePointLightsContribution(pointLights[i], normal, fragPos, viewDir);
+    vec3 norm = vec3(0.0,0.0,0.0);
+    vec3 result = vec3(0.0,0.0,0.0);
+    if(hasNormalMap) {
+        norm = disturbNormalWithNormalMap(tangent, bitangent, normal);
     }
-
+    else {
+        norm = normal;
+    }
+    result += computeDirectionalLightContribution(directionalLight, norm, viewDir);
+    for(int i = 0; i < nb_point_lights; ++i) {
+        result += computePointLightsContribution(pointLights[i], norm, fragPos, viewDir);
+    }
     result += material.emissive;
-    vec3 norm = normalize(normal);
-    //(norm + 1.0) * 0.5
     FragColor = vec4(result,1.0);
 }
 
@@ -142,4 +149,15 @@ vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3
     }
 
     return ambient + diffuse + specular;
+}
+
+vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal) {
+    vec3 T = normalize(tangent); // Already done normal_matrix * normal in vertex shader
+    vec3 B = normalize(bitangent); // Already done normal_matrix * normal in vertex shader
+    vec3 N = normalize(normal);  // Already done normal_matrix * normal in vertex shader
+    mat3 TBN = transpose(mat3(T,B,N));
+    vec3 normal_map_normal = texture(normal_map1, uvs).xyz;
+    normal_map_normal = normal_map_normal * 2.0 - 1.0;
+    vec3 disturbed_normal = normalize(TBN * normal_map_normal);
+    return disturbed_normal;
 }

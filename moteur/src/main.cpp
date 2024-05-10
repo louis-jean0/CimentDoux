@@ -19,10 +19,7 @@
 #include <SceneNode.hpp>
 #include <Texture.hpp>
 #include <Plane.hpp>
-#include <Sphere.hpp>
-#include <PlaneCollider.hpp>
 #include <Camera.hpp>
-#include <Cube.hpp>
 #include <ModelCollider.hpp>
 #include <Player.hpp>
 #include <PointLight.hpp>
@@ -102,6 +99,13 @@ int main(int argc, char* argv[]) {
     auto scene = Scene::create();
     scene->add_entities_into_physics_engine(pe);
 
+    // // Capsule (for test)
+    // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
+    // auto capsule_node = SceneNode::create(capsule);
+    // scene->add_node(capsule_node);
+    // capsule_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
+    // capsule_node->set_scale(glm::vec3(1.0f,0.5f,1.0f));
+
     float temps_debut=glfwGetTime();
 
     // Render loop
@@ -127,9 +131,9 @@ int main(int argc, char* argv[]) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
+        
         pe->update(deltaTime);
-
+        
         while (lag >= MS_PER_UPDATE) {
             player->update(deltaTime);
             lag -= MS_PER_UPDATE;    

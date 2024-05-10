@@ -21,6 +21,8 @@ class Model {
         std::vector<MeshEntry> entries;
         AABB bounding_box;
         ModelCollider collider;
+        std::string directory;
+        static std::vector<std::shared_ptr<Texture>> textures_loaded;
         
         // Constructors
         Model();
@@ -63,10 +65,6 @@ class Model {
         glm::mat4 aiMatrixToGlm(aiMatrix4x4 from);
     
     private:
-        // Private attributes
-        std::string directory;
-        std::vector<std::shared_ptr<Texture>> textures_loaded;
-
         // Private methods
         void load_model(const std::string& path);
         void process_node(aiNode *node, const aiScene *scene, glm::mat4 parent_transform);

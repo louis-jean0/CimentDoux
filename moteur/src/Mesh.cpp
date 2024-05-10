@@ -1,6 +1,7 @@
 #include <Mesh.hpp>
 #include <cstddef>
 #include <memory>
+#include <string>
 
 void Mesh::setup_mesh() {
     glGenVertexArrays(1, &vao);
@@ -10,9 +11,7 @@ void Mesh::setup_mesh() {
     // Vertices
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);  
-    glEnableVertexAttribArray(0); // Vertex positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW); 
 
     // Indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -26,9 +25,17 @@ void Mesh::setup_mesh() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-    // Vertex uv
+    // Vertex tangent
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+
+    // Vertex bitangent
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
+
+    // Vertex uv
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
     glBindVertexArray(0);
 }
@@ -48,8 +55,10 @@ void Mesh::draw() {
     // Textures
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
+    unsigned int normalMapNr = 1;
     bool hasDiffuse = false;
     bool hasSpecular = false;
+    bool hasNormalMap = false;
     for(int i = 0; i < material->textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         std::string number;
@@ -60,13 +69,18 @@ void Mesh::draw() {
         }
         else if(name == "texture_specular") {
             number = std::to_string(specularNr++);
-            hasSpecular = false;
+            hasSpecular = true;
+        }
+        else if(name == "normal_map") {
+            number = std::to_string(normalMapNr++);
+            hasNormalMap = true;
         }
         shader->setBind1i((name + number).c_str(), i);
         material->textures[i]->use();
     }
-    shader->setBool("hasTextureDiffuse", hasDiffuse);
-    shader->setBool("hasTextureSpecular", hasSpecular);
+    shader->setBool("hasDiffuse", hasDiffuse);
+    shader->setBool("hasSpecular", hasSpecular);
+    shader->setBool("hasNormalMap", hasNormalMap);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

@@ -13,6 +13,8 @@ class Texture {
         Texture() {}
         Texture(const char* image_path);
         Texture(const char* image_path, const std::string &directory, const std::string &tex_type);
+        Texture(std::string &image_path, const std::string &directory, const std::string &tex_type);
+        Texture(const std::string &filename_with_dir, const std::string &tex_type);
         
         static unsigned int texture_from_file(const char* image_path, const std::string &directory);
         void use();

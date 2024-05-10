@@ -4,6 +4,7 @@
 #include <memory>
 
 void RigidBody::updatePhysics(float delta_time) {
+    use_gravity = !is_on_ladder;
     if(use_gravity) {
         glm::vec3 gravity = glm::vec3(0.0f,-1.00f,0.0f);
         glm::vec3 acceleration = gravity;
@@ -53,22 +54,30 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
         if(collisionNormal.y > 0.1f) {
             is_on_ground = true;
             if(other->restitution_coefficient == 0.0f) {
-                velocity.y = 0;
+                velocity.y = 0.0f;
             }
             else {
                 float velocity_normal_component = glm::dot(velocity, collisionNormal);
                 if (velocity_normal_component < 0) {
                     glm::vec3 velocity_perpendicular = velocity_normal_component * collisionNormal;
                     glm::vec3 velocity_tangential = velocity - velocity_perpendicular;
-
-                    // Inverser la composante perpendiculaire pour le rebond et appliquer le coefficient
                     velocity = velocity_tangential - other->restitution_coefficient * velocity_perpendicular;
                 }
             }
         }
-        
+
         shared_node->transform.adjust_translation(correction);
         shared_node->transform.transform_updated = true;
+
+        if(other->is_ladder) {
+            use_gravity = false;
+            is_on_ladder = true;
+        }
+        else {
+            use_gravity = true;
+            is_on_ladder = false;
+        }
+        
         //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * other->restitution_coefficient;
         applyGroundFriction(other);
     }
@@ -78,7 +87,7 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
 }
 
 void RigidBody::applyAirResistance() {
-    float air_resistance = 0.05;
+    float air_resistance = 0.08f;
     velocity.x *= (1.0f - air_resistance);
     velocity.z *= (1.0f - air_resistance);
 }

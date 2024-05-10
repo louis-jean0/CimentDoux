@@ -1,6 +1,13 @@
+#include "assimp/material.h"
 #include "assimp/matrix4x4.h"
+#include "assimp/postprocess.h"
+#include "assimp/types.h"
 #include <Model.hpp>
 #include <memory>
+#include <string>
+
+// Static variable
+std::vector<std::shared_ptr<Texture>> Model::textures_loaded;
 
 // Constructors
 Model::Model() : collider(bounding_box) {}
@@ -58,7 +65,7 @@ void Model::updateGlobalBoundingBox(const glm::mat4& modelMatrix) {
 // Private methods
 void Model::load_model(const std::string& path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_GenBoundingBoxes);
+    const aiScene *scene = importer.ReadFile(path, aiProcess_GenSmoothNormals | aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs | aiProcess_GenBoundingBoxes);
     if(!scene || (scene->mFlags && AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
         std::cout<<"ERROR::ASSIMP"<<importer.GetErrorString()<<std::endl;
     }
@@ -82,6 +89,10 @@ void Model::process_node(aiNode *node, const aiScene *scene, glm::mat4 parent_tr
 
 std::shared_ptr<Material> Model::load_material_textures(aiMaterial *material) {
     auto mat = std::make_shared<Material>();
+    aiString name;
+    if (material->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) {
+        mat->name = name.C_Str();
+    }
     aiColor3D color(0.f, 0.f, 0.f);
     if (material->Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS) {
         mat->ambient = glm::vec3(color.r, color.g, color.b);
@@ -101,25 +112,31 @@ std::shared_ptr<Material> Model::load_material_textures(aiMaterial *material) {
     }
     load_textures_from_material(material, aiTextureType_DIFFUSE, "texture_diffuse", mat);
     load_textures_from_material(material, aiTextureType_SPECULAR, "texture_specular", mat);
+    load_textures_from_material(material, aiTextureType_NORMALS, "normal_map", mat);
     return mat;
 }
 
 void Model::load_textures_from_material(aiMaterial *material, aiTextureType tex_type, std::string tex_type_name, std::shared_ptr<Material> mat) {
-    for(unsigned int i = 0; i < material->GetTextureCount(tex_type); i++) {
+    for (unsigned int i = 0; i < material->GetTextureCount(tex_type); i++) {
         aiString str;
         material->GetTexture(tex_type, i, &str);
+
+        // Full texture path
+        std::string texture_path = directory + "/" + std::string(str.C_Str());
+        std::replace(texture_path.begin(), texture_path.end(), '\\', '/');
+
         bool skip = false;
-        for(auto& loaded_tex : textures_loaded) {
-            if(std::strcmp(loaded_tex->path.data(), str.C_Str()) == 0) {
+        for (auto& loaded_tex : textures_loaded) {
+            if (loaded_tex->path == texture_path) {
                 mat->add_texture(loaded_tex);
                 skip = true;
                 break;
             }
         }
-        if(!skip) {
-            auto texture = std::make_shared<Texture>(str.C_Str(), directory, tex_type_name);
-            mat->add_texture(texture);
+        if (!skip) {
+            auto texture = std::make_shared<Texture>(texture_path, tex_type_name);
             textures_loaded.push_back(texture);
+            mat->add_texture(texture);
         }
     }
 }
@@ -133,16 +150,35 @@ std::shared_ptr<Mesh> Model::process_mesh(aiMesh *mesh, const aiScene *scene) {
     for(unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
         glm::vec3 temp;
+        // Position
         temp.x = mesh->mVertices[i].x;
         temp.y = mesh->mVertices[i].y;
         temp.z = mesh->mVertices[i].z;
         vertex.position = temp;
+        // Normal
         temp.x = mesh->mNormals[i].x;
         temp.y = mesh->mNormals[i].y;
         temp.z = mesh->mNormals[i].z;
         vertex.normal = temp;
+        if(mesh->HasTangentsAndBitangents()) {
+            // Tangent
+            temp.x = mesh->mTangents[i].x;
+            temp.y = mesh->mTangents[i].y;
+            temp.z = mesh->mTangents[i].z;
+            vertex.tangent = temp;
+            // Bitangent
+            temp.x = mesh->mBitangents[i].x;
+            temp.y = mesh->mBitangents[i].y;
+            temp.z = mesh->mBitangents[i].z;
+            vertex.bitangent = temp;
+        }
+        else {
+            vertex.tangent = glm::vec3(0.0f);
+            vertex.bitangent = glm::vec3(0.0f);
+        }
         if(mesh->mTextureCoords[0]) {
             glm::vec2 temp_uv;
+            // UVs
             temp_uv.x = mesh->mTextureCoords[0][i].x;
             temp_uv.y = mesh->mTextureCoords[0][i].y;
             vertex.uv = temp_uv;

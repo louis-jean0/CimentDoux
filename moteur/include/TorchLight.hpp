@@ -1,3 +1,5 @@
+#pragma once
+
 #include <PointLight.hpp>
 
 class TorchLight : public PointLight {

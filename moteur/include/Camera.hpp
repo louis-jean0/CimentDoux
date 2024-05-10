@@ -37,7 +37,7 @@ class Camera
 public: 
 
 	//gestion plusieurs cam
-	int mode_cam=0;
+	int mode_cam=1;
 	glm::vec3 pos_player;
 
 	void init();
@@ -67,7 +67,7 @@ public:
 private:
 
 	//Camera parameters 
-	float		m_fovDegree{ 45.0f };
+	float		m_fovDegree{ 90.0f };
 	glm::vec3	m_position{ glm::vec3(10.f, 40.f, 10.f) };
 	glm::vec3	m_eulerAngle{ glm::vec3(0.f, 0.f, 0.f) };
 	glm::vec3	m_eulerAngleInDegrees{glm::vec3(0.0f, 0.0f, 0.0f)};
