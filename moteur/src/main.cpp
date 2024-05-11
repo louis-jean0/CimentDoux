@@ -37,9 +37,6 @@ const unsigned int SCR_WIDTH = 1440;
 const unsigned int SCR_HEIGHT = 1080;
 bool showMouse = true;
 
-// Camera
-Camera* myCamera = new Camera();
-
 // Player
 std::shared_ptr<Player> player;
 

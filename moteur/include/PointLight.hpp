@@ -12,7 +12,7 @@ class PointLight : public Light, std::enable_shared_from_this<PointLight> {
         float linear;
         float quadratic;
         bool is_torch_light = false;
-        std::unique_ptr<ShadowMap> shadow_map;
+        std::shared_ptr<ShadowMap> shadow_map;
         unsigned int fbo_index;
         float far_plane = 25.0f;
         
@@ -34,5 +34,4 @@ class PointLight : public Light, std::enable_shared_from_this<PointLight> {
         void setup_shadow_map(std::shared_ptr<Shader> shadow_shader) const;
         void gen_shadow_map();
         std::vector<glm::mat4> get_shadow_transforms() const;
-        std::shared_ptr<PointLight> get_shared_ptr();
 };

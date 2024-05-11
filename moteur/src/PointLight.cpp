@@ -1,3 +1,4 @@
+#include "ShadowMap.hpp"
 #include <PointLight.hpp>
 #include <ShaderManager.hpp>
 #include <memory>
@@ -11,11 +12,12 @@ void PointLight::setup_light(std::shared_ptr<Shader> shader, int light_index) co
     shader->setBind1f(("pointLights["+std::to_string(light_index)+"].linear").c_str(), linear);
     shader->setBind1f(("pointLights["+std::to_string(light_index)+"].quadratic").c_str(), quadratic);
     shader->setBool(("pointLights["+std::to_string(light_index)+"].is_torch_light").c_str(), is_torch_light);
+    shader->setBind1f(("pointLights["+std::to_string(light_index)+"].far_plane").c_str(), far_plane);
 }
 
 void PointLight::setup_shadow_map(std::shared_ptr<Shader> shadow_shader) const {
     shadow_shader->setBind1f("far_plane", far_plane);
-    shadow_shader->setVec3("lightPos", position);
+    shadow_shader->setVec3("light_position", position);
     std::vector<glm::mat4> shadow_transforms = get_shadow_transforms();
     for(int i = 0; i < 6; ++i) {
         shadow_shader->setBindMatrix4fv(("shadow_matrices["+std::to_string(i)+"]").c_str(), 1, 0, glm::value_ptr(shadow_transforms[i]));
@@ -35,10 +37,6 @@ std::vector<glm::mat4> PointLight::get_shadow_transforms() const {
     return shadow_transforms;
 }
 
-std::shared_ptr<PointLight> PointLight::get_shared_ptr() {
-    return shared_from_this();
-}
-
 void PointLight::gen_shadow_map() {
-    shadow_map = std::make_unique<ShadowMap>(get_shared_ptr());
+    shadow_map = ShadowMap::create(shared_from_this());
 }

@@ -3,7 +3,7 @@
 #include <PointLight.hpp>
 #include <memory>
 
-ShadowMap::ShadowMap(std::weak_ptr<PointLight> point_light) {
+ShadowMap::ShadowMap(std::shared_ptr<PointLight> point_light) : point_light(point_light) {
     glGenFramebuffers(1, &depthMapFBO);
     glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
@@ -20,13 +20,10 @@ ShadowMap::ShadowMap(std::weak_ptr<PointLight> point_light) {
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    auto shared_point_light = point_light.lock();
-    if(shared_point_light) {
-        shared_point_light->fbo_index = depthCubemap;
-    }
+    point_light->fbo_index = depthCubemap;
 }
 
-std::shared_ptr<ShadowMap> ShadowMap::create(std::weak_ptr<PointLight> point_light) {
+std::shared_ptr<ShadowMap> ShadowMap::create(std::shared_ptr<PointLight> point_light) {
     return std::make_shared<ShadowMap>(point_light);
 }
 

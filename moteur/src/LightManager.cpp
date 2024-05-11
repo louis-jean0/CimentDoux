@@ -13,7 +13,7 @@ void LightManager::setup_lights(std::shared_ptr<Shader> shader) const {
         if (std::dynamic_pointer_cast<PointLight>(light)) {
             auto point_light = std::dynamic_pointer_cast<PointLight>(light);
             point_light->setup_light(shader, point_light_count++);
-            glActiveTexture(GL_TEXTURE0 + 27); // 27 but could be whatever else
+            glActiveTexture(GL_TEXTURE0 + shadow_map_index); // 27 but could be whatever else
             glBindTexture(GL_TEXTURE_CUBE_MAP, point_light->fbo_index);
             shader->setBind1i("shadow_map", shadow_map_index);
             shadow_map_index++;

@@ -19,6 +19,7 @@ struct PointLight {
     vec3 direction;
     float cut_off;
     float outer_cut_off;
+    float far_plane;
 };
 
 // DirectionalLight
@@ -56,6 +57,9 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
 uniform DirectionalLight directionalLight;
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir);
 
+uniform samplerCube shadow_map;
+float shadowCalculation(PointLight pointLight, vec3 fragPos);
+
 uniform Material material;
 
 uniform vec3 viewPos;
@@ -66,6 +70,7 @@ void main() {
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 norm = vec3(0.0,0.0,0.0);
     vec3 result = vec3(0.0,0.0,0.0);
+    float shadow = 0.0;
     if(hasNormalMap) {
         norm = disturbNormalWithNormalMap(tangent, bitangent, normal);
     }
@@ -111,6 +116,7 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
     float distance = length(pointLight.position - fragPos);
     float attenuation = 1.0 / (pointLight.constant + (pointLight.linear * distance) + (pointLight.quadratic * distance * distance));
 
+    // Torch light
     if(pointLight.is_torch_light) {
         float theta = dot(lightDir, normalize(-pointLight.direction));
         float epsilon = pointLight.cut_off - pointLight.outer_cut_off;
@@ -118,7 +124,10 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
         attenuation *= intensity;
     }
 
-    return (ambient + diffuse + specular) * attenuation;
+    // Shadow
+    float shadow = shadowCalculation(pointLight, fragPos);
+    //return (ambient + diffuse + specular) * attenuation;
+    return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
 }
 
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir) {
@@ -160,4 +169,14 @@ vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal) {
     normal_map_normal = normal_map_normal * 2.0 - 1.0;
     vec3 disturbed_normal = normalize(TBN * normal_map_normal);
     return disturbed_normal;
+}
+
+float shadowCalculation(PointLight pointLight, vec3 fragPos) {
+    vec3 frag_to_light = fragPos - pointLight.position;
+    float closest_depth = texture(shadow_map, frag_to_light).r;
+    closest_depth *= pointLight.far_plane;
+    float current_depth = length(frag_to_light);
+    float bias = 0.05;
+    float shadow = current_depth - bias > closest_depth ? 1.0 : 0.0;
+    return shadow;
 }
