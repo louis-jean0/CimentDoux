@@ -97,7 +97,23 @@ int main(int argc, char* argv[]) {
 
     // Scene
     auto scene = Scene::create();
+    auto plateforme = Model::create("../data/models/cube/Cube.gltf", shader);
     scene->add_entities_into_physics_engine(pe);
+
+    auto obst1 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst1_node = SceneNode::create(obst1);
+    obst1_node->transform.set_scale(glm::vec3(1.0f));
+    obst1_node->transform.set_translation(glm::vec3(-24.f,15.5f,-28.3f));
+    obst1_node->rigid_body->is_in_motion=true;
+    pe->add_entity(obst1_node);
+
+    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst2_node = SceneNode::create(obst2);
+    obst2_node->transform.set_scale(glm::vec3(2.0f,0.5f,2.f));
+    obst2_node->transform.set_translation(glm::vec3(-20.f,18.f,12.6f));
+    obst2_node->rigid_body->is_in_motion=true;
+    pe->add_entity(obst2_node);
+
 
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
@@ -115,6 +131,7 @@ int main(int argc, char* argv[]) {
         lastFrame = currentFrame;
         lag += deltaTime;
     
+
         // Input
         if(showMouse) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -154,8 +171,21 @@ int main(int argc, char* argv[]) {
         // shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
         shader->setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
 
+        //mouvement plateforme
+        obst1_node->transform.adjust_translation(glm::vec3(0.f,-sin(temps_debut-currentFrame)/8.,0.f));
+        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)/8.,0.f,0.f));
+
+        if(obst2_node->rigid_body->is_child){
+            std::cout<<"-----il est lie-------"<<std::endl;
+            //player->player_node->transform.set_translation(obst2_node->get_position());
+            //obst2_node->add_child(player->player_node);
+            //player->player_node->set_parent(obst2_node);
+        }
+
         // Scene
-        scene->draw(view, proj);
+        scene->draw(view, proj);        
+        obst1_node->draw(view,proj);
+        obst2_node->draw(view,proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 

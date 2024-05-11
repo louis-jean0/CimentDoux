@@ -8,6 +8,7 @@ void Scene::setup_scene() {
     // Map
     auto map = Model::create("../data/models/test_text/test_text.obj", shader);
     add_meshes_from_model(map);
+
     
     // Directional light
     glm::vec3 ambient = glm::vec3(0.1f,0.1f,0.1f);
@@ -18,7 +19,7 @@ void Scene::setup_scene() {
     lights->add_light(directionalLight);
 
     //std::cout<<scene_nodes.size()<<std::endl;
-
+    /*
     glm::vec3 reglage = glm::vec3(1.0f, 0.09f, 0.032f);   
     glm::vec3 ambient2 = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 diffuse2 = glm::vec3(0.5f,0.5f,0.5f);
@@ -111,7 +112,7 @@ void Scene::setup_scene() {
     glm::vec3 position12 = glm::vec3(-4.3f,30.f,-27.5f);
     glm::vec3 direction3 = glm::vec3(-0.6,-0.6,0.55);
     auto pointLight12 = TorchLight::create(ambient2, diffuse2, specular2, position12, 1.5f, 0.2f, 0.012f,direction3,40.f,50.f);
-    lights->add_light(pointLight12);
+    lights->add_light(pointLight12);*/
 
 }
 
