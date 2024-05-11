@@ -3,7 +3,7 @@ layout (location = 0) in vec3 aPos;
 
 uniform mat4 shadow_matrices[6];
 uniform float far_plane;
-uniform vec3 lightPos;
+uniform vec3 light_position;
 
 out vec4 fragPos;
 

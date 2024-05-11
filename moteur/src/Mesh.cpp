@@ -90,6 +90,15 @@ void Mesh::draw() {
     }
 }
 
+void Mesh::bindVAO() {
+    glBindVertexArray(vao);
+}
+
+void Mesh::drawElements() {
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 void Mesh::bind_shader(std::shared_ptr<Shader> shader) {
     this->shader = shader;
 }

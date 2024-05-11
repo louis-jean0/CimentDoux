@@ -28,6 +28,7 @@ class Mesh {
         AABB bounding_box;
         ModelCollider collider;
         std::shared_ptr<Shader> shader;
+        
 
         // Constructors
         Mesh() : collider(bounding_box) {}
@@ -46,10 +47,12 @@ class Mesh {
         void unbind_shader();
         void draw();
         void setup_mesh();
+        void bindVAO();
+        void drawElements();
         void add_texture(std::shared_ptr<Texture> texture);
         glm::vec3 getVerticeFromIndice(unsigned int indice);
         void updateGlobalBoundingBox(const glm::mat4& modelMatrix);
-
+    
     private:
         // Private attributes
         GLuint vao,vbo,ebo;

@@ -67,6 +67,7 @@ class SceneNode : public std::enable_shared_from_this<SceneNode> {
         void add_child(std::shared_ptr<SceneNode> child);
         glm::mat4 get_world_transform();
         void draw(glm::mat4& view, glm::mat4& projection);
+        void computeShadow(std::shared_ptr<Shader> shadow_shader);
         void drawModelAABB(glm::mat4& view, glm::mat4& projection);
         void drawMeshAABB(glm::mat4& view, glm::mat4& projection);
         void enable_physics(bool use_gravity);

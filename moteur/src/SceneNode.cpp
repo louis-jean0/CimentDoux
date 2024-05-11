@@ -60,6 +60,24 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
     }
 }
 
+void SceneNode::computeShadow(std::shared_ptr<Shader> shadow_shader) {
+    if(model) {
+        for(const auto entry : model->entries) {
+            entry.mesh->bindVAO();
+            entry.mesh->drawElements();
+        }
+    }
+
+    if(mesh) {
+        mesh->bindVAO();
+        mesh->drawElements();
+    }
+
+    for(const auto child : children) {
+        child->computeShadow(shadow_shader);
+    }
+}
+
 void SceneNode::updateAABB() {
     if(transform.transform_updated && mesh) {
         glm::mat4 model_matrix = get_world_transform();

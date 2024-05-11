@@ -1,5 +1,7 @@
 #include <Scene.hpp>
+#include <ShadowMap.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <memory>
 
 void Scene::setup_scene() {
     // Shader
@@ -113,6 +115,13 @@ void Scene::setup_scene() {
     auto pointLight12 = TorchLight::create(ambient2, diffuse2, specular2, position12, 1.5f, 0.2f, 0.012f,direction3,40.f,50.f);
     lights->add_light(pointLight12);
 
+    // for(auto& light : lights->lights) {
+    //     auto point_light = std::dynamic_pointer_cast<PointLight>(light);
+    //     if(point_light) {
+    //         point_light->gen_shadow_map();
+    //     }
+    // }
+
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
@@ -151,6 +160,20 @@ void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) 
 }
 
 void Scene::draw(glm::mat4& view, glm::mat4& projection) {
+    auto shadow_shader = shaders->getShadowShader();
+    shadow_shader->useShader();
+    for (auto& light : lights->lights) {
+        auto point_light = std::dynamic_pointer_cast<PointLight>(light); // Makes sure that we are working with a point light or a torch light
+        if(point_light) {
+            auto shadow_fbo = ShadowMap::create(point_light);
+            shadow_fbo->bind();
+            point_light->setup_shadow_map(shadow_shader);
+            for(auto& scene_node : scene_nodes) {
+                scene_node->computeShadow(shadow_shader);
+            }
+            shadow_fbo->unbind();
+        }
+    }
     for(auto& scene_node : scene_nodes) {
         scene_node->draw(view, projection);
     }
