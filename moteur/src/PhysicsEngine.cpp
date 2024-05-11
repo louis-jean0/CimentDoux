@@ -11,21 +11,21 @@ void PhysicsEngine::update(float delta_time) {
             //std::cout << "Collision detected between model at index " << 0 << " and model at index " << i << std::endl;
             int acc=entities[0]->solveCollision(entities[i], collisionDepth, collisionNormal);
             if(acc==1){
-                std::cout<<"on stocke bien l'id : "<<i<<std::endl;
+                //std::cout<<"on stocke bien l'id : "<<i<<std::endl;
                 id_block=i;
             }
             if(acc==0){
-                std::cout<<"on stocker l'id ladder : "<<i<<std::endl;
+                //std::cout<<"on stocker l'id ladder : "<<i<<std::endl;
                 id_ladder=i;
             }
         }else{
             if(id_block==i){
-                std::cout<<"on enleve l'indice et on reset"<<std::endl;
+                //std::cout<<"on enleve l'indice et on reset"<<std::endl;
                 id_block=-1;
                 entities[i]->is_child=false;
             }
             if(id_ladder==i){
-                std::cout<<"on enleve l'id ladder : "<<i<<std::endl;
+                //std::cout<<"on enleve l'id ladder : "<<i<<std::endl;
                 id_ladder=-1;
                 entities[0]->use_gravity = true;
                 entities[0]->is_on_ladder = false;

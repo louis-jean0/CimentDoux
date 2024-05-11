@@ -172,20 +172,21 @@ int main(int argc, char* argv[]) {
         shader->setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
 
         //mouvement plateforme
-        obst1_node->transform.adjust_translation(glm::vec3(0.f,-sin(temps_debut-currentFrame)/8.,0.f));
-        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)/8.,0.f,0.f));
+        obst1_node->transform.adjust_translation(glm::vec3(0.f,-sin(temps_debut-currentFrame)*10*deltaTime,0.f));
+        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
 
         if(obst2_node->rigid_body->is_child){
-            std::cout<<"-----il est lie-------"<<std::endl;
-            //player->player_node->transform.set_translation(obst2_node->get_position());
-            //obst2_node->add_child(player->player_node);
-            //player->player_node->set_parent(obst2_node);
+            //std::cout<<"-----il est lie-------"<<std::endl;
+            glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
+            //player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
+            player->player_node->transform.adjust_translation(glm::vec3(acc.x,0.f,0.f));
         }
+
 
         // Scene
         scene->draw(view, proj);        
         obst1_node->draw(view,proj);
-        obst2_node->draw(view,proj);
+        obst2_node->draw(view,proj);    
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 

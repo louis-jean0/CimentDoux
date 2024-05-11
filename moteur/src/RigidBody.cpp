@@ -71,7 +71,7 @@ int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collision
         shared_node->transform.transform_updated = true;
 
         if(other->is_ladder) {
-            std::cout<<"detetion ladder"<<std::endl;
+            //std::cout<<"detetion ladder"<<std::endl;
             use_gravity = false;
             is_on_ladder = true;
             acc=0;
@@ -82,7 +82,7 @@ int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collision
         }
 
         if(other->is_in_motion){
-            std::cout<<"ok pour detection de mouvement"<<std::endl;
+            //std::cout<<"ok pour detection de mouvement"<<std::endl;
             other->is_child=true;
             acc=1;
         }
