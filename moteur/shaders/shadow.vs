@@ -2,12 +2,10 @@
 layout (location = 0) in vec3 aPos;
 
 uniform mat4 model_matrix;
-uniform mat4 shadow_matrices[6];
-
-out vec4 fragPos;
+uniform mat4 light_projection;
+uniform mat4 light_view;
 
 void main() {
-    vec4 world_position = model_matrix * vec4(aPos, 1.0);
-    fragPos = world_position;
-    gl_Position = shadow_matrices[gl_InstanceID] * world_position;
+
+    gl_Position = light_projection * light_view * model_matrix * vec4(aPos, 1.0);
 }

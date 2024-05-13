@@ -19,7 +19,6 @@ struct PointLight {
     vec3 direction;
     float cut_off;
     float outer_cut_off;
-    float far_plane;
 };
 
 // DirectionalLight
@@ -49,15 +48,18 @@ uniform bool hasNormalMap;
 uniform sampler2D normal_map1;
 vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal);
 
-#define NB_POINT_LIGHTS_MAX 30
+#define NB_POINT_LIGHTS_MAX 20
 uniform int nb_point_lights;
 uniform PointLight pointLights[NB_POINT_LIGHTS_MAX];
+uniform mat4 light_projection;
+uniform mat4 light_view;
+
 vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir, int shadow_map_index);
 
 uniform DirectionalLight directionalLight;
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir);
 
-uniform samplerCube shadow_map[NB_POINT_LIGHTS_MAX];
+uniform sampler2D shadow_map[NB_POINT_LIGHTS_MAX];
 uniform int shadow_map_indices[NB_POINT_LIGHTS_MAX];
 float shadowCalculation(PointLight pointLight, vec3 fragPos, int shadow_map_index);
 
@@ -81,15 +83,8 @@ void main() {
     result += computeDirectionalLightContribution(directionalLight, norm, viewDir);
     for(int i = 0; i < nb_point_lights; ++i) {
         result += computePointLightsContribution(pointLights[i], norm, fragPos, viewDir, shadow_map_indices[i]);
-        //result += shadowCalculation(pointLights[i], fragPos, shadow_map_indices[i]);
     }
-    //result += material.emissive;
-    // if(hasDiffuse) {
-    //     result = vec3(1.0,0.0,0.0);
-    // }
-    // else {
-    //     result = vec3(0.0,1.0,0.0);
-    // }
+    result += material.emissive;
     FragColor = vec4(result,1.0);
 }
 
@@ -131,11 +126,13 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
         float intensity = clamp((theta - pointLight.outer_cut_off) / epsilon, 0.0, 1.0);
         attenuation *= intensity;
         // Shadow only for torch light to optimize performances
+        float shadow = shadowCalculation(pointLight, fragPos, shadow_map_index);
+        return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
     }
-    float shadow = shadowCalculation(pointLight, fragPos, shadow_map_index);
-    return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
-    //return (ambient + diffuse + specular) * attenuation;    
-    
+    else {
+        //return (ambient + diffuse + specular) * attenuation;    
+    }
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir) {
@@ -180,11 +177,12 @@ vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal) {
 }
 
 float shadowCalculation(PointLight pointLight, vec3 fragPos, int shadow_map_index) {
-    vec3 frag_to_light = fragPos - pointLight.position;
-    float closest_depth = texture(shadow_map[shadow_map_index], frag_to_light).r;
-    closest_depth *= pointLight.far_plane;
-    float current_depth = length(frag_to_light);
-    float bias = 0.001;
+    vec4 fragPos_light_space = light_projection * light_view * vec4(fragPos, 1.0);
+    fragPos_light_space.xyz /= fragPos_light_space.w;
+    fragPos_light_space.xyz = fragPos_light_space.xyz * 0.5 + 0.5;
+    float closest_depth = texture(shadow_map[shadow_map_index], fragPos_light_space.xy).r;
+    float current_depth = fragPos_light_space.z;
+    float bias = 0.005;
     float shadow = current_depth - bias > closest_depth ? 1.0 : 0.0;
     return shadow;
 }

@@ -1,12 +1,15 @@
 #pragma once
 
 #include <PointLight.hpp>
+#include <ShadowMap.hpp>
 
-class TorchLight : public PointLight {
+class TorchLight : public std::enable_shared_from_this<TorchLight>, PointLight {
     public:
         glm::vec3 direction;
         float cut_off;
         float outer_cut_off;
+        std::shared_ptr<ShadowMap> shadow_map;
+        unsigned int fbo_index;
 
         TorchLight() : PointLight() {
             is_torch_light = true;
@@ -24,6 +27,6 @@ class TorchLight : public PointLight {
         }
 
         void setup_light(std::shared_ptr<Shader> shader, int light_index) const override;
-        std::vector<glm::mat4> get_shadow_transforms() const;
-
+        void gen_shadow_map();
+        void setup_shadow_map(std::shared_ptr<Shader> shadow_shader);
 };

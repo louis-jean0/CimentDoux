@@ -18,7 +18,7 @@ void Scene::setup_scene() {
     glm::vec3 specular = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
-    //lights->add_directional_light(directionalLight);
+    lights->add_directional_light(directionalLight);
 
     glm::vec3 reglage = glm::vec3(1.0f, 0.09f, 0.032f);   
     glm::vec3 ambient2 = glm::vec3(0.5f,0.5f,0.5f);
@@ -99,23 +99,23 @@ void Scene::setup_scene() {
     glm::vec3 position5 = glm::vec3(-29.f,0.5f,24.5f);
     glm::vec3 direction1 = glm::vec3(0.8,0.23,-0.55);
     auto pointLight5 = TorchLight::create(ambient2, diffuse2, specular2, position5, 1.5f, 0.2f, 0.012f,direction1,40.f,50.f);
-    lights->add_point_light(pointLight5);
+    lights->add_torch_light(pointLight5);
 
     //spot2
     glm::vec3 position2 = glm::vec3(-12.3f,0.5f,0.7f);
     glm::vec3 direction2 = glm::vec3(-0.4,0.2,0.9);
     auto pointLight2 = TorchLight::create(ambient2, diffuse2, specular2, position2, 1.5f, 0.2f, 0.012f,direction2,40.f,50.f);
-    lights->add_point_light(pointLight2);
+    lights->add_torch_light(pointLight2);
 
     //spot3 plateforme
     glm::vec3 position12 = glm::vec3(-4.3f,30.f,-27.5f);
     glm::vec3 direction3 = glm::vec3(-0.6,-0.6,0.55);
     auto pointLight12 = TorchLight::create(ambient2, diffuse2, specular2, position12, 1.5f, 0.2f, 0.012f,direction3,40.f,50.f);
-    lights->add_point_light(pointLight12);
+    lights->add_torch_light(pointLight12);
 
-    for(auto& point_light : lights->point_lights) {
-        point_light->gen_shadow_map();
-        }
+    for(auto& torch_light : lights->torch_lights) {
+        torch_light->gen_shadow_map();
+    }
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
@@ -155,13 +155,13 @@ void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) 
 void Scene::draw(glm::mat4& view, glm::mat4& projection) {
     auto shadow_shader = shaders->getShadowShader();
     shadow_shader->useShader();
-    for (auto& point_light : lights->point_lights) {
-        point_light->setup_shadow_map(shadow_shader);
-        point_light->shadow_map->bind();
+    for (auto& torch_light : lights->torch_lights) {
+        torch_light->setup_shadow_map(shadow_shader);
+        torch_light->shadow_map->bind();
         for(auto& scene_node : scene_nodes) {            
             scene_node->computeShadow(shadow_shader);
         }
-        point_light->shadow_map->unbind();
+        torch_light->shadow_map->unbind();
     }
     for(auto& scene_node : scene_nodes) {
         scene_node->draw(view, projection);

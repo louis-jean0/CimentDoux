@@ -2,18 +2,18 @@
 
 #include <memory>
 
-class PointLight;
+class TorchLight;
 
 class ShadowMap {
 public:
-    std::weak_ptr<PointLight> point_light;
-    unsigned int depth, depthMapFBO, depthCubemap;
+    std::weak_ptr<TorchLight> torch_light;
+    unsigned int depth, depthMapFBO, depthMap;
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
-    ShadowMap(std::shared_ptr<PointLight> point_light);
+    ShadowMap(std::shared_ptr<TorchLight> point_light);
     ~ShadowMap();
 
-    static std::shared_ptr<ShadowMap> create(std::shared_ptr<PointLight> point_light);
+    static std::shared_ptr<ShadowMap> create(std::shared_ptr<TorchLight> torch_light);
 
     void bind();
     void unbind();
