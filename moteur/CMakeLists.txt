@@ -36,9 +36,6 @@ file(GLOB IMGUI_SOURCES ${IMGUI_DIR}/src/*.cpp)
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR}/include ${IMGUI_DIR}/backends)
 
-# OpenAL
-#add_subdirectory(external/libsndfile-master)
-add_subdirectory(external/openal-soft-master)
 
 # Find and link OpenGL
 find_package(OpenGL REQUIRED)
@@ -98,7 +95,7 @@ include_directories(
 )
 
 # Linking libraries
-target_link_libraries(main glfw glad imgui assimp -lsndfile -lopenal)
+target_link_libraries(main glfw glad imgui assimp)
 
 # Output directories
 set_target_properties(glad imgui PROPERTIES

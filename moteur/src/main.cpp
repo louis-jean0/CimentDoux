@@ -30,6 +30,9 @@
 #include <ShaderManager.hpp>
 #include <Scene.hpp>
 
+#define MINIAUDIO_IMPLEMENTATION
+#include <miniaudio.h>
+
 // Functions prototypes
 void printUsage();
 void processInput(GLFWwindow *window);
@@ -79,6 +82,9 @@ bool ESCAPE;
 bool toucheCPresseePrecedemment = false;
 bool afficherMenu = false;
 
+bool AZERTY = false;
+bool QWERTY = true;
+
 int main(int argc, char* argv[]) {
     // Initialize window
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux",true);
@@ -124,6 +130,28 @@ int main(int argc, char* argv[]) {
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
 
+
+    float volume = 1.0;
+    ma_result result;
+    ma_engine engine;
+    ma_sound sound;
+    result = ma_engine_init(NULL, &engine);
+    if (result != MA_SUCCESS){
+        std::cout << "Failed to initialized miniaudio engine\n";
+        ma_engine_uninit(&engine);
+        return -1;
+    }
+    result = ma_sound_init_from_file(&engine, "../data/sounds/BetonBrutal3.mp3", 0, NULL, NULL, &sound);
+    if (result != MA_SUCCESS){
+        std::cout << "Impossible de charger le son\n";
+        ma_engine_uninit(&engine);
+        return -1;
+    }
+
+    ma_sound_set_looping(&sound,true);
+    ma_sound_start(&sound);
+
+
     // Render loop
     while (glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
@@ -140,6 +168,7 @@ int main(int argc, char* argv[]) {
             }            
         } 
 
+        ma_engine_set_volume(&engine, volume);
 
         // Input
         if(showMouse) {
@@ -583,20 +612,25 @@ int main(int argc, char* argv[]) {
             ImGui::SetNextWindowBgAlpha(0.7f);
             ImGui::Begin("Slides", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 9.2, SCR_HEIGHT / 6));
-            ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 700));  
+            ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 800));  
 
             float contentWidth = ImGui::GetContentRegionAvail().x;
             float contentHeight = ImGui::GetContentRegionAvail().y;
 
             float textHeight = ImGui::GetTextLineHeightWithSpacing(); 
-            float posY = (contentHeight - textHeight * 5) * 0.5f;
+            float posY = (contentHeight - textHeight * 10) * 0.5f;
 
             float sliderWidth = 200.0f;
             float textWidthFOV = ImGui::CalcTextSize("FOV").x;
             float textWidthSensi = ImGui::CalcTextSize("Sensibilité de la souris").x;
+            float textWidthVolume = ImGui::CalcTextSize("Volume du son").x;
+            float textWidthCom = ImGui::CalcTextSize("Commandes AZERTY / QWERTY :").x;
 
             float textPosXFOV = (contentWidth - textWidthFOV) * 0.5f;
             float textPosXSensi = (contentWidth - textWidthSensi) * 0.5f;
+            float textPosXVolume = (contentWidth - textWidthVolume) * 0.5f;
+            float textPosXCom = (contentWidth - textWidthCom) * 0.5f;
+
             float sliderPosX = (contentWidth - sliderWidth) * 0.5f;
 
             ImGui::SetCursorPosX(textPosXFOV);
@@ -611,7 +645,7 @@ int main(int argc, char* argv[]) {
             player->get_camera()->setFOV(fov);
 
             ImGui::SetCursorPosX(textPosXSensi);
-            ImGui::SetCursorPosY(posY + textHeight + 110);
+            ImGui::SetCursorPosY(posY + textHeight + 100);
             ImGui::Text("Sensibilité de la souris");
 
             float imguiWindowSizee = ImGui::GetWindowSize().x;
@@ -621,13 +655,49 @@ int main(int argc, char* argv[]) {
             ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 10.f);
             player->get_camera()->set_sensitivity(sensi);
 
+            ImGui::SetCursorPosX(textPosXVolume);
+            ImGui::SetCursorPosY(posY + textHeight + 280);
+            ImGui::Text("Volume du son");
+
+            float imguiWindowSizeee = ImGui::GetWindowSize().x;
+            float sliderPosOffsetVolume = imguiWindowSizeee / 4;
+            float sliderPosXVolume = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetVolume;
+            ImGui::SetCursorPosX(sliderPosXVolume);;
+            ImGui::SliderFloat("##Volume", &volume, 0.0f, 1.f);
+
+            ImGui::SetCursorPosX(textPosXCom);
+            ImGui::SetCursorPosY(posY + textHeight + 450);
+            ImGui::Text("Commandes AZERTY / QWERTY :");
+
+
+            float imguiWindowSizeeee = ImGui::GetWindowSize().x;
+            float sliderPosOffsetCom = imguiWindowSizeeee / 4;
+            float sliderPosXCom = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetCom;
+            float buttonWidth = 25;
+            float totalButtonWidth = 2 * buttonWidth;
+            float spaceBetweenButtons = imguiWindowSizeeee - totalButtonWidth;
+            float offsetX = (SCR_WIDTH / 4); 
+            ImGui::SetCursorPosX(offsetX);
+            if(ImGui::Checkbox("AZERTY", &AZERTY)) {
+                player->get_camera()->mode_cam = 1;
+                QWERTY = false;
+            }
+            ImGui::SameLine();
+            if(ImGui::Checkbox("QWERTY", &QWERTY)) {
+                player->get_camera()->mode_cam = 0;
+                AZERTY = false;
+            }
+
             ImGui::End();
+
         } else if(ESCAPE == true && credits == true) {
             ImGui::SetNextWindowBgAlpha(0.7f);
             ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
+            ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 9.2, SCR_HEIGHT / 6));
+            ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 800));  
 
             char CHFormater1[] = "SERVA Benjamin";
             char CHFormater2[] = "JEAN Louis";
