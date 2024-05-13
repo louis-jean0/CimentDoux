@@ -5,7 +5,7 @@
 #include <vector>
 #include <ShadowMap.hpp>
 
-class PointLight : public Light, std::enable_shared_from_this<PointLight> {
+class PointLight : public std::enable_shared_from_this<PointLight>, Light {
     public:
         glm::vec3 position;
         float constant;

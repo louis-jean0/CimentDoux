@@ -65,7 +65,7 @@ glm::mat4 proj;
 
 int main(int argc, char* argv[]) {
     // Initialize window
-    Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux",true);
+    Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Ciment doux",true);
     window.setup_GLFW();
     glfwSetKeyCallback(window.get_window(), keyCallback); 
 

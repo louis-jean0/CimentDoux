@@ -1,4 +1,3 @@
-#include "ShadowMap.hpp"
 #include <PointLight.hpp>
 #include <ShaderManager.hpp>
 #include <memory>

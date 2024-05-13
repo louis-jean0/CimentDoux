@@ -40,9 +40,6 @@ target_sources(imgui PUBLIC
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
-# OpenAL
-#add_subdirectory(external/openal-soft-master)
-
 # Find and link OpenGL
 find_package(OpenGL REQUIRED)
 
@@ -55,7 +52,6 @@ target_include_directories(main PRIVATE
     external/glfw-3.3.9/include
     external/glad/include
     external/assimp/include
-    #external/openal-soft-master/include/AL
 )
 
 target_link_libraries(main glfw glad imgui assimp)
