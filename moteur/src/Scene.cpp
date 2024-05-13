@@ -8,8 +8,8 @@ void Scene::setup_scene() {
     auto shader = shaders->getShader();
 
     // Map
-    //auto map = Model::create("../data/models/test_text/test_text.obj", shader);
-    auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
+    auto map = Model::create("../data/models/test_text/test_text.obj", shader);
+    //auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
     add_meshes_from_model(map);
     
     // Directional light
@@ -98,7 +98,7 @@ void Scene::setup_scene() {
     //spot1 bétoniere
     glm::vec3 position5 = glm::vec3(-29.f,0.5f,24.5f);
     glm::vec3 direction1 = glm::vec3(0.8,0.23,-0.55);
-    auto pointLight5 = TorchLight::create(ambient2, diffuse2, specular2, position5, 1.5f, 0.2f, 0.012f,direction1,40.f,50.f);
+    auto pointLight5 = TorchLight::create(ambient2, diffuse2, specular2, position5, 1.5f, 0.5f, 0.012f,direction1,40.f,120.f);
     lights->add_torch_light(pointLight5);
 
     //spot2
