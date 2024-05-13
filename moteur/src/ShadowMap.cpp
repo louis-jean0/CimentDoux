@@ -4,8 +4,8 @@
 #include <memory>
 
 ShadowMap::ShadowMap(std::shared_ptr<PointLight> point_light) : point_light(point_light) {
-    glGenTextures(1, &depth);
-    glBindTexture(GL_TEXTURE_2D, depth);
+    glGenFramebuffers(1, &depthMapFBO);
+    glGenTextures(1, &depthCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     for (unsigned int i = 0; i < 6; ++i) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
