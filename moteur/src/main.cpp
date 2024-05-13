@@ -31,6 +31,7 @@
 void printUsage();
 void processInput(GLFWwindow *window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam); 
 
 // Window settings
 const unsigned int SCR_WIDTH = 1440;
@@ -68,6 +69,10 @@ int main(int argc, char* argv[]) {
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Ciment doux",true);
     window.setup_GLFW();
     glfwSetKeyCallback(window.get_window(), keyCallback); 
+
+    // // OpenGL debug
+    // glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    // glDebugMessageCallback(openglCallbackFunction, nullptr);
 
     // Initialize ImGui
     IMGUI_CHECKVERSION();
@@ -276,4 +281,22 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void APIENTRY openglCallbackFunction(
+        GLenum source,
+        GLenum type,
+        GLuint id,
+        GLenum severity,
+        GLsizei length,
+        const GLchar* message,
+        const void* userParam) {
+
+    (void)source; (void)type; (void)id; 
+    (void)severity; (void)length; (void)userParam;
+    fprintf(stderr, "%s\n", message);
+    if (severity == GL_DEBUG_SEVERITY_HIGH) {
+        fprintf(stderr, "Aborting...\n");
+        abort();
+    }
 }

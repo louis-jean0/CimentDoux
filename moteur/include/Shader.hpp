@@ -15,9 +15,13 @@ class Shader
         GLuint Program;
         //Texture tex[10];    // 10 textures max
         
-        // Constructor
+        // Constructors
         Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
             setShader(vertexPath, fragmentPath);
+        }
+
+        Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath) {
+            setShader(vertexPath, fragmentPath, geometryPath);
         }
 
         // Factory
@@ -25,7 +29,12 @@ class Shader
             return std::make_shared<Shader>(vertexPath, fragmentPath);
         }
 
-        void setShader(const GLchar* vertexPath, const GLchar* fragmentPath);        
+        static std::shared_ptr<Shader> create(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath) {
+            return std::make_shared<Shader>(vertexPath, fragmentPath, geometryPath);
+        }
+
+        void setShader(const GLchar* vertexPath, const GLchar* fragmentPath);
+        void setShader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* geometryPath);      
         void useShader();
         void deleteShader();
 

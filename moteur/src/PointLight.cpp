@@ -25,7 +25,8 @@ void PointLight::setup_shadow_map(std::shared_ptr<Shader> shadow_shader) const {
 
 std::vector<glm::mat4> PointLight::get_shadow_transforms() const {
     float near_plane = 1.0f;
-    glm::mat4 shadow_proj = glm::perspective(glm::radians(90.0f), 1.0f, near_plane, far_plane);
+    float aspect = (float)shadow_map->SHADOW_WIDTH/shadow_map->SHADOW_HEIGHT;
+    glm::mat4 shadow_proj = glm::perspective(glm::radians(90.0f), aspect, near_plane, far_plane);
     std::vector<glm::mat4> shadow_transforms;
     shadow_transforms.push_back(shadow_proj * glm::lookAt(position, position + glm::vec3( 1.0,  0.0,  0.0), glm::vec3(0.0, -1.0,  0.0)));
     shadow_transforms.push_back(shadow_proj * glm::lookAt(position, position + glm::vec3(-1.0,  0.0,  0.0), glm::vec3(0.0, -1.0,  0.0)));

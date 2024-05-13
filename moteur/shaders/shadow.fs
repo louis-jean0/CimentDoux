@@ -6,6 +6,6 @@ uniform float far_plane;
 
 void main() {
     float lightDistance = length(fragPos.xyz - light_position);
-    lightDistance = lightDistance / far_plane; // Normalisez en fonction de la portée de la lumière
+    lightDistance = lightDistance / far_plane;
     gl_FragDepth = lightDistance;
 }

@@ -52,13 +52,14 @@ vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal);
 #define NB_POINT_LIGHTS_MAX 30
 uniform int nb_point_lights;
 uniform PointLight pointLights[NB_POINT_LIGHTS_MAX];
-vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir, int shadow_map_index);
 
 uniform DirectionalLight directionalLight;
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir);
 
-uniform samplerCube shadow_map;
-float shadowCalculation(PointLight pointLight, vec3 fragPos);
+uniform samplerCube shadow_map[NB_POINT_LIGHTS_MAX];
+uniform int shadow_map_indices[NB_POINT_LIGHTS_MAX];
+float shadowCalculation(PointLight pointLight, vec3 fragPos, int shadow_map_index);
 
 uniform Material material;
 
@@ -79,13 +80,20 @@ void main() {
     }
     result += computeDirectionalLightContribution(directionalLight, norm, viewDir);
     for(int i = 0; i < nb_point_lights; ++i) {
-        result += computePointLightsContribution(pointLights[i], norm, fragPos, viewDir);
+        result += computePointLightsContribution(pointLights[i], norm, fragPos, viewDir, shadow_map_indices[i]);
+        //result += shadowCalculation(pointLights[i], fragPos, shadow_map_indices[i]);
     }
-    result += material.emissive;
+    //result += material.emissive;
+    // if(hasDiffuse) {
+    //     result = vec3(1.0,0.0,0.0);
+    // }
+    // else {
+    //     result = vec3(0.0,1.0,0.0);
+    // }
     FragColor = vec4(result,1.0);
 }
 
-vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir) {
+vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fragPos, vec3 viewDir, int shadow_map_index) {
     vec3 lightDir = normalize(pointLight.position - fragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
 
@@ -122,12 +130,12 @@ vec3 computePointLightsContribution(PointLight pointLight, vec3 normal, vec3 fra
         float epsilon = pointLight.cut_off - pointLight.outer_cut_off;
         float intensity = clamp((theta - pointLight.outer_cut_off) / epsilon, 0.0, 1.0);
         attenuation *= intensity;
+        // Shadow only for torch light to optimize performances
     }
-
-    // Shadow
-    float shadow = shadowCalculation(pointLight, fragPos);
-    //return (ambient + diffuse + specular) * attenuation;
+    float shadow = shadowCalculation(pointLight, fragPos, shadow_map_index);
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
+    //return (ambient + diffuse + specular) * attenuation;    
+    
 }
 
 vec3 computeDirectionalLightContribution(DirectionalLight directionalLight, vec3 normal, vec3 viewDir) {
@@ -171,12 +179,12 @@ vec3 disturbNormalWithNormalMap(vec3 tangent, vec3 bitangent, vec3 normal) {
     return disturbed_normal;
 }
 
-float shadowCalculation(PointLight pointLight, vec3 fragPos) {
+float shadowCalculation(PointLight pointLight, vec3 fragPos, int shadow_map_index) {
     vec3 frag_to_light = fragPos - pointLight.position;
-    float closest_depth = texture(shadow_map, frag_to_light).r;
+    float closest_depth = texture(shadow_map[shadow_map_index], frag_to_light).r;
     closest_depth *= pointLight.far_plane;
     float current_depth = length(frag_to_light);
-    float bias = 0.05;
+    float bias = 0.001;
     float shadow = current_depth - bias > closest_depth ? 1.0 : 0.0;
     return shadow;
 }
