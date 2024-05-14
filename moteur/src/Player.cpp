@@ -45,17 +45,18 @@ void Player::handleInput(float delta_time) {
 
     else { // If not on ladder
         if(camera->mode_cam==0 || camera->mode_cam == 1) {
+            float sensi = camera->get_sensivity();
             if(glfwGetKey(window, forward_key) == GLFW_PRESS) {
-            moveDirection += camera->getCFront();
+            moveDirection += camera->getCFront() * sensi;
             }
             if(glfwGetKey(window, backward_key) == GLFW_PRESS) {
-                moveDirection -= camera->getCFront();
+                moveDirection -= camera->getCFront() * sensi;
             }
             if(glfwGetKey(window, left_key) == GLFW_PRESS) {
-                moveDirection += camera->getCRight();
+                moveDirection += camera->getCRight() * sensi;
             }
             if(glfwGetKey(window, right_key) == GLFW_PRESS) {
-                moveDirection -= camera->getCRight();
+                moveDirection -= camera->getCRight() * sensi;
             }
         }
     }

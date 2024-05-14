@@ -332,3 +332,11 @@ glm::vec3 Camera::getCUp() const {
 glm::vec3 Camera::getCRight() const {
 	return m_rotation * VEC_RIGHT;
 }
+
+void Camera::set_sensitivity(float sensitivity) {
+	m_rotationSpeed = sensitivity;
+}
+
+float Camera::get_sensivity() {
+	return m_rotationSpeed;
+}
