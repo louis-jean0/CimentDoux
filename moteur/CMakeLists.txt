@@ -58,7 +58,9 @@ target_include_directories(main PRIVATE
     #external/openal-soft-master/include/AL
 )
 
-target_link_libraries(main glfw glad imgui assimp)
+# Add OpenGL to the target link libraries
+target_link_libraries(main glfw glad imgui assimp ${OPENGL_LIBRARIES})
+
 target_compile_definitions(main PRIVATE GLM_ENABLE_EXPERIMENTAL)
 
 set_target_properties(glad imgui PROPERTIES
