@@ -9,8 +9,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd Cement_Bag_BaseColor.jpg
-map_Kn Cement_Bag_Normal.jpg
+#map_Kd Cement_Bag_BaseColor.jpg
+#map_Kn Cement_Bag_Normal.jpg
 
 newmtl Cement_Bag.001
 Ns 200.000000
@@ -30,8 +30,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd Cement_Bag_BaseColor.jpg
-map_Kn Cement_Bag_Normal.jpg
+#map_Kd Cement_Bag_BaseColor.jpg
+#map_Kn Cement_Bag_Normal.jpg
 
 newmtl Clou
 Ns 250.000000
@@ -41,8 +41,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd rust_coarse_01_diff_4k.jpg
-map_Kn rust_coarse_01_nor_gl_4k.png
+#map_Kd rust_coarse_01_diff_4k.jpg
+#map_Kn rust_coarse_01_nor_gl_4k.png
 
 newmtl Echelle
 Ns 10.000005
@@ -62,7 +62,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 3
-map_Kd surface-with-abstract-watercolor-paint.jpg
+#map_Kd surface-with-abstract-watercolor-paint.jpg
 
 newmtl Gris_01
 Ns 10.000005
@@ -72,8 +72,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd white_plaster_02_diff_4k.jpg
-map_Kn white_plaster_02_nor_gl_4k.png
+#map_Kd white_plaster_02_diff_4k.jpg
+#map_Kn white_plaster_02_nor_gl_4k.png
 
 newmtl Gris_02
 Ns 10.000005
@@ -143,8 +143,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd rust_coarse_01_diff_4k.jpg
-map_Kn rust_coarse_01_nor_gl_4k.png
+#map_Kd rust_coarse_01_diff_4k.jpg
+#map_Kn rust_coarse_01_nor_gl_4k.png
 
 newmtl Sol
 Ns 250.000000
@@ -154,8 +154,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
 illum 2
-map_Kd gravel_concrete_03_diff_4k.jpg
-map_Kn gravel_concrete_03_nor_gl_4k.png
+#map_Kd gravel_concrete_03_diff_4k.jpg
+#map_Kn gravel_concrete_03_nor_gl_4k.png
 
 newmtl Trampoline
 Ns 10.000005
@@ -175,5 +175,5 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd white_plaster_02_diff_4k.jpg
-map_Kn white_plaster_02_nor_gl_4k.png
+#map_Kd white_plaster_02_diff_4k.jpg
+#map_Kn white_plaster_02_nor_gl_4k.png

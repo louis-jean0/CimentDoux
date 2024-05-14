@@ -8,6 +8,7 @@ std::shared_ptr<Shader> ShaderManager::getAABBShader() {
         aabbShader = Shader::create("../shaders/aabb.vert", "../shaders/aabb.frag");
         isLoaded = true;
     }
+    //std::cout<<"aabbShader : "<<aabbShader->Program<<std::endl;
     return aabbShader;
 }
 
@@ -18,6 +19,7 @@ std::shared_ptr<Shader> ShaderManager::getShader() {
         shader = Shader::create("../shaders/test.vs", "../shaders/test.fs");
         isLoaded = true;
     }
+    //std::cout<<"shader : "<<shader->Program<<std::endl;
     return shader;
 }
 
@@ -28,5 +30,6 @@ std::shared_ptr<Shader> ShaderManager::getShadowShader() {
         shadow_shader = Shader::create("../shaders/shadow.vs", "../shaders/shadow.fs");
         isLoaded = true;
     }
+    //std::cout<<"shadow_shader : "<<shadow_shader->Program<<std::endl;
     return shadow_shader;
 }

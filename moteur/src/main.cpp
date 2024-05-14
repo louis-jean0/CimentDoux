@@ -125,14 +125,14 @@ int main(int argc, char* argv[]) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
-        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         // ImGui
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        view = player->get_view_matrix();
+        proj = player->get_projection_matrix();
+        scene->draw(view, proj);
         
         pe->update(deltaTime);
         
@@ -141,23 +141,6 @@ int main(int argc, char* argv[]) {
             lag -= MS_PER_UPDATE;    
         }
 
-        view = player->get_view_matrix();
-        proj = player->get_projection_matrix(); 
-
-        // Sending to shader
-
-        glm::vec3 camPos = player->get_position();
-        glm::vec3 camFront = player->getCFront();
-
-        shader->useShader();
-        shader->setVPMatrix(view,proj);
-
-        // Phong + Flashlight
-        // shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
-        shader->setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
-
-        // Scene
-        scene->draw(view, proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 

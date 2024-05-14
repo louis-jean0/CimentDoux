@@ -62,6 +62,7 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
 
 void SceneNode::computeShadow(std::shared_ptr<Shader> shadow_shader) {
     glm::mat4 model_matrix = get_world_transform();
+    shadow_shader->useShader();
     shadow_shader->setBindMatrix4fv("model_matrix", 1, 0, glm::value_ptr(model_matrix));
     if(model) {
         for(const auto entry : model->entries) {

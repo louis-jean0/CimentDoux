@@ -213,12 +213,13 @@ void Shader::setShader(const GLchar* vertexPath, const GLchar* fragmentPath, con
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-    glDeleteShader(geometry);  // Don't forget to delete the geometry shader as well
+    glDeleteShader(geometry);
 }
 
 void Shader::useShader()
 {
     glUseProgram(this->Program);
+    //std::cout<<"Je suis le shader "<<this->Program<<std::endl;
 }
 
 void Shader::deleteShader()
