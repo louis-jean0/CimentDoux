@@ -1,16 +1,20 @@
-cmake_minimum_required(VERSION 3.14.0)
-
-# Project information
-project(main VERSION 0.1)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_BUILD_TYPE Release)
-
-# Set the compile options
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+cmake_minimum_required(VERSION 3.10)
 
 # Always generate compile_commands.json for clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+
+# Debug
+set(CMAKE_BUILD_TYPE Debug)
+
+# Project information
+project(main VERSION 0.1)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Disable GLFW docs, tests, and examples to avoid unnecessary builds
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # Third-party libraries
 # GLFW for windowing
@@ -25,13 +29,19 @@ target_include_directories(glad PRIVATE external/glad/include)
 
 # Assimp
 add_subdirectory(external/assimp)
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 # ImGui setup
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui-1.90.4)
 file(GLOB IMGUI_SOURCES ${IMGUI_DIR}/src/*.cpp)
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR}/include ${IMGUI_DIR}/backends)
+
+# OpenAL
+#add_subdirectory(external/libsndfile-master)
+add_subdirectory(external/openal-soft-master)
+
+# Find and link OpenGL
+find_package(OpenGL REQUIRED)
 target_link_libraries(imgui PUBLIC ${OPENGL_gl_LIBRARY} glfw)
 
 # ImGui GLFW and OpenGL3 implementations
@@ -40,26 +50,51 @@ target_sources(imgui PUBLIC
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
-# OpenAL
-#add_subdirectory(external/openal-soft-master)
-
-# Find and link OpenGL
-find_package(OpenGL REQUIRED)
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 
 # Executable definition
-file(GLOB PROJECT_SOURCES "src/*.cpp")
-add_executable(main ${PROJECT_SOURCES})
+add_executable(main
+    src/main.cpp
+    src/Window.cpp
+    src/Shader.cpp
+    src/SceneNode.cpp
+    src/Mesh.cpp
+    src/Transform.cpp
+    src/stb_image.cpp
+    src/Texture.cpp
+    src/Model.cpp
+    src/Plane.cpp
+    src/Sphere.cpp
+    src/PlaneCollider.cpp
+    src/Camera.cpp
+    src/Camera_Helper.cpp
+    src/quaternion_utils.cpp
+    src/Cube.cpp
+    src/AABB.cpp
+    src/ModelCollider.cpp
+    src/ShaderManager.cpp
+    src/Scene.cpp
+    src/RigidBody.cpp
+    src/PhysicsEngine.cpp
+    src/Player.cpp
+)
 
-target_include_directories(main PRIVATE
+# Include directories for our project
+include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     external/glfw-3.3.9/include
     external/glad/include
     external/assimp/include
+    external/assimp/include
+    external/libsndfile-master/include
+    external/openal-soft-master/include/AL
+    external
 )
 
-target_link_libraries(main glfw glad imgui assimp)
-target_compile_definitions(main PRIVATE GLM_ENABLE_EXPERIMENTAL)
+# Linking libraries
+target_link_libraries(main glfw glad imgui assimp -lsndfile -lopenal)
 
+# Output directories
 set_target_properties(glad imgui PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
