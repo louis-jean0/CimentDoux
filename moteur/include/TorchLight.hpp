@@ -29,4 +29,5 @@ class TorchLight : public std::enable_shared_from_this<TorchLight>, PointLight {
         void setup_light(std::shared_ptr<Shader> shader, int light_index) const override;
         void gen_shadow_map();
         void setup_shadow_map(std::shared_ptr<Shader> shadow_shader);
+        void set_position(glm::vec3 new_pos){position=new_pos;};
 };

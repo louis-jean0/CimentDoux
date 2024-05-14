@@ -12,9 +12,9 @@ void Scene::setup_scene() {
     //auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
     add_meshes_from_model(map);
 
-    
+
     // Directional light
-    glm::vec3 ambient = glm::vec3(0.05f,0.05f,0.05f);
+    glm::vec3 ambient = glm::vec3(0.01f,0.01f,0.01f);
     glm::vec3 diffuse = glm::vec3(1.0f,1.0f,1.0f);
     glm::vec3 specular = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
@@ -134,6 +134,14 @@ void Scene::setup_scene() {
 
 
     //spot--------------------------------------------------------
+
+    //spot joueur
+    glm::vec3 pos_joueur = player->player_node->get_translation();
+    std::shared_ptr<Camera> c = player->get_camera();
+    glm::vec3 dir_joueur = c->getCFront();
+    auto spot_joueur = TorchLight::create(ambient2, diffuse2, specular2, pos_joueur, 1.5f, 0.5f, 0.012f,dir_joueur,40.f,50.f);
+    lights->add_torch_light(spot_joueur);
+
     //spot1 bétoniere
     // glm::vec3 position5 = glm::vec3(-29.f,0.5f,24.5f);
     // glm::vec3 direction1 = glm::vec3(0.8,0.23,-0.55);
@@ -168,6 +176,14 @@ void Scene::setup_scene() {
     for(const auto& torch_light : lights->torch_lights) {
         torch_light->gen_shadow_map();
     }
+}
+
+void Scene::update_light_player(){
+    glm::vec3 pos_joueur = player->player_node->get_translation();
+    std::shared_ptr<Camera> c = player->get_camera();
+    glm::vec3 dir_joueur = c->getCFront();
+    lights->torch_lights[0]->set_position(pos_joueur);
+    lights->torch_lights[0]->direction=dir_joueur;
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
@@ -205,6 +221,7 @@ void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) 
 }
 
 void Scene::draw(glm::mat4& view, glm::mat4& projection) {
+    update_light_player();
     auto shadow_shader = shaders->getShadowShader();
     shadow_shader->useShader();
     glEnable(GL_CULL_FACE);

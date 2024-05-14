@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
     pe->add_player(player);
 
     // Scene
-    auto scene = Scene::create();
+    auto scene = Scene::create(player);
     auto plateforme = Model::create("../data/models/cube/Cube.gltf", shader);
     scene->add_entities_into_physics_engine(pe);
 

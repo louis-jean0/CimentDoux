@@ -94,7 +94,7 @@ void Player::handleInput(float delta_time) {
     }
 
     // Jump
-    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && player_node->rigid_body->is_on_ground) {
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && player_node->rigid_body->is_on_ground && player_node->rigid_body->can_jump) {
         float jumpStrength = sqrt(2.0f * 9.81f * 0.7f);
         float vitesse = 0.01f;
         player_node->rigid_body->velocity.y += jumpStrength * vitesse;

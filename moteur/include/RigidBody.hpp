@@ -20,6 +20,7 @@ class RigidBody {
         bool is_on_ladder = false;
         bool is_in_motion = false;
         bool is_child = false;
+        bool can_jump = true;
 
         RigidBody() = default;
         RigidBody(std::weak_ptr<SceneNode> node) : node(node), velocity(0.0f), mass(1.0f), use_gravity(false), is_on_ground(false), friction_coefficient(0.05f), restitution_coefficient(0.0f) {}
