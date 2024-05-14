@@ -51,7 +51,7 @@ bool wireframe = false;
 float deltaTime = 0.0f;	
 float lastFrame = 0.0f;
 float lag = 0.0f;
-float MS_PER_UPDATE = 0.001;
+float MS_PER_UPDATE = 0.01;
 
 // Trans
 float PasTranslationCube = 0.01;
@@ -65,8 +65,6 @@ glm::vec3 a = glm::vec3(0., 0., 0.);
 
 glm::mat4 view;
 glm::mat4 proj;
-
-
 
 // Permet d'aficher ou non (métrage + timer)
 bool principal = true;
@@ -144,7 +142,6 @@ int main(int argc, char* argv[]) {
     // capsule_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
     // capsule_node->set_scale(glm::vec3(1.0f,0.5f,1.0f));
 
-
     // Variables menu
     double hauteur = 0.;
     double MaxHeight = 0.;
@@ -153,7 +150,6 @@ int main(int argc, char* argv[]) {
     double timing = 0.0, acc;
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
-
 
     float volume = 1.0;
     ma_result result;
@@ -210,20 +206,19 @@ int main(int argc, char* argv[]) {
 
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
-        scene->draw(view, proj);
-        
-        pe->update(deltaTime);
         
         while (lag >= MS_PER_UPDATE) {
             if(principal == true) {
                 player->update(deltaTime);
+                pe->update(deltaTime);
             }
-            
             lag -= MS_PER_UPDATE;    
         }
 
         view = player->get_view_matrix();
-        proj = player->get_projection_matrix(); 
+        proj = player->get_projection_matrix();
+
+        scene->draw(view, proj);
 
         // Sending to shader
 
@@ -246,7 +241,6 @@ int main(int argc, char* argv[]) {
             //player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
             player->player_node->transform.adjust_translation(glm::vec3(acc.x,0.f,0.f));
         }
-
 
         // Scene
         scene->draw(view, proj);        
@@ -296,7 +290,6 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleVar();
             ImGui::End();
 
-
             ImGui::SetNextWindowBgAlpha(0.5f);
             ImGui::Begin("Timer_main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
@@ -334,7 +327,6 @@ int main(int argc, char* argv[]) {
             ImGui::End();        
         }
 
-
         // Menu
         //ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
 
@@ -343,7 +335,6 @@ int main(int argc, char* argv[]) {
             ESCAPE = !ESCAPE;
         }
         toucheCPresseePrecedemment = toucheEscapePressee;
-
 
         if (ESCAPE && settings == false && credits == false) {
 

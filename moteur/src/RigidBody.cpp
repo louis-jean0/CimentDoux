@@ -6,19 +6,19 @@
 void RigidBody::updatePhysics(float delta_time) {
     use_gravity = !is_on_ladder;
     if(use_gravity) {
-        glm::vec3 gravity = glm::vec3(0.0f,-1.00f,0.0f);
+        glm::vec3 gravity = glm::vec3(0.0f,-9.81f,0.0f);
         glm::vec3 acceleration = gravity;
         velocity += acceleration * delta_time;
+        auto shared_node = node.lock();
+        if(shared_node) {
+            shared_node->transform.adjust_translation(velocity);
+            shared_node->transform.transform_updated = true;
+        }
+        else {
+        std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
+        }
     }
     applyAirResistance();
-    auto shared_node = node.lock();
-    if(shared_node) {
-        shared_node->transform.adjust_translation(velocity);
-        shared_node->transform.transform_updated = true;
-    }
-    else {
-        std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
-    }
     is_on_ground = false;
 }
 

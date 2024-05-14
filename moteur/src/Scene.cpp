@@ -11,12 +11,11 @@ void Scene::setup_scene() {
     auto map = Model::create("../data/models/map_final_ben/Ciment_doux_level_v2.obj", shader);
     //auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
     add_meshes_from_model(map);
-
     
     // Directional light
-    glm::vec3 ambient = glm::vec3(0.1f,0.1f,0.1f);
-    glm::vec3 diffuse = glm::vec3(0.1f,0.1f,0.1f);
-    glm::vec3 specular = glm::vec3(0.1f,0.1f,0.1f);
+    glm::vec3 ambient = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 diffuse = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 specular = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
 
