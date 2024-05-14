@@ -168,7 +168,6 @@ void Scene::setup_scene() {
     for(const auto& torch_light : lights->torch_lights) {
         torch_light->gen_shadow_map();
     }
-
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
