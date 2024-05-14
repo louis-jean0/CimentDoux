@@ -13,10 +13,10 @@ void Player::update(float delta_time) {
     player_node->updateAABB();
     camera->update(delta_time, window);
     //std::cout<<player_node->rigid_body->is_on_ladder<<std::endl;
-    std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
+    //std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
     //std::cout<<player_node->rigid_body->velocity.y<<std::endl;
     //std::cout<<"pos"<<glm::to_string(player_node->get_translation())<<std::endl;
-    std::cout<<"front"<<glm::to_string(camera->getCFront())<<std::endl;
+    //std::cout<<"front"<<glm::to_string(camera->getCFront())<<std::endl;
     //std::cout<<player_node->rigid_body->velocity.y<<std::endl;
 }
 
@@ -45,18 +45,17 @@ void Player::handleInput(float delta_time) {
 
     else { // If not on ladder
         if(camera->mode_cam==0 || camera->mode_cam == 1) {
-            float sensi = camera->get_sensivity();
             if(glfwGetKey(window, forward_key) == GLFW_PRESS) {
-            moveDirection += camera->getCFront() * sensi;
+            moveDirection += camera->getCFront();
             }
             if(glfwGetKey(window, backward_key) == GLFW_PRESS) {
-                moveDirection -= camera->getCFront() * sensi;
+                moveDirection -= camera->getCFront();
             }
             if(glfwGetKey(window, left_key) == GLFW_PRESS) {
-                moveDirection += camera->getCRight() * sensi;
+                moveDirection += camera->getCRight();
             }
             if(glfwGetKey(window, right_key) == GLFW_PRESS) {
-                moveDirection -= camera->getCRight() * sensi;
+                moveDirection -= camera->getCRight();
             }
         }
     }
