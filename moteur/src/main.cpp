@@ -51,7 +51,7 @@ bool wireframe = false;
 float deltaTime = 0.0f;	
 float lastFrame = 0.0f;
 float lag = 0.0f;
-float MS_PER_UPDATE = 0.001;
+const float MS_PER_UPDATE = 0.008333f;
 
 // Trans
 float PasTranslationCube = 0.01;
@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
 
-    float volume = 1.0;
+    float volume = 0.0;
     ma_result result;
     ma_engine engine;
     ma_sound sound;
@@ -212,6 +212,7 @@ int main(int argc, char* argv[]) {
         while (lag >= MS_PER_UPDATE) {
             if(principal == true) {
                 player->update(MS_PER_UPDATE);
+                scene->updateAABB();
                 pe->update(MS_PER_UPDATE);
             }
             lag -= MS_PER_UPDATE;    
@@ -219,6 +220,7 @@ int main(int argc, char* argv[]) {
 
         //mouvement plateforme
         obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
+        obst2_node->updateAABB();
 
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();

@@ -190,7 +190,7 @@ void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
             node->rigid_body->restitution_coefficient = 1.0f;
         }
         if(node->mesh->material->name == "Glace") { // Ice
-            node->rigid_body->friction_coefficient = -1.0f;
+            node->rigid_body->friction_coefficient = -0.1f;
         }
         scene_nodes.push_back(node);
     }
@@ -201,6 +201,12 @@ void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) 
         if(scene_node->mesh->material->name != "Plante" && scene_node->mesh->material->name != "Clou" && scene_node->mesh->material->name != "UnderTrampoline") { // To prevent plants collisions and under trampoline AABB bug
             pe->add_entity(scene_node);
         }
+    }
+}
+
+void Scene::updateAABB() {
+    for(const auto& scene_node : scene_nodes) {
+        scene_node->updateAABB();
     }
 }
 

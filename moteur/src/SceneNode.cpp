@@ -34,7 +34,6 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
     glm::mat4 model_matrix = get_world_transform();
 
     if (model) {
-        updateAABB();
         //drawModelAABB(view, projection);
         for (const auto entry : model->entries) {
             entry.mesh->shader->useShader();
@@ -46,7 +45,6 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
     }
 
     if (mesh) {
-        updateAABB();
         //drawMeshAABB(view, projection);
         mesh->shader->useShader();
         mesh->shader->setMVPMatrix(model_matrix, view, projection);
