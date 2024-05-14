@@ -237,7 +237,7 @@ uniform sampler2D texture_specular1;
 uniform bool hasNormalMap;
 uniform sampler2D normal_map1;
 
-#define NB_POINT_LIGHTS_MAX 20
+#define NB_POINT_LIGHTS_MAX 30
 uniform int nb_point_lights;
 uniform PointLight pointLights[NB_POINT_LIGHTS_MAX];
 uniform mat4 light_projection;

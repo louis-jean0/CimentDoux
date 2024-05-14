@@ -270,8 +270,8 @@ int main(int argc, char* argv[]) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
             
-            std::cout << hauteur << std::endl;
-            std::cout << MaxHeight << std::endl;
+            //std::cout << hauteur << std::endl;
+            //std::cout << MaxHeight << std::endl;
 
             char HauteurFormater[6];
             if((int)hauteur == 0) {
@@ -549,7 +549,7 @@ int main(int argc, char* argv[]) {
             {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
-                player->player_node->transform.set_translation(glm::vec3(0.0f, 80.0f, -10.0f));
+                player->player_node->transform.set_translation(glm::vec3(-8.23f, 10.0f, 21.89f));
                 timing = 0.;
                 acc = 0.0;
                 ESCAPE = false;
