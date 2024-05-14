@@ -19,6 +19,10 @@ void PhysicsEngine::update(float delta_time) {
                 id_ladder=i;
             }
         }else{
+            /*
+            if(!entities[0]->can_jump){
+                entities[0]->can_jump=true;
+            }*/
             if(id_block==i){
                 //std::cout<<"on enleve l'indice et on reset"<<std::endl;
                 id_block=-1;

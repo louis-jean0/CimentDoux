@@ -102,6 +102,7 @@ void Player::handleInput(float delta_time) {
     }
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         is_jumping = false;
+        player_node->rigid_body->can_jump=true;
     }
 }
 
