@@ -119,11 +119,11 @@ int main(int argc, char* argv[]) {
 
     // Scene
     auto scene = Scene::create(player);
-    auto plateforme = Model::create("../data/models/cube/Cube.gltf", shader);
     scene->add_entities_into_physics_engine(pe);
 
+    auto texture = Texture::create("../data/textures/pavement.jpg");
 
-    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader,texture);
     auto obst2_node = SceneNode::create(obst2);
     obst2_node->transform.set_scale(glm::vec3(2.0f,0.5f,2.f));
     obst2_node->transform.set_translation(glm::vec3(-20.f,27.f,8.6f));
@@ -131,11 +131,7 @@ int main(int argc, char* argv[]) {
     pe->add_entity(obst2_node);
 
 
-    auto obst3 = Model::create("../data/models/cube/Cube.gltf", shader);
-    auto obst3_node = SceneNode::create(obst3);
-    obst3_node->transform.set_scale(glm::vec3(15.0f,0.5f,15.f));
-    obst3_node->transform.set_translation(glm::vec3(-20.f,72.f,0.f));
-    pe->add_entity(obst3_node);
+
 
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
@@ -155,7 +151,8 @@ int main(int argc, char* argv[]) {
     float sensi = player->get_camera()->get_sensivity();
 
 
-    float volume = 1.0;
+    //float volume = 1.0;
+    float volume = 0.0;
     ma_result result;
     ma_engine engine;
     ma_sound sound;

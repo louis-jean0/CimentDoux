@@ -60,7 +60,6 @@ int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collision
             else {
                 float velocity_normal_component = glm::dot(velocity, collisionNormal);
                 if (velocity_normal_component < 0) {
-                    can_jump=false;
                     glm::vec3 velocity_perpendicular = velocity_normal_component * collisionNormal;
                     glm::vec3 velocity_tangential = velocity - velocity_perpendicular;
                     velocity = velocity_tangential - other->restitution_coefficient * velocity_perpendicular;
