@@ -39,7 +39,7 @@ void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLen
 // Window settings
 const unsigned int SCR_WIDTH = 1440;
 const unsigned int SCR_HEIGHT = 1080;
-bool showMouse = true;
+bool showMouse = false;
 
 // Player
 std::shared_ptr<Player> player;
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
     float sensi = player->get_camera()->get_sensivity();
 
 
-    float volume = 1.0;
+    float volume = 0.1;
     ma_result result;
     ma_engine engine;
     ma_sound sound;
@@ -264,7 +264,7 @@ int main(int argc, char* argv[]) {
 
         if(glfwGetKey(window.get_window(), GLFW_KEY_R) == GLFW_PRESS) {
             player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
-            player->player_node->transform.set_rotation(globalRot);
+            player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
         }
 
         if(principal == true) {
@@ -356,11 +356,9 @@ int main(int argc, char* argv[]) {
 
         if (ESCAPE && settings == false && credits == false) {
             globalPos = player->get_camera()->getPosition();
-            globalPos.y -= 2.;
             player->player_node->set_translation(globalPos);
-
-            globalRot = player->get_camera()->getCFront();
-            player->player_node->set_rotation(globalRot);
+            globalRot = player->get_camera()->getRotationDegrees();
+            std::cout << globalRot.x << "\t" << globalRot.y << "\t" << globalRot.z << std::endl;
 
 
             principal = false;
@@ -534,8 +532,10 @@ int main(int argc, char* argv[]) {
             if (ImGui::Button("Play"))
             {
                 ESCAPE = false;
-                player->get_camera()->setPosition(player->get_camera()->getPosition());
-                player->get_camera()->setRotationDegrees(player->get_camera()->getRotationDegrees());
+                globalPos = player->get_camera()->getPosition();
+                player->player_node->set_translation(globalPos);
+
+                player->get_camera()->setRotationDegrees(globalRot);
             }
             ImGui::PopStyleColor();
 
@@ -566,8 +566,9 @@ int main(int argc, char* argv[]) {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
                 player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
-                player->player_node->transform.set_rotation(globalRot);
-                
+
+                player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
+
                 timing = 0.;
                 acc = 0.0;
                 ESCAPE = false;

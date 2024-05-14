@@ -36,10 +36,6 @@ file(GLOB IMGUI_SOURCES ${IMGUI_DIR}/src/*.cpp)
 add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC ${IMGUI_DIR}/include ${IMGUI_DIR}/backends)
 
-# OpenAL
-#add_subdirectory(external/libsndfile-master)
-add_subdirectory(external/openal-soft-master)
-
 # Find and link OpenGL
 find_package(OpenGL REQUIRED)
 target_link_libraries(imgui PUBLIC ${OPENGL_gl_LIBRARY} glfw)
@@ -54,29 +50,32 @@ add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 
 # Executable definition
 add_executable(main
+    src/AABB.cpp
+    src/Camera_Helper.cpp
+    src/Camera.cpp
+    src/DirectionalLight.cpp
+    src/LightManager.cpp
     src/main.cpp
-    src/Window.cpp
-    src/Shader.cpp
-    src/SceneNode.cpp
+    src/Material.cpp
     src/Mesh.cpp
-    src/Transform.cpp
+    src/Model.cpp
+    src/ModelCollider.cpp
+    src/PhysicsEngine.cpp
+    src/Plane.cpp
+    src/Player.cpp
+    src/PointLight.cpp
+    src/quaternion_utils.cpp
+    src/RigidBody.cpp
+    src/Scene.cpp
+    src/SceneNode.cpp
+    src/Shader.cpp
+    src/ShaderManager.cpp
+    src/ShadowMap.cpp
     src/stb_image.cpp
     src/Texture.cpp
-    src/Model.cpp
-    src/Plane.cpp
-    src/Sphere.cpp
-    src/PlaneCollider.cpp
-    src/Camera.cpp
-    src/Camera_Helper.cpp
-    src/quaternion_utils.cpp
-    src/Cube.cpp
-    src/AABB.cpp
-    src/ModelCollider.cpp
-    src/ShaderManager.cpp
-    src/Scene.cpp
-    src/RigidBody.cpp
-    src/PhysicsEngine.cpp
-    src/Player.cpp
+    src/TorchLight.cpp
+    src/Transform.cpp
+    src/Window.cpp
 )
 
 # Include directories for our project
@@ -86,8 +85,6 @@ include_directories(
     external/glad/include
     external/assimp/include
     external/assimp/include
-    external/libsndfile-master/include
-    external/openal-soft-master/include/AL
     external
 )
 
