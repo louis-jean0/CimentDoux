@@ -352,12 +352,12 @@ int main(int argc, char* argv[]) {
             ESCAPE = !ESCAPE;
         }
         toucheCPresseePrecedemment = toucheEscapePressee;
-
+        
+        globalRot = player->get_camera()->getRotationDegrees();
 
         if (ESCAPE && settings == false && credits == false) {
             globalPos = player->get_camera()->getPosition();
             player->player_node->set_translation(globalPos);
-            globalRot = player->get_camera()->getRotationDegrees();
             std::cout << globalRot.x << "\t" << globalRot.y << "\t" << globalRot.z << std::endl;
 
 
@@ -535,6 +535,7 @@ int main(int argc, char* argv[]) {
                 globalPos = player->get_camera()->getPosition();
                 player->player_node->set_translation(globalPos);
 
+                glm::vec3 testAngle = glm::vec3(0., globalRot.y, 0.);
                 player->get_camera()->setRotationDegrees(globalRot);
             }
             ImGui::PopStyleColor();
