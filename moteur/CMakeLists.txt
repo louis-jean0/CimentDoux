@@ -55,7 +55,6 @@ target_include_directories(main PRIVATE
     external/glfw-3.3.9/include
     external/glad/include
     external/assimp/include
-    #external/openal-soft-master/include/AL
 )
 
 target_link_libraries(main glfw glad imgui assimp)
