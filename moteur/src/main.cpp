@@ -82,6 +82,10 @@ bool QWERTY = true;
 
 bool Fulscreen = false;
 
+
+glm::vec3 globalPos = glm::vec3(0.);
+glm::vec3 globalRot = glm::vec3(0.);
+
 int main(int argc, char* argv[]) {
     // Initialize window
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Ciment doux",true);
@@ -258,6 +262,11 @@ int main(int argc, char* argv[]) {
         char TempsFormater[9];
         char TempsFormaterMenu[9];
 
+        if(glfwGetKey(window.get_window(), GLFW_KEY_R) == GLFW_PRESS) {
+            player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+            player->player_node->transform.set_rotation(globalRot);
+        }
+
         if(principal == true) {
             ImGui::SetNextWindowBgAlpha(0.5f);
             ImGui::Begin("Metrage_main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
@@ -265,7 +274,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
             //hauteur = std::floor(player->player_node->transform.get_translation().y - 3.0 * 1.54);
-            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 1.54;
+            hauteur = (player->player_node->transform.get_translation().y - 3.) * 1.26;
             if(hauteur >= MaxHeight) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
@@ -274,7 +283,7 @@ int main(int argc, char* argv[]) {
             std::cout << MaxHeight << std::endl;
 
             char HauteurFormater[6];
-            if((int)hauteur == 0) {
+            if((int)hauteur <= 0) {
                 snprintf(HauteurFormater, sizeof(HauteurFormater), "0M");
             } else {
                 snprintf(HauteurFormater, sizeof(HauteurFormater), "%.0lfM", hauteur);
@@ -346,6 +355,13 @@ int main(int argc, char* argv[]) {
 
 
         if (ESCAPE && settings == false && credits == false) {
+            globalPos = player->get_camera()->getPosition();
+            globalPos.y -= 2.;
+            player->player_node->set_translation(globalPos);
+
+            globalRot = player->get_camera()->getCFront();
+            player->player_node->set_rotation(globalRot);
+
 
             principal = false;
             showMouse = true;
@@ -390,7 +406,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushFont(font);
 
             char CHFormater[6];
-            if((int)hauteur == 0) {
+            if((int)hauteur <= 0) {
                 snprintf(CHFormater, sizeof(CHFormater), "0M");
             } else {
                 snprintf(CHFormater, sizeof(CHFormater), "%.0lfM", hauteur);
@@ -426,7 +442,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushFont(font);
 
             char MXFormater[6];
-            if((int)MaxHeight == 0) {
+            if((int)MaxHeight <= 0) {
                 snprintf(MXFormater, sizeof(MXFormater), "0M");
             } else {
                 snprintf(MXFormater, sizeof(MXFormater), "%.0lfM", MaxHeight);
@@ -549,7 +565,9 @@ int main(int argc, char* argv[]) {
             {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
-                player->player_node->transform.set_translation(glm::vec3(0.0f, 80.0f, -10.0f));
+                player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+                player->player_node->transform.set_rotation(globalRot);
+                
                 timing = 0.;
                 acc = 0.0;
                 ESCAPE = false;
@@ -789,9 +807,6 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleVar();
             ImGui::End();
         } else {
-            player->get_camera()->setPosition(player->get_camera()->getPosition());
-            player->get_camera()->setRotationDegrees(player->get_camera()->getRotationDegrees());
-
             principal = true; 
             showMouse = false;  
             settings = false;    

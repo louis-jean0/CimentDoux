@@ -14,7 +14,7 @@ void Scene::setup_scene() {
 
     
     // Directional light
-    glm::vec3 ambient = glm::vec3(0.1f,0.1f,0.1f);
+    glm::vec3 ambient = glm::vec3(0.6f,0.6f,0.6f);
     glm::vec3 diffuse = glm::vec3(0.1f,0.1f,0.1f);
     glm::vec3 specular = glm::vec3(0.1f,0.1f,0.1f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
