@@ -6,7 +6,7 @@
 void RigidBody::updatePhysics(float delta_time) {
     use_gravity = !is_on_ladder;
     if(use_gravity) {
-        glm::vec3 gravity = glm::vec3(0.0f,-9.81f,0.0f);
+        glm::vec3 gravity = glm::vec3(0.0f,-0.1f,0.0f);
         glm::vec3 acceleration = gravity;
         velocity += acceleration * delta_time;
         auto shared_node = node.lock();
@@ -43,6 +43,7 @@ bool RigidBody::checkCollision(std::shared_ptr<RigidBody> other, float& collisio
         std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
         return false;
     }
+    return false;
 }
 
 int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {

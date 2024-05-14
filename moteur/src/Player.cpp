@@ -29,7 +29,7 @@ void Player::handleInput(float delta_time) {
     int right_key = GLFW_KEY_D;
 
     if(player_node->rigid_body->is_on_ladder) { // If on ladder
-        float ladder_climb_speed = 0.05f;
+        float ladder_climb_speed = 0.01f;
         if(camera->mode_cam==0 || camera->mode_cam==1) { // Petite pensée pour les dégénérés du WASD
             if(glfwGetKey(window, forward_key) == GLFW_PRESS) {
                 player_node->rigid_body->velocity.y = ladder_climb_speed;
@@ -67,7 +67,7 @@ void Player::handleInput(float delta_time) {
     float current_fov = user_base_fov;
     float fov_interpolation_rate = 5.0f;
     float target_fov = current_fov;
-    float acceleration = 0.2f;
+    float acceleration = 1.0f;
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         target_fov = sprint_fov;
@@ -86,7 +86,7 @@ void Player::handleInput(float delta_time) {
         moveDirection = glm::normalize(moveDirection);
         player_node->rigid_body->velocity += moveDirection * acceleration * delta_time;
     }
-    float max_speed = 1.0f;
+    float max_speed = 5.0f;
     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         max_speed *= sprint_speed_multiplier; // Adjust max speed when sprinting
     }
@@ -96,9 +96,8 @@ void Player::handleInput(float delta_time) {
 
     // Jump
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && player_node->rigid_body->is_on_ground) {
-        float jumpStrength = sqrt(2.0f * 9.81f * 0.7f);
-        float vitesse = 0.01f;
-        player_node->rigid_body->velocity.y += jumpStrength * vitesse;
+        float jumpStrength = sqrt(2.0f * 9.81f * 35.0f);
+        player_node->rigid_body->velocity.y += jumpStrength * delta_time;
         is_jumping = true;
     }
     if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {

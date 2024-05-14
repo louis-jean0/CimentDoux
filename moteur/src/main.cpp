@@ -37,7 +37,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam); 
 
 // Window settings
-const unsigned int SCR_WIDTH = 1440;
+const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 bool showMouse = true;
 
@@ -51,7 +51,7 @@ bool wireframe = false;
 float deltaTime = 0.0f;	
 float lastFrame = 0.0f;
 float lag = 0.0f;
-float MS_PER_UPDATE = 0.01;
+float MS_PER_UPDATE = 0.001;
 
 // Trans
 float PasTranslationCube = 0.01;
@@ -206,34 +206,24 @@ int main(int argc, char* argv[]) {
 
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
+
+        //player->handleInput(deltaTime);
         
         while (lag >= MS_PER_UPDATE) {
             if(principal == true) {
-                player->update(deltaTime);
-                pe->update(deltaTime);
+                player->update(MS_PER_UPDATE);
+                pe->update(MS_PER_UPDATE);
             }
             lag -= MS_PER_UPDATE;    
         }
+
+        //mouvement plateforme
+        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
 
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
 
         scene->draw(view, proj);
-
-        // Sending to shader
-
-        glm::vec3 camPos = player->get_position();
-        glm::vec3 camFront = player->getCFront();
-
-        shader->useShader();
-        shader->setVPMatrix(view,proj);
-
-        // Phong + Flashlight
-        // shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
-        shader->setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
-
-        //mouvement plateforme
-        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
 
         if(obst2_node->rigid_body->is_child){
             //std::cout<<"-----il est lie-------"<<std::endl;
@@ -243,7 +233,6 @@ int main(int argc, char* argv[]) {
         }
 
         // Scene
-        scene->draw(view, proj);        
         obst2_node->draw(view,proj);    
         //obst3_node->draw(view,proj);
         //capsule_node->draw(view, proj);
@@ -683,7 +672,7 @@ int main(int argc, char* argv[]) {
             float sliderPosOffsetSensi = imguiWindowSizee / 4;
             float sliderPosXSensi = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetSensi;
             ImGui::SetCursorPosX(sliderPosXSensi);;
-            ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 10.f);
+            ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 100.f);
             player->get_camera()->set_sensitivity(sensi);
 
             ImGui::SetCursorPosX(textPosXVolume);

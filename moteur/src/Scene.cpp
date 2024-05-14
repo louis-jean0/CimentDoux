@@ -13,9 +13,9 @@ void Scene::setup_scene() {
     add_meshes_from_model(map);
     
     // Directional light
-    glm::vec3 ambient = glm::vec3(0.5f,0.5f,0.5f);
-    glm::vec3 diffuse = glm::vec3(0.5f,0.5f,0.5f);
-    glm::vec3 specular = glm::vec3(0.5f,0.5f,0.5f);
+    glm::vec3 ambient = glm::vec3(0.3f,0.3f,0.3f);
+    glm::vec3 diffuse = glm::vec3(0.3f,0.3f,0.3f);
+    glm::vec3 specular = glm::vec3(0.3f,0.3f,0.3f);
     glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     auto directionalLight = DirectionalLight::create(ambient, diffuse, specular, direction);
 
@@ -139,11 +139,11 @@ void Scene::setup_scene() {
     auto pointLight5 = TorchLight::create(ambient2, diffuse2, specular2, position5, 1.5f, 0.5f, 0.012f,direction1,40.f,120.f);
     lights->add_torch_light(pointLight5);
 
-    // //spot2
-    // glm::vec3 position2 = glm::vec3(-12.3f,0.5f,0.7f);
-    // glm::vec3 direction2 = glm::vec3(-0.4,0.2,0.9);
-    // auto pointLight2 = TorchLight::create(ambient2, diffuse2, specular2, position2, 1.5f, 0.5f, 0.012f,direction2,40.f,50.f);
-    // lights->add_torch_light(pointLight2);
+    //spot2
+    glm::vec3 position2 = glm::vec3(-12.3f,0.5f,0.7f);
+    glm::vec3 direction2 = glm::vec3(-0.4,0.2,0.9);
+    auto pointLight2 = TorchLight::create(ambient2, diffuse2, specular2, position2, 1.5f, 0.5f, 0.012f,direction2,40.f,50.f);
+    lights->add_torch_light(pointLight2);
 
     //spot3 plateforme
     // glm::vec3 position12 = glm::vec3(-4.3f,30.f,-27.5f);
@@ -189,7 +189,7 @@ void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
             node->rigid_body->restitution_coefficient = 1.0f;
         }
         if(node->mesh->material->name == "Glace") { // Ice
-            node->rigid_body->friction_coefficient = -0.1f;
+            node->rigid_body->friction_coefficient = -1.0f;
         }
         scene_nodes.push_back(node);
     }
@@ -206,8 +206,8 @@ void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) 
 void Scene::draw(glm::mat4& view, glm::mat4& projection) {
     auto shadow_shader = shaders->getShadowShader();
     shadow_shader->useShader();
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    // glEnable(GL_CULL_FACE);
+    // glCullFace(GL_FRONT);
     for (auto& torch_light : lights->torch_lights) {
         torch_light->setup_shadow_map(shadow_shader);
         torch_light->shadow_map->bind();
@@ -216,8 +216,8 @@ void Scene::draw(glm::mat4& view, glm::mat4& projection) {
         }
         torch_light->shadow_map->unbind();
     }
-    glCullFace(GL_BACK);
-    glViewport(0, 0, 1440, 1080);
+    // glCullFace(GL_BACK);
+    glViewport(0, 0, 1920, 1080);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     lights->setup_lights(shaders->getShader());
     for(auto& scene_node : scene_nodes) {

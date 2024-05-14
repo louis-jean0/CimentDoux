@@ -8,7 +8,7 @@ class ShadowMap {
 public:
     std::weak_ptr<TorchLight> torch_light;
     unsigned int depthMapFBO, depthMap;
-    const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
     ShadowMap(std::shared_ptr<TorchLight> point_light);
     ~ShadowMap();
