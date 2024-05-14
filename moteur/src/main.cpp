@@ -99,7 +99,23 @@ int main(int argc, char* argv[]) {
 
     // Scene
     auto scene = Scene::create();
+    auto plateforme = Model::create("../data/models/cube/Cube.gltf", shader);
     scene->add_entities_into_physics_engine(pe);
+
+
+    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst2_node = SceneNode::create(obst2);
+    obst2_node->transform.set_scale(glm::vec3(2.0f,0.5f,2.f));
+    obst2_node->transform.set_translation(glm::vec3(-20.f,27.f,8.6f));
+    obst2_node->rigid_body->is_in_motion=true;
+    pe->add_entity(obst2_node);
+
+
+    auto obst3 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst3_node = SceneNode::create(obst3);
+    obst3_node->transform.set_scale(glm::vec3(15.0f,0.5f,15.f));
+    obst3_node->transform.set_translation(glm::vec3(-20.f,72.f,0.f));
+    pe->add_entity(obst3_node);
 
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
@@ -117,6 +133,7 @@ int main(int argc, char* argv[]) {
         lastFrame = currentFrame;
         lag += deltaTime;
     
+
         // Input
         if(showMouse) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -141,6 +158,36 @@ int main(int argc, char* argv[]) {
             lag -= MS_PER_UPDATE;    
         }
 
+        view = player->get_view_matrix();
+        proj = player->get_projection_matrix(); 
+
+        // Sending to shader
+
+        glm::vec3 camPos = player->get_position();
+        glm::vec3 camFront = player->getCFront();
+
+        shader->useShader();
+        shader->setVPMatrix(view,proj);
+
+        // Phong + Flashlight
+        // shader.setBind3f("lightPos", camPos[0], camPos[1], camPos[2]);
+        shader->setBind3f("viewPos", camPos[0], camPos[1], camPos[2]);
+
+        //mouvement plateforme
+        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
+
+        if(obst2_node->rigid_body->is_child){
+            //std::cout<<"-----il est lie-------"<<std::endl;
+            glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
+            //player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
+            player->player_node->transform.adjust_translation(glm::vec3(acc.x,0.f,0.f));
+        }
+
+
+        // Scene
+        scene->draw(view, proj);        
+        obst2_node->draw(view,proj);    
+        //obst3_node->draw(view,proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 

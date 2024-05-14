@@ -6,6 +6,8 @@
 
 class PhysicsEngine {
     public:
+        int id_block=-1;
+        int id_ladder=-1;
         std::vector<std::shared_ptr<RigidBody>> entities;
         void update(float delta_time);
         void add_player(std::shared_ptr<Player> player);

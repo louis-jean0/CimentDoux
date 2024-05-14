@@ -45,7 +45,8 @@ bool RigidBody::checkCollision(std::shared_ptr<RigidBody> other, float& collisio
     }
 }
 
-void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {
+int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {
+    int acc=-1;
     float safetyOffset = 0.01f;
     collisionNormal = -collisionNormal;
     glm::vec3 correction = (collisionDepth + safetyOffset) * collisionNormal;
@@ -70,12 +71,20 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
         shared_node->transform.transform_updated = true;
 
         if(other->is_ladder) {
+            //std::cout<<"detetion ladder"<<std::endl;
             use_gravity = false;
             is_on_ladder = true;
+            acc=0;
         }
         else {
             use_gravity = true;
             is_on_ladder = false;
+        }
+
+        if(other->is_in_motion){
+            //std::cout<<"ok pour detection de mouvement"<<std::endl;
+            other->is_child=true;
+            acc=1;
         }
         
         //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * other->restitution_coefficient;
@@ -84,6 +93,7 @@ void RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisio
     else {
         std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
     }
+    return acc;
 }
 
 void RigidBody::applyAirResistance() {
