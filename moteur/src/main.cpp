@@ -85,6 +85,8 @@ bool afficherMenu = false;
 bool AZERTY = false;
 bool QWERTY = true;
 
+bool Fulscreen = false;
+
 int main(int argc, char* argv[]) {
     // Initialize window
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Moteur de jeux",true);
@@ -308,6 +310,7 @@ int main(int argc, char* argv[]) {
 
 
         if (ESCAPE && settings == false && credits == false) {
+
             principal = false;
             showMouse = true;
 
@@ -607,7 +610,6 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleColor();
             ImGui::PopStyleVar();
             ImGui::End();
-  
         } else if(ESCAPE == true && settings == true) {
             ImGui::SetNextWindowBgAlpha(0.7f);
             ImGui::Begin("Slides", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
@@ -696,13 +698,10 @@ int main(int argc, char* argv[]) {
             float checkboxWidth = ImGui::CalcTextSize("").x;
             float offsetXFSC = (SCR_WIDTH - checkboxWidth) / 2.65;
             ImGui::SetCursorPosX(offsetXFSC);
-            if(ImGui::Checkbox("##", &QWERTY)) {
-
-            }
+            ImGui::Checkbox("##", &Fulscreen);
             ImGui::End();
 
         } else if(ESCAPE == true && credits == true) {
-
             ImGui::SetNextWindowBgAlpha(0.7f);
             ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
