@@ -186,6 +186,7 @@ void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
             node->rigid_body->is_ladder = true;
         }
         if(node->mesh->material->name == "Trampoline") { // Trampolines
+            node->rigid_body->is_trampoline = true;
             node->rigid_body->restitution_coefficient = 1.0f;
         }
         if(node->mesh->material->name == "Glace") { // Ice

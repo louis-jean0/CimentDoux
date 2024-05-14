@@ -18,6 +18,7 @@ class RigidBody {
         bool is_on_ground;
         bool is_ladder = false;
         bool is_on_ladder = false;
+        bool is_trampoline = false;
         bool is_in_motion = false;
         bool is_child = false;
 

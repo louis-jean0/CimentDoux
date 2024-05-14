@@ -54,7 +54,9 @@ int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collision
     auto shared_node = node.lock();
     if(shared_node) {
         if(collisionNormal.y > 0.1f) {
-            is_on_ground = true;
+            if(!other->is_trampoline) {
+                is_on_ground = true;
+            }
             if(other->restitution_coefficient == 0.0f) {
                 velocity.y = 0.0f;
             }
