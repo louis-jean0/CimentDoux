@@ -109,6 +109,12 @@ int main(int argc, char* argv[]) {
     pe->add_entity(obst2_node);
 
 
+    auto obst3 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst3_node = SceneNode::create(obst3);
+    obst3_node->transform.set_scale(glm::vec3(15.0f,0.5f,15.f));
+    obst3_node->transform.set_translation(glm::vec3(-20.f,72.f,0.f));
+    pe->add_entity(obst3_node);
+
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
     // auto capsule_node = SceneNode::create(capsule);
@@ -179,6 +185,7 @@ int main(int argc, char* argv[]) {
         // Scene
         scene->draw(view, proj);        
         obst2_node->draw(view,proj);    
+        obst3_node->draw(view,proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 

@@ -6,7 +6,7 @@ void Scene::setup_scene() {
     auto shader = shaders->getShader();
 
     // Map
-    auto map = Model::create("../data/models/test_text/test_text.obj", shader);
+    auto map = Model::create("../data/models/map_final_ben/Ciment_doux_level_v2.obj", shader);
     add_meshes_from_model(map);
 
     
@@ -19,12 +19,12 @@ void Scene::setup_scene() {
     lights->add_light(directionalLight);
 
     //std::cout<<scene_nodes.size()<<std::endl;
-    
+    /*
     glm::vec3 reglage = glm::vec3(1.0f, 0.09f, 0.032f);   
     glm::vec3 ambient2 = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 diffuse2 = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 specular2 = glm::vec3(0.5f,0.5f,0.5f);
-          
+    
     //neon----------------------------------------------------
     //neon1
     glm::vec3 reglage_neon = glm::vec3(0.50f, 0.001f, 0.352f); 
@@ -51,8 +51,26 @@ void Scene::setup_scene() {
     glm::vec3 position16 = glm::vec3(-5.f,64.f,29.f);
     auto pointLight16 = PointLight::create(ambient2, diffuse2, specular2, position16,reglage_neon.x, reglage_neon.y, reglage_neon.z);
     lights->add_light(pointLight16);
+
+    //neon6
+    glm::vec3 pos_neon6 = glm::vec3(29.f,50.f,-10.2f);
+    auto neon6 = PointLight::create(ambient2, diffuse2, specular2, pos_neon6,reglage_neon.x, reglage_neon.y, reglage_neon.z);
+    lights->add_light(neon6);
+
+    //neon7
+    glm::vec3 pos_neon7 = glm::vec3(13.2f,43.f,-28.6f);
+    auto neon7 = PointLight::create(ambient2, diffuse2, specular2, pos_neon7,reglage_neon.x, reglage_neon.y, reglage_neon.z);
+    lights->add_light(neon7);
+
+    //neon8
+    glm::vec3 pos_neon8 = glm::vec3(28.55f,90.f,-5.f);
+    auto neon8 = PointLight::create(ambient2, diffuse2, specular2, pos_neon8,reglage_neon.x, reglage_neon.y, reglage_neon.z);
+    lights->add_light(neon8);
+
     
     //lumiere---------------------------------------------------
+    glm::vec3 rouge = glm::vec3(1.,0.,0.);
+    glm::vec3 vert = glm::vec3(0.,1.,0.);
     //lumiere 1
     glm::vec3 reglage_lumiere = glm::vec3(0.50f, 0.001f, 0.352f);   
     glm::vec3 position = glm::vec3(-23.6f,6.5f,11.f);
@@ -66,7 +84,7 @@ void Scene::setup_scene() {
 
     //lumiere 2
     glm::vec3 position4 = glm::vec3(0.1f,9.3f,28.3f);
-    auto pointLight4 = PointLight::create(ambient2, diffuse2, specular2, position4, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
+    auto pointLight4 = PointLight::create(rouge, diffuse2, specular2, position4, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_light(pointLight4);
 
     //lumière 4 
@@ -80,11 +98,12 @@ void Scene::setup_scene() {
     lights->add_light(pointLight11);
 
     //lumiere 6
-    glm::vec3 position13 = glm::vec3(-28.f,74.5f,-15.5f);
-    auto pointLight13 = PointLight::create(ambient2, diffuse2, specular2, position13, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
+    glm::vec3 position13 = glm::vec3(-28.f,89.5f,-19.5f);
+    auto pointLight13 = PointLight::create(vert, diffuse2, specular2, position13, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_light(pointLight13);
 
     //lumiere 7
+
     glm::vec3 position17 = glm::vec3(29.f,64.7f,-2.f);
     auto pointLight17 = PointLight::create(ambient2, diffuse2, specular2, position17, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_light(pointLight17);
@@ -113,6 +132,19 @@ void Scene::setup_scene() {
     glm::vec3 direction3 = glm::vec3(-0.6,-0.6,0.55);
     auto pointLight12 = TorchLight::create(ambient2, diffuse2, specular2, position12, 1.5f, 0.2f, 0.012f,direction3,40.f,50.f);
     lights->add_light(pointLight12);
+
+    //spot4 plateforme
+    glm::vec3 pos_spot4 = glm::vec3(29.f,83.f,-29.f);
+    glm::vec3 dir_spot_4 = glm::vec3(-0.6,-0.8,0.55);
+    auto spot4 = TorchLight::create(ambient2, diffuse2, specular2, pos_spot4, 1.5f, 0.2f, 0.012f,dir_spot_4,40.f,50.f);
+    lights->add_light(spot4);
+
+
+    //spot5 plateforme
+    glm::vec3 pos_spot5 = glm::vec3(28.8f,88.f,27.f);
+    glm::vec3 dir_spot_5 = glm::vec3(-0.43,-0.6,-0.7);
+    auto spot5 = TorchLight::create(ambient2, diffuse2, specular2, pos_spot5, 1.5f, 0.2f, 0.012f,dir_spot_5,40.f,50.f);
+    lights->add_light(spot5);*/
 
 }
 
