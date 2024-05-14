@@ -175,6 +175,7 @@ int main(int argc, char* argv[]) {
     ma_sound_set_looping(&sound,true);
     ma_sound_start(&sound);
 
+    float temps_debut = glfwGetTime();
 
     // Render loop
     while (glfwWindowShouldClose(window.get_window()) == 0) {
