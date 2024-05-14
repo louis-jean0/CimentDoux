@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
         // Scene
         scene->draw(view, proj);        
         obst2_node->draw(view,proj);    
-        obst3_node->draw(view,proj);
+        //obst3_node->draw(view,proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 

@@ -19,12 +19,12 @@ void Scene::setup_scene() {
     lights->add_light(directionalLight);
 
     //std::cout<<scene_nodes.size()<<std::endl;
-    /*
+    
     glm::vec3 reglage = glm::vec3(1.0f, 0.09f, 0.032f);   
     glm::vec3 ambient2 = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 diffuse2 = glm::vec3(0.5f,0.5f,0.5f);
     glm::vec3 specular2 = glm::vec3(0.5f,0.5f,0.5f);
-    
+        /*
     //neon----------------------------------------------------
     //neon1
     glm::vec3 reglage_neon = glm::vec3(0.50f, 0.001f, 0.352f); 
@@ -71,6 +71,7 @@ void Scene::setup_scene() {
     //lumiere---------------------------------------------------
     glm::vec3 rouge = glm::vec3(1.,0.,0.);
     glm::vec3 vert = glm::vec3(0.,1.,0.);
+    glm::vec3 jaune = glm::vec3(1.,0.9,0.);
     //lumiere 1
     glm::vec3 reglage_lumiere = glm::vec3(0.50f, 0.001f, 0.352f);   
     glm::vec3 position = glm::vec3(-23.6f,6.5f,11.f);
@@ -98,20 +99,35 @@ void Scene::setup_scene() {
     lights->add_light(pointLight11);
 
     //lumiere 6
-    glm::vec3 position13 = glm::vec3(-28.f,89.5f,-19.5f);
+    glm::vec3 position13 = glm::vec3(-28.f,90.f,-17.f);
     auto pointLight13 = PointLight::create(vert, diffuse2, specular2, position13, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_light(pointLight13);
 
     //lumiere 7
-
-    glm::vec3 position17 = glm::vec3(29.f,64.7f,-2.f);
+    glm::vec3 position17 = glm::vec3(28.8f,80.f,27.f);
     auto pointLight17 = PointLight::create(ambient2, diffuse2, specular2, position17, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_light(pointLight17);
 
     //lumiere 8
-    glm::vec3 position18 = glm::vec3(-13.f,64.7f,-2.f);
+    glm::vec3 position18 = glm::vec3(-13.f,80.f,27.86f);
     auto pointLight18 = PointLight::create(ambient2, diffuse2, specular2, position18, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_light(pointLight18);
+
+    //lumiere 9
+    glm::vec3 pos_lumiere9 = glm::vec3(-13.f,80.f,-28.86f);
+    auto lumiere9 = PointLight::create(ambient2, diffuse2, specular2, pos_lumiere9, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
+    lights->add_light(lumiere9);
+
+    //lumiere 10
+    glm::vec3 pos_lumiere10 =  glm::vec3(29.f,80.f,-29.f);
+    auto lumiere10 = PointLight::create(ambient2, diffuse2, specular2, pos_lumiere10, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
+    lights->add_light(lumiere10);
+    
+    //lumiere11
+    glm::vec3 pos_lumiere11 = glm::vec3(1.65f,80.5f,3.3f);
+    auto lumiere11 = PointLight::create(jaune, diffuse2, specular2, pos_lumiere11, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
+    lights->add_light(lumiere11);
+
 
     //spot--------------------------------------------------------
     //spot1 bétoniere
