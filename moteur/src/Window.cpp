@@ -105,3 +105,4 @@ int Window::get_maxWidth() {
 int Window::get_maxHeight() {
     return this->windowParams->height;
 }
+//
