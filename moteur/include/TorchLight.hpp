@@ -5,6 +5,8 @@
 
 class TorchLight : public std::enable_shared_from_this<TorchLight>, PointLight {
     public:
+        bool power = true;
+        bool mode = true;
         glm::vec3 direction;
         float cut_off;
         float outer_cut_off;
@@ -29,4 +31,7 @@ class TorchLight : public std::enable_shared_from_this<TorchLight>, PointLight {
         void setup_light(std::shared_ptr<Shader> shader, int light_index) const override;
         void gen_shadow_map();
         void setup_shadow_map(std::shared_ptr<Shader> shadow_shader);
+        void set_position(glm::vec3 new_pos){position=new_pos;};
+        void off();
+        void on();
 };

@@ -21,3 +21,20 @@ void TorchLight::setup_shadow_map(std::shared_ptr<Shader> shadow_shader) {
     glm::mat4 light_space_matrix = light_projection * light_view;
     shadow_shader->setBindMatrix4fv("light_space_matrix", 1, 0, glm::value_ptr(light_space_matrix));
 }
+
+void TorchLight::off(){
+    constant=5.f;
+    linear=5.f;
+    quadratic=5.f;
+}
+void TorchLight::on(){
+    if(mode){
+        constant=1.f; 
+        linear=0.3f; 
+        quadratic=0.002f;
+    }else{
+        constant=1.f; 
+        linear=0.003f; 
+        quadratic=0.002f;
+    }
+}

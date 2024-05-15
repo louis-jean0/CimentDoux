@@ -34,6 +34,7 @@
 void printUsage();
 void processInput(GLFWwindow *window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam); 
 
 // Window settings
@@ -43,6 +44,7 @@ bool showMouse = true;
 
 // Player
 std::shared_ptr<Player> player;
+std::shared_ptr<Scene> scene;
 
 // Wireframe
 bool wireframe = false;
@@ -85,6 +87,7 @@ int main(int argc, char* argv[]) {
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Ciment doux",true);
     window.setup_GLFW();
     glfwSetKeyCallback(window.get_window(), keyCallback); 
+    glfwSetMouseButtonCallback(window.get_window(), mouse_button_callback);
 
     // // OpenGL debug
     // glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -116,24 +119,20 @@ int main(int argc, char* argv[]) {
     pe->add_player(player);
 
     // Scene
-    auto scene = Scene::create();
-    auto plateforme = Model::create("../data/models/cube/Cube.gltf", shader);
+    scene = Scene::create(player);
     scene->add_entities_into_physics_engine(pe);
 
+    auto texture = Texture::create("../data/textures/pavement.jpg");
 
-    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader);
+    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader,texture);
     auto obst2_node = SceneNode::create(obst2);
     obst2_node->transform.set_scale(glm::vec3(2.0f,0.5f,2.f));
-    obst2_node->transform.set_translation(glm::vec3(-20.f,27.f,8.6f));
+    obst2_node->transform.set_translation(glm::vec3(-25.f,27.f,8.6f));
     obst2_node->rigid_body->is_in_motion=true;
     pe->add_entity(obst2_node);
 
 
-    auto obst3 = Model::create("../data/models/cube/Cube.gltf", shader);
-    auto obst3_node = SceneNode::create(obst3);
-    obst3_node->transform.set_scale(glm::vec3(15.0f,0.5f,15.f));
-    obst3_node->transform.set_translation(glm::vec3(-20.f,72.f,0.f));
-    pe->add_entity(obst3_node);
+
 
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
@@ -151,6 +150,8 @@ int main(int argc, char* argv[]) {
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
 
+
+    //float volume = 1.0;
     float volume = 0.0;
     ma_result result;
     ma_engine engine;
@@ -255,8 +256,8 @@ int main(int argc, char* argv[]) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
             
-            std::cout << hauteur << std::endl;
-            std::cout << MaxHeight << std::endl;
+            //std::cout << hauteur << std::endl;
+            //std::cout << MaxHeight << std::endl;
 
             char HauteurFormater[6];
             if((int)hauteur == 0) {
@@ -531,7 +532,8 @@ int main(int argc, char* argv[]) {
             {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
-                player->player_node->transform.set_translation(glm::vec3(0.0f, 80.0f, -10.0f));
+                //player->player_node->transform.set_translation(glm::vec3(-8.23f, 10.0f, 21.89f));
+                player->player_node->transform.set_translation(glm::vec3(-20.0f, 95.0f, -17.0f));
                 timing = 0.;
                 acc = 0.0;
                 ESCAPE = false;
@@ -824,8 +826,18 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             player->get_camera()->mode_cam=(player->get_camera()->mode_cam+1)%3;
             player->get_camera()->reset();
         }
+
     }
     //player->handleSingleInput(key, scancode, action, mods);
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && ESCAPE==false) {
+        scene->mode_torch_light_player();
+    }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && ESCAPE==false) {
+        scene->on_off_torch_light_player();
+    }
 }
 
 
