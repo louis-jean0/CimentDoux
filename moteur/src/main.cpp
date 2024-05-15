@@ -228,7 +228,7 @@ int main(int argc, char* argv[]) {
         ma_engine_set_volume(&engine2, volume);
         ma_engine_set_volume(&engine3, volume);
 
-        // Input
+        // Inpu
         if(showMouse) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
