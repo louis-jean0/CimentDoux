@@ -67,10 +67,10 @@ bool ESCAPE;
 bool toucheCPresseePrecedemment = false;
 bool afficherMenu = false;
 
-bool AZERTY = false;
-bool QWERTY = true;
+bool AZERTY = true;
+bool QWERTY = false;
 
-bool Fullscreen = false;
+bool Fullscreen = true;
 bool fin = false;
 bool facticeEnd = false;
 
@@ -355,7 +355,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
-            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 1.54;
+            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 0.3;
             if(hauteur >= MaxHeight) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
@@ -1341,22 +1341,22 @@ int main(int argc, char* argv[]) {
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(action == GLFW_PRESS) {
         if(key == GLFW_KEY_Z && player->get_camera()->mode_cam!=0) {
-            wireframe = !wireframe;
-            if(wireframe) {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            }
-            else {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
+            // wireframe = !wireframe;
+            // if(wireframe) {
+            //     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            // }
+            // else {
+            //     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            // }
         }
         if(key == GLFW_KEY_A && player->get_camera()->mode_cam==0) {
-            wireframe = !wireframe;
-            if(wireframe) {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            }
-            else {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
+            // wireframe = !wireframe;
+            // if(wireframe) {
+            //     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            // }
+            // else {
+            //     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            // }
         }
         if(key == GLFW_KEY_T) {
             // showMouse = player->get_camera()->getShowMouse();
