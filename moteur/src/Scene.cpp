@@ -185,11 +185,17 @@ void Scene::setup_scene() {
 }
 
 void Scene::update_light_player(){
-    glm::vec3 pos_joueur = player->player_node->get_translation();
-    std::shared_ptr<Camera> c = player->get_camera();
-    glm::vec3 dir_joueur = c->getCFront();
-    lights->torch_lights[0]->set_position(pos_joueur);
-    lights->torch_lights[0]->direction=dir_joueur;
+    if(lights->torch_lights[0]->power){
+        lights->torch_lights[0]->on();
+        glm::vec3 pos_joueur = player->player_node->get_translation();
+        std::shared_ptr<Camera> c = player->get_camera();
+        glm::vec3 dir_joueur = c->getCFront();
+        lights->torch_lights[0]->set_position(pos_joueur);
+        lights->torch_lights[0]->direction=dir_joueur;
+    }else{
+        lights->torch_lights[0]->off();
+    }
+    
 }
 
 void Scene::add_node(std::shared_ptr<SceneNode> node) {
@@ -247,4 +253,12 @@ void Scene::draw(glm::mat4& view, glm::mat4& projection) {
     for(auto& scene_node : scene_nodes) {
         scene_node->draw(view, projection);
     }
+}
+
+void Scene::on_off_torch_light_player(){
+    lights->torch_lights[0]->power=!lights->torch_lights[0]->power;
+}
+
+void Scene::mode_torch_light_player(){
+    lights->torch_lights[0]->mode=!lights->torch_lights[0]->mode;
 }

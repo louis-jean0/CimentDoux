@@ -32,6 +32,8 @@ class Scene {
         void add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe);
         void draw(glm::mat4& view, glm::mat4& projection);
         void update_light_player();
+        void on_off_torch_light_player();
+        void mode_torch_light_player();
     
     private:
         std::shared_ptr<LightManager> lights = std::make_shared<LightManager>();
