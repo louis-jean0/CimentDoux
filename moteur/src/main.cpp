@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
     auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader,texture);
     auto obst2_node = SceneNode::create(obst2);
     obst2_node->transform.set_scale(glm::vec3(2.0f,0.5f,2.f));
-    obst2_node->transform.set_translation(glm::vec3(-25.f,27.f,8.6f));
+    obst2_node->transform.set_translation(glm::vec3(-20.f,27.f,8.6f));
     obst2_node->rigid_body->is_in_motion=true;
     pe->add_entity(obst2_node);
 
@@ -231,8 +231,8 @@ int main(int argc, char* argv[]) {
         if(obst2_node->rigid_body->is_child){
             //std::cout<<"-----il est lie-------"<<std::endl;
             glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
-            //player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
-            player->player_node->transform.adjust_translation(glm::vec3(acc.x,0.f,0.f));
+            player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
+            //player->player_node->transform.adjust_translation(glm::vec3(acc.x,0.f,0.f));
         }
 
         // Scene
