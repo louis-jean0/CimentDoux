@@ -311,6 +311,8 @@ int main(int argc, char* argv[]) {
         ImGui::NewFrame();
 
         ma_engine_set_volume(&engine, volume);
+        ma_engine_set_volume(&engine2, volume);
+        ma_engine_set_volume(&engine3, volume);
 
         // Input
         if(showMouse) {
