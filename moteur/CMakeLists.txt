@@ -89,7 +89,7 @@ include_directories(
 )
 
 # Linking libraries
-target_link_libraries(main glfw glad imgui assimp -lsndfile -lopenal)
+target_link_libraries(main glfw glad imgui assimp)
 
 # Output directories
 set_target_properties(glad imgui PROPERTIES

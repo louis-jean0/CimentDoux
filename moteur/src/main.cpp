@@ -81,10 +81,99 @@ bool AZERTY = false;
 bool QWERTY = true;
 
 bool Fullscreen = false;
+bool fin = false;
+bool facticeEnd = false;
 
 
 glm::vec3 globalPos = glm::vec3(0.);
 glm::vec3 globalRot = glm::vec3(0.);
+
+ma_result result, result2, result3;
+ma_engine engine, engine2, engine3;
+ma_sound sound, sound2, sound3;
+
+void display_return_ESCAPE(ImFont* fontMenu) {
+    ImGui::SetNextWindowBgAlpha(1.f);
+    ImGui::Begin("Return", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+    ImGui::PushFont(fontMenu);
+
+    float xPos_ret = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Return").x) * 0.5f;
+    float yPos_ret = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Return").y) * 0.5f;
+    ImGui::SetCursorPosX(xPos_ret);
+    ImGui::SetCursorPosY(yPos_ret);
+    ImGui::SetWindowPos(ImVec2(0, SCR_HEIGHT - ImGui::GetWindowHeight()));        
+    ImGui::SetWindowSize(ImVec2(205, 55));  
+            
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    if (ImGui::Button("Return"))
+    {
+        ESCAPE = false;
+    }
+    ImGui::PopStyleColor();
+
+    ImGui::PopFont();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::End();
+}
+
+void display_return_SETTINGS(ImFont* fontMenu) {
+    ImGui::SetNextWindowBgAlpha(1.f);
+    ImGui::Begin("Return", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+    ImGui::PushFont(fontMenu);
+
+    float xPos_ret = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Return").x) * 0.5f;
+    float yPos_ret = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Return").y) * 0.5f;
+    ImGui::SetCursorPosX(xPos_ret);
+    ImGui::SetCursorPosY(yPos_ret);
+    ImGui::SetWindowPos(ImVec2(0, SCR_HEIGHT - ImGui::GetWindowHeight()));        
+    ImGui::SetWindowSize(ImVec2(205, 55));  
+            
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    if (ImGui::Button("Return"))
+    {
+        settings = false;
+    }
+    ImGui::PopStyleColor();
+
+    ImGui::PopFont();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::End();
+}
+
+void display_return_CREDITS(ImFont* fontMenu) {
+    ImGui::SetNextWindowBgAlpha(1.f);
+    ImGui::Begin("Return", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove  | ImGuiWindowFlags_NoScrollbar);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+    ImGui::PushFont(fontMenu);
+
+    float xPos_ret = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Return").x) * 0.5f;
+    float yPos_ret = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Return").y) * 0.5f;
+    ImGui::SetCursorPosX(xPos_ret);
+    ImGui::SetCursorPosY(yPos_ret);
+    ImGui::SetWindowPos(ImVec2(0, SCR_HEIGHT - ImGui::GetWindowHeight()));        
+    ImGui::SetWindowSize(ImVec2(205, 55));  
+            
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    if (ImGui::Button("Return"))
+    {
+        credits = false;
+    }
+    ImGui::PopStyleColor();
+
+    ImGui::PopFont();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::End();
+}
+
+
 
 int main(int argc, char* argv[]) {
     // Initialize window
@@ -102,7 +191,9 @@ int main(int argc, char* argv[]) {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 65.0f);
     ImFont* fontMenu = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 50.0f);
+    ImFont* fontMenu2 = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 40.0f);
     ImFont* fontDefault = io.Fonts->AddFontDefault();
+    ImFont* fontEndt = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 150.0f);
 
 
     ImGui::StyleColorsDark();
@@ -160,9 +251,7 @@ int main(int argc, char* argv[]) {
 
 
     float volume = 0.05;
-    ma_result result, result2, result3;
-    ma_engine engine, engine2, engine3;
-    ma_sound sound, sound2, sound3;
+
     result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS){
         std::cout << "Failed to initialized miniaudio engine\n";
@@ -185,7 +274,7 @@ int main(int argc, char* argv[]) {
         ma_engine_uninit(&engine);
         return -1;
     }
-    result2 = ma_sound_init_from_file(&engine2, "../data/sounds/CIMENT_DOU__TU_TE_PETE_LA_JAMBE.mp3", 0, NULL, NULL, &sound2);
+    result2 = ma_sound_init_from_file(&engine2, "../data/sounds/ciment doux.wav", 0, NULL, NULL, &sound2);
     if (result2 != MA_SUCCESS){
         std::cout << "Impossible de charger le son\n";
         ma_engine_uninit(&engine2);
@@ -198,7 +287,7 @@ int main(int argc, char* argv[]) {
         ma_engine_uninit(&engine3);
         return -1;
     }
-    result3 = ma_sound_init_from_file(&engine3, "../data/sounds/CIMENT_DOU__TU_TE_PETE_LA_JAMBE.mp3", 0, NULL, NULL, &sound3);
+    result3 = ma_sound_init_from_file(&engine3, "../data/sounds/ciment doux.wav", 0, NULL, NULL, &sound3);
     if (result3 != MA_SUCCESS){
         std::cout << "Impossible de charger le son\n";
         ma_engine_uninit(&engine3);
@@ -216,7 +305,7 @@ int main(int argc, char* argv[]) {
         lastFrame = currentFrame;
         lag += deltaTime;
 
-        if(ESCAPE == false) {
+        if(ESCAPE == false && fin == false) {
             acc += deltaTime;
 
             if (acc >= 1.) {
@@ -224,17 +313,24 @@ int main(int argc, char* argv[]) {
             }            
         } 
 
+
+        // ImGui
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         ma_engine_set_volume(&engine, volume);
         ma_engine_set_volume(&engine2, volume);
         ma_engine_set_volume(&engine3, volume);
 
-        // Inpu
+        // Input
         if(showMouse) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
         else {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
+
 
         if(Fullscreen == false) {
             SCR_WIDTH = 1440;
@@ -246,17 +342,15 @@ int main(int argc, char* argv[]) {
             glfwSetWindowMonitor(window.get_window(), window.get_ecran(), 0, 0, window.get_maxWidth(), window.get_maxHeight(), window.windowParams->refreshRate);        
         }
 
-        // ImGui
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
         scene->draw(view, proj, SCR_WIDTH, SCR_HEIGHT);
         
         pe->update(deltaTime);
-        
+
+        globalPos = player->get_camera()->getPosition();
+        fin = globalPos.y >= 83. && globalPos.x <= -27.;
+
         while (lag >= MS_PER_UPDATE) {
             if(principal == true) {
                 player->update(deltaTime);
@@ -306,18 +400,10 @@ int main(int argc, char* argv[]) {
             player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
         }
 
-        globalPos = player->get_camera()->getPosition();
-        if (globalPos.y >= 83. && globalPos.x <= -27.) {
-            ma_sound_stop(&sound);
-            ma_sound_set_looping(&sound3,true);
-            ma_sound_start(&sound3);
-        } else {
-            ma_sound_stop(&sound3);
-            ma_sound_set_looping(&sound,true);
-            ma_sound_start(&sound);
-        }
 
         if(principal == true) {
+            showMouse = false;  
+
             ImGui::SetNextWindowBgAlpha(0.5f);
             ImGui::Begin("Metrage_main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
@@ -340,11 +426,11 @@ int main(int argc, char* argv[]) {
             }
 
             ImVec2 textSize = ImGui::CalcTextSize(HauteurFormater);
-            float posX_TimerMain = (ImGui::GetWindowWidth() - textSize.x) * 0.5f;
-            float posY_TimerMain = (ImGui::GetWindowHeight() - textSize.y) * 0.5f;
+            float posX_MetrageMain = (ImGui::GetWindowWidth() - textSize.x) * 0.5f;
+            float posY_MetrageMain = (ImGui::GetWindowHeight() - textSize.y) * 0.5f;
 
-            ImGui::SetCursorPosX(posX_TimerMain);
-            ImGui::SetCursorPosY(posY_TimerMain);
+            ImGui::SetCursorPosX(posX_MetrageMain);
+            ImGui::SetCursorPosY(posY_MetrageMain);
             ImGui::SetWindowPos(ImVec2(0, 0));        
             ImGui::SetWindowSize(ImVec2(200, 60));  
 
@@ -377,11 +463,11 @@ int main(int argc, char* argv[]) {
             float longueurFenetre = ImGui::GetWindowWidth();
             float hauteurFenetre = ImGui::GetWindowHeight();
 
-            float posX_MetrageMain = (longueurFenetre - longueurTexte) * 0.5f;
-            float posY_MetrageMain = (hauteurFenetre - hauteurTexte) * 0.5f;
+            float posX_TimerMain = (longueurFenetre - longueurTexte) * 0.5f;
+            float posY_TimerMain = (hauteurFenetre - hauteurTexte) * 0.5f;
 
-            ImGui::SetCursorPosX(posX_MetrageMain);
-            ImGui::SetCursorPosY(posY_MetrageMain);
+            ImGui::SetCursorPosX(posX_TimerMain);
+            ImGui::SetCursorPosY(posY_TimerMain);
             ImGui::SetWindowPos(ImVec2(SCR_WIDTH - ImGui::GetWindowWidth(), 0));      
             ImGui::SetWindowSize(ImVec2(200, 60));  
 
@@ -391,6 +477,8 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleColor();
             ImGui::PopStyleVar();
             ImGui::End();        
+        } else {
+            showMouse = true;
         }
         // Menu
         //ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
@@ -707,170 +795,599 @@ int main(int argc, char* argv[]) {
             }
             ImGui::PopStyleColor();
 
-
             ImGui::PopFont();
             ImGui::PopStyleColor();
             ImGui::PopStyleVar();
             ImGui::End();
+
+            display_return_ESCAPE(fontMenu);
         } else if(ESCAPE == true && settings == true) {
-            ImGui::SetNextWindowBgAlpha(0.7f);
-            ImGui::Begin("Slides", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
-            ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 12, SCR_HEIGHT / 10));
-            ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3, SCR_HEIGHT / 1.25));  
+            if(Fullscreen == true) {
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImGui::Begin("Slides", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 12, SCR_HEIGHT / 10));
+                ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3, SCR_HEIGHT / 1.25));  
 
-            float contentWidth = ImGui::GetContentRegionAvail().x;
-            float contentHeight = ImGui::GetContentRegionAvail().y;
+                float contentWidth = ImGui::GetContentRegionAvail().x;
+                float contentHeight = ImGui::GetContentRegionAvail().y;
 
-            float textHeight = ImGui::GetTextLineHeightWithSpacing(); 
-            float posY = (contentHeight - textHeight * 12) * 0.5f;
+                float textHeight = ImGui::GetTextLineHeightWithSpacing(); 
+                float posY = (contentHeight - textHeight * 12) * 0.5f;
 
-            float sliderWidth = 200.0f;
-            float textWidthFOV = ImGui::CalcTextSize("FOV").x;
-            float textWidthSensi = ImGui::CalcTextSize("Sensibilité de la souris").x;
-            float textWidthVolume = ImGui::CalcTextSize("Volume du son").x;
-            float textWidthCom = ImGui::CalcTextSize("Commandes AZERTY / QWERTY :").x;
-            float textWidthFullscreen = ImGui::CalcTextSize("Plein écran :").x;
+                float sliderWidth = 200.0f;
+                float textWidthFOV = ImGui::CalcTextSize("FOV").x;
+                float textWidthSensi = ImGui::CalcTextSize("Mouse sensitivity").x;
+                float textWidthVolume = ImGui::CalcTextSize("Sound volume").x;
+                float textWidthCom = ImGui::CalcTextSize("Commands AZERTY / QWERTY :").x;
+                float textWidthFullscreen = ImGui::CalcTextSize("Fullscreen :").x;
 
-            float textPosXFOV = (contentWidth - textWidthFOV) * 0.5f;
-            float textPosXSensi = (contentWidth - textWidthSensi) * 0.5f;
-            float textPosXVolume = (contentWidth - textWidthVolume) * 0.5f;
-            float textPosXCom = (contentWidth - textWidthCom) * 0.5f;
-            float textPosXFullscreen = (contentWidth - textWidthFullscreen) * 0.5f;
+                float textPosXFOV = (contentWidth - textWidthFOV) * 0.53f;
+                float textPosXSensi = (contentWidth - textWidthSensi) * 0.53f;
+                float textPosXVolume = (contentWidth - textWidthVolume) * 0.53f;
+                float textPosXCom = (contentWidth - textWidthCom) * 0.53f;
+                float textPosXFullscreen = (contentWidth - textWidthFullscreen) * 0.53f;
 
-            float sliderPosX = (contentWidth - sliderWidth) * 0.5f;
+                float sliderPosX = (contentWidth - sliderWidth) * 0.5f;
 
-            ImGui::SetCursorPosX(textPosXFOV);
-            ImGui::SetCursorPosY(posY);
-            ImGui::Text("FOV");
+                ImGui::SetCursorPosX(textPosXFOV);
+                ImGui::SetCursorPosY(posY);
+                ImGui::Text("FOV");
 
-            float imguiWindowSize = ImGui::GetWindowSize().x;
-            float sliderPosOffsetFOV = imguiWindowSize / 4;
-            float sliderPosXFOV = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetFOV;
-            ImGui::SetCursorPosX(sliderPosXFOV);
-            ImGui::SliderFloat("##FOV", &fov, 45.f, 120.f);
-            player->get_camera()->setFOV(fov);
+                float imguiWindowSize = ImGui::GetWindowSize().x;
+                float sliderPosOffsetFOV = imguiWindowSize / 4;
+                float sliderPosXFOV = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetFOV;
+                ImGui::SetCursorPosX(sliderPosXFOV);
+                ImGui::SliderFloat("##FOV", &fov, 45.f, 120.f);
+                player->get_camera()->setFOV(fov);
 
-            ImGui::SetCursorPosX(textPosXSensi);
-            ImGui::SetCursorPosY(posY + textHeight + 100);
-            ImGui::Text("Sensibilité de la souris");
+                ImGui::SetCursorPosX(textPosXSensi);
+                ImGui::SetCursorPosY(posY + textHeight + 100);
+                ImGui::Text("Mouse sensitivity");
 
-            float imguiWindowSizee = ImGui::GetWindowSize().x;
-            float sliderPosOffsetSensi = imguiWindowSizee / 4;
-            float sliderPosXSensi = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetSensi;
-            ImGui::SetCursorPosX(sliderPosXSensi);;
-            ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 10.f);
-            player->get_camera()->set_sensitivity(sensi);
+                float imguiWindowSizee = ImGui::GetWindowSize().x;
+                float sliderPosOffsetSensi = imguiWindowSizee / 4;
+                float sliderPosXSensi = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetSensi;
+                ImGui::SetCursorPosX(sliderPosXSensi);;
+                ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 10.f);
+                player->get_camera()->set_sensitivity(sensi);
 
-            ImGui::SetCursorPosX(textPosXVolume);
-            ImGui::SetCursorPosY(posY + textHeight + 270);
-            ImGui::Text("Volume du son");
+                ImGui::SetCursorPosX(textPosXVolume);
+                ImGui::SetCursorPosY(posY + textHeight + 270);
+                ImGui::Text("Sound volume");
 
-            float imguiWindowSizeee = ImGui::GetWindowSize().x;
-            float sliderPosOffsetVolume = imguiWindowSizeee / 4;
-            float sliderPosXVolume = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetVolume;
-            ImGui::SetCursorPosX(sliderPosXVolume);;
-            ImGui::SliderFloat("##Volume", &volume, 0.0f, 1.f);
+                float imguiWindowSizeee = ImGui::GetWindowSize().x;
+                float sliderPosOffsetVolume = imguiWindowSizeee / 4;
+                float sliderPosXVolume = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetVolume;
+                ImGui::SetCursorPosX(sliderPosXVolume);;
+                ImGui::SliderFloat("##Volume", &volume, 0.0f, 1.f);
 
-            ImGui::SetCursorPosX(textPosXCom);
-            ImGui::SetCursorPosY(posY + textHeight + 450);
-            ImGui::Text("Commandes AZERTY / QWERTY :");
+                ImGui::SetCursorPosX(textPosXCom);
+                ImGui::SetCursorPosY(posY + textHeight + 450);
+                ImGui::Text("Commands AZERTY / QWERTY :");
 
-            float imguiWindowSizeeee = ImGui::GetWindowSize().x;
-            float sliderPosOffsetCom = imguiWindowSizeeee / 4;
-            float sliderPosXCom = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetCom;
-            float buttonWidth = 25;
-            float totalButtonWidth = 2 * buttonWidth;
-            float spaceBetweenButtons = imguiWindowSizeeee - totalButtonWidth;
-            float offsetX = (SCR_WIDTH / 4); 
-            ImGui::SetCursorPosX(offsetX);
-            if(ImGui::Checkbox("AZERTY", &AZERTY)) {
-                player->get_camera()->mode_cam = 1;
-                QWERTY = false;
+                float imguiWindowSizeeee = ImGui::GetWindowSize().x;
+                float sliderPosOffsetCom = imguiWindowSizeeee / 4;
+                float sliderPosXCom = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetCom;
+                float buttonWidth = 25;
+                float totalButtonWidth = 2 * buttonWidth;
+                float spaceBetweenButtons = imguiWindowSizeeee - totalButtonWidth;
+                float offsetX = (SCR_WIDTH / 2.85); 
+                ImGui::SetCursorPosX(offsetX);
+                if(ImGui::Checkbox("AZERTY", &AZERTY)) {
+                    player->get_camera()->mode_cam = 1;
+                    QWERTY = false;
+                }
+                ImGui::SameLine();
+                if(ImGui::Checkbox("QWERTY", &QWERTY)) {
+                    player->get_camera()->mode_cam = 0;
+                    AZERTY = false;
+                }
+
+                ImGui::SetCursorPosX(textPosXFullscreen);
+                ImGui::SetCursorPosY(posY + textHeight + 625);
+                ImGui::Text("Fullscreen :");
+
+                float checkboxWidth = ImGui::CalcTextSize("").x;
+                float offsetXFSC = (SCR_WIDTH - checkboxWidth) / 2.4;
+                ImGui::SetCursorPosX(offsetXFSC);
+                ImGui::Checkbox("##", &Fullscreen);
+                ImGui::End();
+
+                display_return_SETTINGS(fontMenu);
+            } else {
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImGui::Begin("Slides", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 12, SCR_HEIGHT / 10));
+                ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3, SCR_HEIGHT / 1.25));  
+
+                float contentWidth = ImGui::GetContentRegionAvail().x;
+                float contentHeight = ImGui::GetContentRegionAvail().y;
+
+                float textHeight = ImGui::GetTextLineHeightWithSpacing(); 
+                float posY = (contentHeight - textHeight * 12) * 0.5f;
+
+                float sliderWidth = 200.0f;
+                float textWidthFOV = ImGui::CalcTextSize("FOV").x;
+                float textWidthSensi = ImGui::CalcTextSize("Mouse sensitivity").x;
+                float textWidthVolume = ImGui::CalcTextSize("Sound volume").x;
+                float textWidthCom = ImGui::CalcTextSize("Commands AZERTY / QWERTY :").x;
+                float textWidthFullscreen = ImGui::CalcTextSize("Fullscreen :").x;
+
+                float textPosXFOV = (contentWidth - textWidthFOV) * 0.5f;
+                float textPosXSensi = (contentWidth - textWidthSensi) * 0.5f;
+                float textPosXVolume = (contentWidth - textWidthVolume) * 0.5f;
+                float textPosXCom = (contentWidth - textWidthCom) * 0.5f;
+                float textPosXFullscreen = (contentWidth - textWidthFullscreen) * 0.5f;
+
+                float sliderPosX = (contentWidth - sliderWidth) * 0.5f;
+
+                ImGui::SetCursorPosX(textPosXFOV);
+                ImGui::SetCursorPosY(posY);
+                ImGui::Text("FOV");
+
+                float imguiWindowSize = ImGui::GetWindowSize().x;
+                float sliderPosOffsetFOV = imguiWindowSize / 4;
+                float sliderPosXFOV = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetFOV;
+                ImGui::SetCursorPosX(sliderPosXFOV);
+                ImGui::SliderFloat("##FOV", &fov, 45.f, 120.f);
+                player->get_camera()->setFOV(fov);
+
+                ImGui::SetCursorPosX(textPosXSensi);
+                ImGui::SetCursorPosY(posY + textHeight + 100);
+                ImGui::Text("Mouse sensitivity");
+
+                float imguiWindowSizee = ImGui::GetWindowSize().x;
+                float sliderPosOffsetSensi = imguiWindowSizee / 4;
+                float sliderPosXSensi = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetSensi;
+                ImGui::SetCursorPosX(sliderPosXSensi);;
+                ImGui::SliderFloat("##Sensibilite", &sensi, 0.01f, 10.f);
+                player->get_camera()->set_sensitivity(sensi);
+
+                ImGui::SetCursorPosX(textPosXVolume);
+                ImGui::SetCursorPosY(posY + textHeight + 270);
+                ImGui::Text("Sound volume");
+
+                float imguiWindowSizeee = ImGui::GetWindowSize().x;
+                float sliderPosOffsetVolume = imguiWindowSizeee / 4;
+                float sliderPosXVolume = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetVolume;
+                ImGui::SetCursorPosX(sliderPosXVolume);;
+                ImGui::SliderFloat("##Volume", &volume, 0.0f, 1.f);
+
+                ImGui::SetCursorPosX(textPosXCom);
+                ImGui::SetCursorPosY(posY + textHeight + 450);
+                ImGui::Text("Commands AZERTY / QWERTY :");
+
+                float imguiWindowSizeeee = ImGui::GetWindowSize().x;
+                float sliderPosOffsetCom = imguiWindowSizeeee / 4;
+                float sliderPosXCom = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetCom;
+                float buttonWidth = 25;
+                float totalButtonWidth = 2 * buttonWidth;
+                float spaceBetweenButtons = imguiWindowSizeeee - totalButtonWidth;
+                float offsetX = (SCR_WIDTH / 4); 
+                ImGui::SetCursorPosX(offsetX);
+                if(ImGui::Checkbox("AZERTY", &AZERTY)) {
+                    player->get_camera()->mode_cam = 1;
+                    QWERTY = false;
+                }
+                ImGui::SameLine();
+                if(ImGui::Checkbox("QWERTY", &QWERTY)) {
+                    player->get_camera()->mode_cam = 0;
+                    AZERTY = false;
+                }
+
+                ImGui::SetCursorPosX(textPosXFullscreen);
+                ImGui::SetCursorPosY(posY + textHeight + 625);
+                ImGui::Text("Fullscreen :");
+
+                float checkboxWidth = ImGui::CalcTextSize("").x;
+                float offsetXFSC = (SCR_WIDTH - checkboxWidth) / 2.65;
+                ImGui::SetCursorPosX(offsetXFSC);
+                ImGui::Checkbox("##", &Fullscreen);
+                ImGui::End();
+
+                display_return_SETTINGS(fontMenu);
             }
-            ImGui::SameLine();
-            if(ImGui::Checkbox("QWERTY", &QWERTY)) {
-                player->get_camera()->mode_cam = 0;
-                AZERTY = false;
-            }
-
-            ImGui::SetCursorPosX(textPosXFullscreen);
-            ImGui::SetCursorPosY(posY + textHeight + 625);
-            ImGui::Text("Plein écran :");
-
-            float checkboxWidth = ImGui::CalcTextSize("").x;
-            float offsetXFSC = (SCR_WIDTH - checkboxWidth) / 2.65;
-            ImGui::SetCursorPosX(offsetXFSC);
-            ImGui::Checkbox("##", &Fullscreen);
-            ImGui::End();
 
         } else if(ESCAPE == true && credits == true) {
-            ImGui::SetNextWindowBgAlpha(0.7f);
-            ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
-            ImGui::PushFont(font);
-            ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 9.2, SCR_HEIGHT / 8));
-            ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 800));  
+            if(Fullscreen == true) {
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+                ImGui::PushFont(font);
+                ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 9.2, SCR_HEIGHT / 8));
+                ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 800));  
 
-            char CHFormater1[] = "SERVA Benjamin";
-            char CHFormater2[] = "JEAN Louis";
-            char CHFormater3[] = "COMBOT Evan";
-            char CHFormater4[] = "RONTEIX Jonas";
+                const char* CHFormater0 = "Developers";
+                const char* CHFormater1 = "SERVA Benjamin";
+                const char* CHFormater2 = "JEAN Louis";
+                const char* CHFormater3 = "COMBOT Evan";
+                const char* CHFormater5 = "Collaborators";
+                const char* CHFormater6 = "RONTEIX Jonas - Level Designer";
+                const char* CHFormater7 = "Brian & Loïc - sound of the end & credits";
 
-            ImVec2 textSizech1 = ImGui::CalcTextSize(CHFormater1);
-            ImVec2 textSizech2 = ImGui::CalcTextSize(CHFormater2);
-            ImVec2 textSizech3 = ImGui::CalcTextSize(CHFormater3);
-            ImVec2 textSizech4 = ImGui::CalcTextSize(CHFormater4);
+                ImVec2 textSizech0 = ImGui::CalcTextSize(CHFormater0);
+                ImVec2 textSizech1 = ImGui::CalcTextSize(CHFormater1);
+                ImVec2 textSizech2 = ImGui::CalcTextSize(CHFormater2);
+                ImVec2 textSizech3 = ImGui::CalcTextSize(CHFormater3);
+                ImVec2 textSizech5 = ImGui::CalcTextSize(CHFormater5);
+                ImVec2 textSizech6 = ImGui::CalcTextSize(CHFormater6);
+                ImVec2 textSizech7 = ImGui::CalcTextSize(CHFormater7);
 
-            float posX1 = (ImGui::GetWindowWidth() - textSizech1.x) * 0.5f;
-            float posY1 = (ImGui::GetWindowHeight() - 3 * textSizech1.y) * 0.5f;
+                // Center each text horizontally
+                float posX0 = (ImGui::GetWindowWidth() - textSizech0.x) * 0.5f;
+                float posX1 = (ImGui::GetWindowWidth() - textSizech1.x) * 0.53f;
+                float posX2 = (ImGui::GetWindowWidth() - textSizech2.x) * 0.515f;
+                float posX3 = (ImGui::GetWindowWidth() - textSizech3.x) * 0.52f;
+                float posX5 = (ImGui::GetWindowWidth() - textSizech5.x) * 0.5f;
+                float posX6 = (ImGui::GetWindowWidth() - textSizech6.x) * 0.57f;
+                float posX7 = (ImGui::GetWindowWidth() - textSizech7.x) * 0.6f;
 
-            float posX2 = (ImGui::GetWindowWidth() - textSizech2.x) * 0.5f;
-            float posY2 = (ImGui::GetWindowHeight() - textSizech2.y) * 0.5f;
+                float baseY = ImGui::GetCursorPosY() + ImGui::GetWindowHeight() / 8; 
+                float spacing = textSizech1.y * 1.25f;
 
-            float posX3 = (ImGui::GetWindowWidth() - textSizech3.x) * 0.5f;
-            float posY3 = (ImGui::GetWindowHeight() + textSizech3.y) * 0.5f;
+                ImGui::SetCursorPos(ImVec2(posX0, baseY));
+                ImGui::Text("%s", CHFormater0);
 
-            float posX4 = (ImGui::GetWindowWidth() - textSizech4.x) * 0.5f;
-            float posY4 = (ImGui::GetWindowHeight() + 3 * textSizech4.y) * 0.5f;
+                baseY += spacing;
 
-            ImGui::SetCursorPosX(posX1);
-            ImGui::SetCursorPosY(posY1);
-            ImGui::Text("%s", CHFormater1);
+                ImGui::PushFont(fontMenu2);
+                ImGui::SetCursorPos(ImVec2(posX1, baseY));
+                ImGui::Text("%s", CHFormater1);
 
-            ImGui::SetCursorPosX(posX2);
-            ImGui::SetCursorPosY(posY2);
-            ImGui::Text("%s", CHFormater2);
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX2, baseY));
+                ImGui::Text("%s", CHFormater2);
 
-            ImGui::SetCursorPosX(posX3);
-            ImGui::SetCursorPosY(posY3);
-            ImGui::Text("%s", CHFormater3);
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX3, baseY));
+                ImGui::Text("%s", CHFormater3);
+                ImGui::PopFont();
 
-            ImGui::SetCursorPosX(posX4);
-            ImGui::SetCursorPosY(posY4);
-            ImGui::Text("%s", CHFormater4);
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX5, baseY));
+                ImGui::Text("%s", CHFormater5);
 
-            ImGui::PopFont();
-            ImGui::PopStyleColor();
-            ImGui::PopStyleVar();
-            ImGui::End();
+                baseY += spacing;
 
+                ImGui::PushFont(fontMenu2);
+                ImGui::SetCursorPos(ImVec2(posX6, baseY));
+                ImGui::Text("%s", CHFormater6);
+
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX7, baseY));
+                ImGui::Text("%s", CHFormater7);
+                ImGui::PopFont();
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+
+                display_return_CREDITS(fontMenu);
+            } else {
+
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+                ImGui::PushFont(font);
+                ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 9.2, SCR_HEIGHT / 8));
+                ImGui::SetWindowSize(ImVec2(SCR_WIDTH / 2 + SCR_WIDTH / 3 - 80, 800));  
+
+                const char* CHFormater0 = "Developers";
+                const char* CHFormater1 = "SERVA Benjamin";
+                const char* CHFormater2 = "JEAN Louis";
+                const char* CHFormater3 = "COMBOT Evan";
+                const char* CHFormater5 = "Collaborators";
+                const char* CHFormater6 = "RONTEIX Jonas - Level Designer";
+                const char* CHFormater7 = "Brian & Loïc - sound of the end & credits";
+
+                ImVec2 textSizech0 = ImGui::CalcTextSize(CHFormater0);
+                ImVec2 textSizech1 = ImGui::CalcTextSize(CHFormater1);
+                ImVec2 textSizech2 = ImGui::CalcTextSize(CHFormater2);
+                ImVec2 textSizech3 = ImGui::CalcTextSize(CHFormater3);
+                ImVec2 textSizech5 = ImGui::CalcTextSize(CHFormater5);
+                ImVec2 textSizech6 = ImGui::CalcTextSize(CHFormater6);
+                ImVec2 textSizech7 = ImGui::CalcTextSize(CHFormater7);
+
+                // Center each text horizontally
+                float posX0 = (ImGui::GetWindowWidth() - textSizech0.x) * 0.5f;
+                float posX1 = (ImGui::GetWindowWidth() - textSizech1.x) * 0.56f;
+                float posX2 = (ImGui::GetWindowWidth() - textSizech2.x) * 0.53f;
+                float posX3 = (ImGui::GetWindowWidth() - textSizech3.x) * 0.54f;
+                float posX5 = (ImGui::GetWindowWidth() - textSizech5.x) * 0.5f;
+                float posX6 = (ImGui::GetWindowWidth() - textSizech6.x) * 0.68f;
+                float posX7 = (ImGui::GetWindowWidth() - textSizech7.x) * 0.80f;
+
+                float baseY = ImGui::GetCursorPosY() + ImGui::GetWindowHeight() / 8; 
+                float spacing = textSizech1.y * 1.25f;
+
+                ImGui::SetCursorPos(ImVec2(posX0, baseY));
+                ImGui::Text("%s", CHFormater0);
+
+                baseY += spacing;
+
+                ImGui::PushFont(fontMenu2);
+                ImGui::SetCursorPos(ImVec2(posX1, baseY));
+                ImGui::Text("%s", CHFormater1);
+
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX2, baseY));
+                ImGui::Text("%s", CHFormater2);
+
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX3, baseY));
+                ImGui::Text("%s", CHFormater3);
+                ImGui::PopFont();
+
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX5, baseY));
+                ImGui::Text("%s", CHFormater5);
+
+                baseY += spacing;
+
+                ImGui::PushFont(fontMenu2);
+                ImGui::SetCursorPos(ImVec2(posX6, baseY));
+                ImGui::Text("%s", CHFormater6);
+
+                baseY += spacing;
+                ImGui::SetCursorPos(ImVec2(posX7, baseY));
+                ImGui::Text("%s", CHFormater7);
+                ImGui::PopFont();
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+
+                display_return_CREDITS(fontMenu);
+                          
+            }
             ma_sound_stop(&sound);
             ma_sound_set_looping(&sound2,true);
             ma_sound_start(&sound2);
-        
         } else {
             ma_sound_stop(&sound2);
             ma_sound_set_looping(&sound,true);
             ma_sound_start(&sound);
 
             principal = true; 
-            showMouse = false;  
             settings = false;    
             credits = false; 
         }
 
 
+        if (fin == true) {
+            showMouse = true;
+
+            if(Fullscreen == true) {
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImVec2 screenSize = ImVec2(SCR_WIDTH, SCR_HEIGHT);
+                ImVec2 textSize = ImGui::CalcTextSize("You won");
+                ImVec2 windowPos = ImVec2((screenSize.x - textSize.x) * 0.45f, (screenSize.y - textSize.y) * 0.1f);
+
+                ImGui::Begin("You won", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::SetWindowPos(windowPos);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+                ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0., 0., 0., 0.)); 
+                ImGui::PushFont(fontEndt);
+
+                const char* message = "You won";
+                ImVec2 textSizeText = ImGui::CalcTextSize(message);
+                float padding = 10.0f;
+                textSizeText.x += 2 * padding;
+                textSizeText.y += 2 * padding;
+
+                ImGui::SetWindowSize(textSizeText);
+
+                float xPosYouWon = (textSizeText.x - ImGui::CalcTextSize(message).x) * 0.5f;
+                float yPosYouWon = (textSizeText.y - ImGui::CalcTextSize(message).y) * 0.5f;
+                ImGui::SetCursorPosX(xPosYouWon);
+                ImGui::SetCursorPosY(yPosYouWon);
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
+                ImGui::Text("You won");
+                ImGui::PopStyleColor();
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImGui::Begin("Timer_menu", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1., 0., 0., 0.5));
+                ImGui::PushFont(font);
+
+                int heures_menu = static_cast<int>(timing / 3600);
+                int minutes_menu = static_cast<int>((timing - heures_menu * 3600) / 60);
+                int secondes_menu = static_cast<int>(timing - heures_menu * 3600 - minutes_menu * 60);
+
+                snprintf(TempsFormaterMenu, sizeof(TempsFormaterMenu), "%02d:%02d:%02d", heures_menu, minutes_menu, secondes_menu);
+
+                char chaineTempsMenu[16];
+                snprintf(chaineTempsMenu, sizeof(chaineTempsMenu), "%.02f", timing);
+
+                float longueurTexte = ImGui::CalcTextSize(TempsFormaterMenu).x;
+                float hauteurTexte = ImGui::CalcTextSize(TempsFormaterMenu).y;
+
+                float longueurFenetre = ImGui::GetWindowWidth();
+                float hauteurFenetre = ImGui::GetWindowHeight();
+
+                float posX_MetrageMain = (longueurFenetre - longueurTexte) * 0.5f;
+                float posY_MetrageMain = (hauteurFenetre - hauteurTexte) * 0.5f;
+
+                ImGui::SetCursorPosX(posX_MetrageMain);
+                ImGui::SetCursorPosY(posY_MetrageMain);
+                ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 4, SCR_HEIGHT / 3 * 2.));
+                ImGui::SetWindowSize(ImVec2(1000, 400));  
+
+                ImGui::Text("%s", TempsFormaterMenu);
+
+
+                ImGui::PushFont(fontMenu);
+                ImGui::SetCursorPosX(5);
+                ImGui::SetCursorPosY(2);
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Your time");
+                ImGui::PopFont();
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End(); 
+
+                ImGui::SetNextWindowBgAlpha(1.f);
+                ImGui::Begin("Restart runr", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+                ImGui::PushFont(fontMenu);
+
+                float xPos_res = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Restart run").x) * 0.5f;
+                float yPos_res = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Restart run").y) * 0.5f;
+                ImGui::SetCursorPosX(xPos_res);
+                ImGui::SetCursorPosY(yPos_res);
+                ImGui::SetWindowPos(ImVec2(0, SCR_HEIGHT - ImGui::GetWindowHeight()));            
+                ImGui::SetWindowSize(ImVec2(205, 55));  
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                if (ImGui::Button("Restart run"))
+                {
+                    currentRun += 1;
+                    MaxHeight = std::min(0., hauteur);
+                    player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+                    player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
+
+                    timing = 0.;
+                    acc = 0.0;
+                }
+                ImGui::PopStyleColor();
+
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+            } else {
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImVec2 screenSize = ImVec2(SCR_WIDTH, SCR_HEIGHT);
+                ImVec2 textSize = ImGui::CalcTextSize("You won");
+                ImVec2 windowPos = ImVec2((screenSize.x - textSize.x) * 0.45f, (screenSize.y - textSize.y) * 0.1f);
+
+                ImGui::Begin("You won", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::SetWindowPos(windowPos);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+                ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0., 0., 0., 0.)); 
+                ImGui::PushFont(fontEndt);
+
+                const char* message = "You won";
+                ImVec2 textSizeText = ImGui::CalcTextSize(message);
+                float padding = 10.0f;
+                textSizeText.x += 2 * padding;
+                textSizeText.y += 2 * padding;
+
+                ImGui::SetWindowSize(textSizeText);
+
+                float xPosYouWon = (textSizeText.x - ImGui::CalcTextSize(message).x) * 0.5f;
+                float yPosYouWon = (textSizeText.y - ImGui::CalcTextSize(message).y) * 0.5f;
+                ImGui::SetCursorPosX(xPosYouWon);
+                ImGui::SetCursorPosY(yPosYouWon);
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
+                ImGui::Text("You won");
+                ImGui::PopStyleColor();
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+
+                ImGui::SetNextWindowBgAlpha(0.7f);
+                ImGui::Begin("Timer_menu", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(1., 0., 0., 0.5));
+                ImGui::PushFont(font);
+
+                int heures_menu = static_cast<int>(timing / 3600);
+                int minutes_menu = static_cast<int>((timing - heures_menu * 3600) / 60);
+                int secondes_menu = static_cast<int>(timing - heures_menu * 3600 - minutes_menu * 60);
+
+                snprintf(TempsFormaterMenu, sizeof(TempsFormaterMenu), "%02d:%02d:%02d", heures_menu, minutes_menu, secondes_menu);
+
+                char chaineTempsMenu[16];
+                snprintf(chaineTempsMenu, sizeof(chaineTempsMenu), "%.02f", timing);
+
+                float longueurTexte = ImGui::CalcTextSize(TempsFormaterMenu).x;
+                float hauteurTexte = ImGui::CalcTextSize(TempsFormaterMenu).y;
+
+                float longueurFenetre = ImGui::GetWindowWidth();
+                float hauteurFenetre = ImGui::GetWindowHeight();
+
+                float posX_MetrageMain = (longueurFenetre - longueurTexte) * 0.5f;
+                float posY_MetrageMain = (hauteurFenetre - hauteurTexte) * 0.5f;
+
+                ImGui::SetCursorPosX(posX_MetrageMain);
+                ImGui::SetCursorPosY(posY_MetrageMain);
+                ImGui::SetWindowPos(ImVec2(SCR_WIDTH / 6, SCR_HEIGHT / 3));
+                ImGui::SetWindowSize(ImVec2(1000, 400));  
+
+                ImGui::Text("%s", TempsFormaterMenu);
+
+
+                ImGui::PushFont(fontMenu);
+                ImGui::SetCursorPosX(5);
+                ImGui::SetCursorPosY(2);
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Your time");
+                ImGui::PopFont();
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End(); 
+
+                ImGui::SetNextWindowBgAlpha(1.f);
+                ImGui::Begin("Restart runr", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+                ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
+                ImGui::PushFont(fontMenu);
+
+                float xPos_res = (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Restart run").x) * 0.5f;
+                float yPos_res = (ImGui::GetWindowHeight() - ImGui::CalcTextSize("Restart run").y) * 0.5f;
+                ImGui::SetCursorPosX(xPos_res);
+                ImGui::SetCursorPosY(yPos_res);
+                ImGui::SetWindowPos(ImVec2(0, SCR_HEIGHT - ImGui::GetWindowHeight()));            
+                ImGui::SetWindowSize(ImVec2(205, 55));  
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+                if (ImGui::Button("Restart run"))
+                {
+                    currentRun += 1;
+                    MaxHeight = std::min(0., hauteur);
+                    player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+                    player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
+
+                    timing = 0.;
+                    acc = 0.0;
+                }
+                ImGui::PopStyleColor();
+
+
+                ImGui::PopFont();
+                ImGui::PopStyleColor();
+                ImGui::PopStyleVar();
+                ImGui::End();
+            }
+
+            ma_sound_stop(&sound);
+            ma_sound_set_looping(&sound3,true);
+            ma_sound_start(&sound3);
+        }
+        
         // Render window & ImGui
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); 
