@@ -55,16 +55,6 @@ float lastFrame = 0.0f;
 float lag = 0.0f;
 const float MS_PER_UPDATE = 0.008333f;
 
-// Trans
-float PasTranslationCube = 0.01;
-
-// Physique
-double v0_Vitesse = 0.01f;
-float g = 9.81;
-float vitesse = 0.5;
-glm::vec3 F = glm::vec3(0., 0., 0.);
-glm::vec3 a = glm::vec3(0., 0., 0.);
-
 glm::mat4 view;
 glm::mat4 proj;
 
@@ -84,9 +74,7 @@ bool Fullscreen = false;
 bool fin = false;
 bool facticeEnd = false;
 
-
 glm::vec3 globalPos = glm::vec3(0.);
-glm::vec3 globalRot = glm::vec3(0.);
 
 ma_result result, result2, result3;
 ma_engine engine, engine2, engine3;
@@ -173,8 +161,6 @@ void display_return_CREDITS(ImFont* fontMenu) {
     ImGui::End();
 }
 
-
-
 int main(int argc, char* argv[]) {
     // Initialize window
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Ciment doux",true);
@@ -217,21 +203,14 @@ int main(int argc, char* argv[]) {
     scene = Scene::create(player);
     scene->add_entities_into_physics_engine(pe);
 
-    auto texture = Texture::create("../data/textures/pavement.jpg");
-
-    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader,texture);
+    // Moving cube
+    auto texture = Texture::create("../data/textures/pierre_rough.jpg");
+    auto obst2 = Model::create("../data/models/cube/Cube.gltf", shader);
     auto obst2_node = SceneNode::create(obst2);
     obst2_node->transform.set_scale(glm::vec3(2.0f,0.5f,2.f));
     obst2_node->transform.set_translation(glm::vec3(-20.f,27.f,8.6f));
     obst2_node->rigid_body->is_in_motion=true;
     pe->add_entity(obst2_node);
-
-    // // Capsule (for test)
-    // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
-    // auto capsule_node = SceneNode::create(capsule);
-    // scene->add_node(capsule_node);
-    // capsule_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
-    // capsule_node->set_scale(glm::vec3(1.0f,0.5f,1.0f));
 
     // Variables menu
     double hauteur = 0.;
@@ -242,9 +221,7 @@ int main(int argc, char* argv[]) {
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
 
-
-    //float volume = 1.0;
-    float volume = 0.0;
+    float volume = 0.3;
     ma_result result;
     ma_engine engine;
     ma_sound sound;
@@ -289,6 +266,7 @@ int main(int argc, char* argv[]) {
 
     float temps_debut = glfwGetTime();
     std::cout << deltaTime << std::endl;
+
     // Render loop
     while (glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
@@ -348,7 +326,7 @@ int main(int argc, char* argv[]) {
             lag -= MS_PER_UPDATE;    
         }
 
-        //mouvement plateforme
+        // Moving cube
         obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
         obst2_node->updateAABB();
 
@@ -356,23 +334,18 @@ int main(int argc, char* argv[]) {
         proj = player->get_projection_matrix();
 
         if(obst2_node->rigid_body->is_child){
-            //std::cout<<"-----il est lie-------"<<std::endl;
             glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
             player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
-            //player->player_node->transform.adjust_translation(glm::vec3(acc.x,0.f,0.f));
         }
 
-        // Scene
+        // Draw moving cube
         obst2_node->draw(view,proj);    
-        //obst3_node->draw(view,proj);
-        //capsule_node->draw(view, proj);
-        //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
 
         char TempsFormater[9];
         char TempsFormaterMenu[9];
 
         if(glfwGetKey(window.get_window(), GLFW_KEY_R) == GLFW_PRESS) {
-            player->player_node->transform.set_translation(glm::vec3(-21.0f, 95.0f, 23.4f));
+            player->player_node->transform.set_translation(glm::vec3(-21.0f, 4.0f, 23.4f));
             player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
         }
 
@@ -384,14 +357,10 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
-            //hauteur = std::floor(player->player_node->transform.get_translation().y - 3.0 * 1.54);
             hauteur = (player->player_node->transform.get_translation().y - 3.0) * 1.54;
             if(hauteur >= MaxHeight) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
-            
-            //std::cout << hauteur << std::endl;
-            //std::cout << MaxHeight << std::endl;
 
             char HauteurFormater[6];
             if((int)hauteur == 0) {
@@ -456,7 +425,6 @@ int main(int argc, char* argv[]) {
         }
 
         // Menu
-        //ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
 
         bool toucheEscapePressee = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
         if (toucheEscapePressee && !toucheCPresseePrecedemment) {
@@ -605,7 +573,6 @@ int main(int argc, char* argv[]) {
 
             ImGui::Text("%s", TempsFormaterMenu);
 
-
             ImGui::PushFont(fontMenu);
             ImGui::SetCursorPosX(5);
             ImGui::SetCursorPosY(2);
@@ -616,7 +583,6 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleColor();
             ImGui::PopStyleVar();
             ImGui::End(); 
-
 
             // Paramètres
             ImGui::SetNextWindowBgAlpha(1.f);
@@ -668,7 +634,6 @@ int main(int argc, char* argv[]) {
             {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
-                //player->player_node->transform.set_translation(glm::vec3(-8.23f, 10.0f, 21.89f));
                 player->player_node->transform.set_translation(glm::vec3(-20.0f, 95.0f, -17.0f));
                 timing = 0.;
                 acc = 0.0;
@@ -1394,13 +1359,13 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             }
         }
         if(key == GLFW_KEY_T) {
-            showMouse = player->get_camera()->getShowMouse();
-            showMouse = !showMouse;
-            player->get_camera()->setShowMouse(showMouse);
+            // showMouse = player->get_camera()->getShowMouse();
+            // showMouse = !showMouse;
+            // player->get_camera()->setShowMouse(showMouse);
         }
         if (key == GLFW_KEY_H) {
-            player->get_camera()->mode_cam=(player->get_camera()->mode_cam+1)%3;
-            player->get_camera()->reset();
+            // player->get_camera()->mode_cam=(player->get_camera()->mode_cam+1)%3;
+            // player->get_camera()->reset();
         }
 
     }
