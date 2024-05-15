@@ -30,9 +30,11 @@ void Player::handleInput(float delta_time) {
 
     // Handle ladder movement
     if (player_node->rigid_body->is_on_ladder) {
-        float ladder_climb_speed = 8.0f;
+        float ladder_climb_speed = 20.0f;
+        player_node->rigid_body->velocity.z = 0.;
+        player_node->rigid_body->velocity.x = 0.;
         if (camera->mode_cam == 0 || camera->mode_cam == 1) {
-            if (glfwGetKey(window, forward_key) == GLFW_PRESS) {
+            if (glfwGetKey(window, forward_key) == GLFW_PRESS) { 
                 player_node->rigid_body->velocity.y = ladder_climb_speed;
             } else if (glfwGetKey(window, backward_key) == GLFW_PRESS) {
                 player_node->rigid_body->velocity.y = -ladder_climb_speed;

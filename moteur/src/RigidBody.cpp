@@ -68,23 +68,21 @@ int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collision
                 }
             }
         }
-        shared_node->transform.adjust_translation(correction);
-        shared_node->transform.transform_updated = true;
+
         if(other->is_ladder) {
-            //std::cout<<"detetion ladder"<<std::endl;
             use_gravity = false;
             is_on_ladder = true;
             acc=0;
+
         }
-        else {
-            use_gravity = true;
-            is_on_ladder = false;
-        }
+
         if(other->is_in_motion){
             //std::cout<<"ok pour detection de mouvement"<<std::endl;
             other->is_child=true;
             acc=1;
         }
+        shared_node->transform.adjust_translation(correction);
+        shared_node->transform.transform_updated = true;
         //velocity -= glm::dot(velocity, collisionNormal) * collisionNormal * other->restitution_coefficient;
         applyGroundFriction(other);
     }
