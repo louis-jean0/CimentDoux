@@ -322,19 +322,23 @@ int main(int argc, char* argv[]) {
                 pe->update(MS_PER_UPDATE);
             }
             lag -= MS_PER_UPDATE;    
+
+            // Moving cube
+            obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*MS_PER_UPDATE,0.f,0.f));
+            obst2_node->updateAABB();
+
+            if(obst2_node->rigid_body->is_child){
+                glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
+                player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*MS_PER_UPDATE,0.f,0.f));
+            }
+
         }
 
-        // Moving cube
-        obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
-        obst2_node->updateAABB();
+
 
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
 
-        if(obst2_node->rigid_body->is_child){
-            glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
-            player->player_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*deltaTime,0.f,0.f));
-        }
 
         // Draw moving cube
         obst2_node->draw(view,proj);    
@@ -355,7 +359,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
-            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 0.3;
+            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 0.6;
             if(hauteur >= MaxHeight) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
