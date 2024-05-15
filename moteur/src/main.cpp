@@ -37,8 +37,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam); 
 
 // Window settings
-const unsigned int SCR_WIDTH = 1440;
-const unsigned int SCR_HEIGHT = 1080;
+unsigned int SCR_WIDTH = 1440;
+unsigned int SCR_HEIGHT = 1080;
 bool showMouse = false;
 
 // Player
@@ -80,7 +80,7 @@ bool afficherMenu = false;
 bool AZERTY = false;
 bool QWERTY = true;
 
-bool Fulscreen = false;
+bool Fullscreen = false;
 
 
 glm::vec3 globalPos = glm::vec3(0.);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImFont* font = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 65.0f);
-    ImFont* fontMenu = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf",50.0f);
+    ImFont* fontMenu = io.Fonts->AddFontFromFileTTF("../data/fonts/BebasNeue-Regular.ttf", 50.0f);
     ImFont* fontDefault = io.Fonts->AddFontDefault();
 
 
@@ -159,10 +159,10 @@ int main(int argc, char* argv[]) {
     float sensi = player->get_camera()->get_sensivity();
 
 
-    float volume = 0.1;
-    ma_result result;
-    ma_engine engine;
-    ma_sound sound;
+    float volume = 0.05;
+    ma_result result, result2, result3;
+    ma_engine engine, engine2, engine3;
+    ma_sound sound, sound2, sound3;
     result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS){
         std::cout << "Failed to initialized miniaudio engine\n";
@@ -178,6 +178,33 @@ int main(int argc, char* argv[]) {
 
     ma_sound_set_looping(&sound,true);
     ma_sound_start(&sound);
+
+    result2 = ma_engine_init(NULL, &engine2);
+    if (result2 != MA_SUCCESS){
+        std::cout << "Failed to initialized miniaudio engine\n";
+        ma_engine_uninit(&engine);
+        return -1;
+    }
+    result2 = ma_sound_init_from_file(&engine2, "../data/sounds/CIMENT_DOU__TU_TE_PETE_LA_JAMBE.mp3", 0, NULL, NULL, &sound2);
+    if (result2 != MA_SUCCESS){
+        std::cout << "Impossible de charger le son\n";
+        ma_engine_uninit(&engine2);
+        return -1;
+    }
+
+    result3 = ma_engine_init(NULL, &engine3);
+    if (result3 != MA_SUCCESS){
+        std::cout << "Failed to initialized miniaudio engine\n";
+        ma_engine_uninit(&engine3);
+        return -1;
+    }
+    result3 = ma_sound_init_from_file(&engine3, "../data/sounds/CIMENT_DOU__TU_TE_PETE_LA_JAMBE.mp3", 0, NULL, NULL, &sound3);
+    if (result3 != MA_SUCCESS){
+        std::cout << "Impossible de charger le son\n";
+        ma_engine_uninit(&engine3);
+        return -1;
+    }
+
 
     float temps_debut = glfwGetTime();
 
@@ -198,6 +225,8 @@ int main(int argc, char* argv[]) {
         } 
 
         ma_engine_set_volume(&engine, volume);
+        ma_engine_set_volume(&engine2, volume);
+        ma_engine_set_volume(&engine3, volume);
 
         // Input
         if(showMouse) {
@@ -207,6 +236,16 @@ int main(int argc, char* argv[]) {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
+        if(Fullscreen == false) {
+            SCR_WIDTH = 1440;
+            SCR_HEIGHT = 1080;
+            glfwSetWindowMonitor(window.get_window(), NULL, SCR_WIDTH/4, 0, SCR_WIDTH, SCR_HEIGHT, window.windowParams->refreshRate);
+        } else {
+            SCR_WIDTH = window.get_maxWidth();
+            SCR_HEIGHT = window.get_maxHeight();
+            glfwSetWindowMonitor(window.get_window(), window.get_ecran(), 0, 0, window.get_maxWidth(), window.get_maxHeight(), window.windowParams->refreshRate);        
+        }
+
         // ImGui
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -214,7 +253,7 @@ int main(int argc, char* argv[]) {
 
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
-        scene->draw(view, proj);
+        scene->draw(view, proj, SCR_WIDTH, SCR_HEIGHT);
         
         pe->update(deltaTime);
         
@@ -253,8 +292,8 @@ int main(int argc, char* argv[]) {
 
 
         // Scene
-        scene->draw(view, proj);        
-        obst2_node->draw(view,proj);    
+        scene->draw(view, proj, SCR_WIDTH, SCR_HEIGHT);
+        obst2_node->draw(view,proj, SCR_WIDTH, SCR_HEIGHT);
         //obst3_node->draw(view,proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
@@ -263,8 +302,19 @@ int main(int argc, char* argv[]) {
         char TempsFormaterMenu[9];
 
         if(glfwGetKey(window.get_window(), GLFW_KEY_R) == GLFW_PRESS) {
-            player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+            player->player_node->transform.set_translation(glm::vec3(-21.0f, 95.0f, 23.4f));
             player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
+        }
+
+        globalPos = player->get_camera()->getPosition();
+        if (globalPos.y >= 83. && globalPos.x <= -27.) {
+            ma_sound_stop(&sound);
+            ma_sound_set_looping(&sound3,true);
+            ma_sound_start(&sound3);
+        } else {
+            ma_sound_stop(&sound3);
+            ma_sound_set_looping(&sound,true);
+            ma_sound_start(&sound);
         }
 
         if(principal == true) {
@@ -274,7 +324,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
             //hauteur = std::floor(player->player_node->transform.get_translation().y - 3.0 * 1.54);
-            hauteur = (player->player_node->transform.get_translation().y - 3.) * 1.26;
+            hauteur = (player->player_node->transform.get_translation().y - 3.) * 1.24;
             if(hauteur >= MaxHeight) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
@@ -342,8 +392,6 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleVar();
             ImGui::End();        
         }
-
-
         // Menu
         //ESCAPE = glfwGetKey(window.get_window(), GLFW_KEY_ESCAPE) == GLFW_PRESS;
 
@@ -352,13 +400,12 @@ int main(int argc, char* argv[]) {
             ESCAPE = !ESCAPE;
         }
         toucheCPresseePrecedemment = toucheEscapePressee;
-        
-        globalRot = player->get_camera()->getRotationDegrees();
 
         if (ESCAPE && settings == false && credits == false) {
             globalPos = player->get_camera()->getPosition();
             player->player_node->set_translation(globalPos);
-            std::cout << globalRot.x << "\t" << globalRot.y << "\t" << globalRot.z << std::endl;
+            globalRot = player->get_camera()->getRotationDegrees();
+            player->get_camera()->setRotationDegrees(globalRot);
 
 
             principal = false;
@@ -535,7 +582,7 @@ int main(int argc, char* argv[]) {
                 globalPos = player->get_camera()->getPosition();
                 player->player_node->set_translation(globalPos);
 
-                glm::vec3 testAngle = glm::vec3(0., globalRot.y, 0.);
+                globalRot = player->get_camera()->getRotationDegrees();
                 player->get_camera()->setRotationDegrees(globalRot);
             }
             ImGui::PopStyleColor();
@@ -567,7 +614,6 @@ int main(int argc, char* argv[]) {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
                 player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
-
                 player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
 
                 timing = 0.;
@@ -754,7 +800,7 @@ int main(int argc, char* argv[]) {
             float checkboxWidth = ImGui::CalcTextSize("").x;
             float offsetXFSC = (SCR_WIDTH - checkboxWidth) / 2.65;
             ImGui::SetCursorPosX(offsetXFSC);
-            ImGui::Checkbox("##", &Fulscreen);
+            ImGui::Checkbox("##", &Fullscreen);
             ImGui::End();
 
         } else if(ESCAPE == true && credits == true) {
@@ -808,11 +854,20 @@ int main(int argc, char* argv[]) {
             ImGui::PopStyleColor();
             ImGui::PopStyleVar();
             ImGui::End();
+
+            ma_sound_stop(&sound);
+            ma_sound_set_looping(&sound2,true);
+            ma_sound_start(&sound2);
+        
         } else {
+            ma_sound_stop(&sound2);
+            ma_sound_set_looping(&sound,true);
+            ma_sound_start(&sound);
+
             principal = true; 
             showMouse = false;  
             settings = false;    
-            credits = false;    
+            credits = false; 
         }
 
 

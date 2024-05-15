@@ -23,7 +23,7 @@ class Scene {
         void add_model(std::shared_ptr<Model> model);
         void add_meshes_from_model(std::shared_ptr<Model> model);
         void add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe);
-        void draw(glm::mat4& view, glm::mat4& projection);
+        void draw(glm::mat4& view, glm::mat4& projection, int width, int height);
     
     private:
         std::shared_ptr<LightManager> lights = std::make_shared<LightManager>();
