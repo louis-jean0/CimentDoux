@@ -11,8 +11,6 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/norm.hpp>
 
-
-
 enum CameraMode {
 	FIRST_MODE = 1,
 	SECOND_MODE,
@@ -92,8 +90,6 @@ private:
 	bool m_showHelp{false};
 	CameraMode	m_cameraMode{FIRST_MODE};
 	bool m_showMouse = true;
-
-
 
 	// Window handling (I'm not sure it's a good practice to do this here, but for this TP it will do just fine)
 	double lastCursorXPos,lastCursorYPos;
