@@ -261,9 +261,6 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    ma_sound_set_looping(&sound,true);
-    ma_sound_start(&sound);
-
     result2 = ma_engine_init(NULL, &engine2);
     if (result2 != MA_SUCCESS){
         std::cout << "Failed to initialized miniaudio engine\n";
@@ -291,7 +288,7 @@ int main(int argc, char* argv[]) {
     }
 
     float temps_debut = glfwGetTime();
-
+    std::cout << deltaTime << std::endl;
     // Render loop
     while (glfwWindowShouldClose(window.get_window()) == 0) {
         float currentFrame = glfwGetTime();
@@ -956,6 +953,10 @@ int main(int argc, char* argv[]) {
             }
 
         } else if(ESCAPE == true && credits == true) {
+            ma_sound_stop(&sound);
+            ma_sound_set_looping(&sound2,true);
+            ma_sound_start(&sound2);
+
             if(Fullscreen == true) {
                 ImGui::SetNextWindowBgAlpha(0.7f);
                 ImGui::Begin("Creditss", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
@@ -1108,13 +1109,12 @@ int main(int argc, char* argv[]) {
                 ImGui::PopStyleVar();
                 ImGui::End();
 
-                display_return_CREDITS(fontMenu);
-                          
-            }
-            ma_sound_stop(&sound);
-            ma_sound_set_looping(&sound2,true);
-            ma_sound_start(&sound2);
+                display_return_CREDITS(fontMenu);                
+            };
         } else {
+            ma_sound_stop(&sound2);
+            ma_sound_set_looping(&sound,true);
+            ma_sound_start(&sound);
             player->get_camera()->setPosition(player->get_camera()->getPosition());
             player->get_camera()->setRotationDegrees(player->get_camera()->getRotationDegrees());
 
@@ -1126,6 +1126,9 @@ int main(int argc, char* argv[]) {
 
         if (fin == true) {
             showMouse = true;
+            ma_sound_stop(&sound);
+            ma_sound_set_looping(&sound3,true);
+            ma_sound_start(&sound3);            
 
             if(Fullscreen == true) {
                 ImGui::SetNextWindowBgAlpha(0.7f);
@@ -1331,7 +1334,7 @@ int main(int argc, char* argv[]) {
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
                 if (ImGui::Button("Restart run"))
-                {
+                {        
                     currentRun += 1;
                     MaxHeight = std::min(0., hauteur);
                     player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
@@ -1342,16 +1345,16 @@ int main(int argc, char* argv[]) {
                 }
                 ImGui::PopStyleColor();
 
-
                 ImGui::PopFont();
                 ImGui::PopStyleColor();
                 ImGui::PopStyleVar();
                 ImGui::End();
             }
+        } else {
+            ma_sound_stop(&sound3);
+            ma_sound_set_looping(&sound,true);
+            ma_sound_start(&sound);            
 
-            ma_sound_stop(&sound);
-            ma_sound_set_looping(&sound3,true);
-            ma_sound_start(&sound3);
         }
         
         // Render window & ImGui

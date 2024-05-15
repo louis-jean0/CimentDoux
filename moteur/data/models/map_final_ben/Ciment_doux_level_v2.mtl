@@ -1,10 +1,20 @@
-# Blender 4.1.1 MTL File: 'Ciment_doux_level.blend'
+# Blender 4.1.1 MTL File: 'Ciment_doux_level(1).blend'
 # www.blender.org
 
 newmtl Cement_Bag
 Ns 200.000000
 Ka 1.000000 1.000000 1.000000
-Ks 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Cement_Bag_BaseColor.jpg
+map_Kn Cement_Bag_Normal.jpg
+newmtl Cement_Bag.001
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
@@ -12,20 +22,10 @@ illum 2
 map_Kd Cement_Bag_BaseColor.jpg
 map_Kn Cement_Bag_Normal.jpg
 
-newmtl Cement_Bag.001
-Ns 200.000000
-Ka 1.000000 1.000000 1.000000
-Ks 1.000000 1.000000 1.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 2
-map_Kd Cement_Bag_BaseColor.jpg
-map_Kn Cement_Bag_Normal.jpg
 newmtl Cement_Bag.002
 Ns 200.000000
 Ka 1.000000 1.000000 1.000000
-Ks 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 d 1.000000
@@ -57,7 +57,7 @@ illum 2
 newmtl Glace
 Ns 640.000000
 Ka 1.000000 1.000000 1.000000
-Ks 0.900000 0.900000 0.900000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
@@ -128,7 +128,7 @@ illum 2
 newmtl Plante
 Ns 10.000005
 Ka 1.000000 1.000000 1.000000
-Kd 0.074825 0.454437 0.037416
+Kd 0.004613 0.178773 0.001442
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
@@ -145,17 +145,6 @@ d 1.000000
 illum 2
 map_Kd rust_coarse_01_diff_4k.jpg
 map_Kn rust_coarse_01_nor_gl_4k.png
-
-newmtl Sol
-Ns 250.000000
-Ka 1.000000 1.000000 1.000000
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 2
-#map_Kd gravel_concrete_03_diff_4k.jpg
-#map_Kn gravel_concrete_03_nor_gl_4k.png
 
 newmtl Trampoline
 Ns 10.000005
