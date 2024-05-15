@@ -176,3 +176,4 @@ void SceneNode::set_scale(glm::vec3 scale) {
 void SceneNode::adjust_scale(glm::vec3 delta) {
     transform.adjust_scale(delta);
 }
+//

@@ -196,6 +196,7 @@ void Scene::add_meshes_from_model(std::shared_ptr<Model> model) {
     }
 }
 
+//
 void Scene::add_entities_into_physics_engine(std::shared_ptr<PhysicsEngine> pe) {
     for(auto& scene_node : scene_nodes) {
         if(scene_node->mesh->material->name != "Plante" && scene_node->mesh->material->name != "Clou" && scene_node->mesh->material->name != "UnderTrampoline") { // To prevent plants collisions and under trampoline AABB bug
