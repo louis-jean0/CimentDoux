@@ -35,6 +35,7 @@ class Scene {
         void update_light_player();
         void on_off_torch_light_player();
         void mode_torch_light_player();
+        void draw(glm::mat4& view, glm::mat4& projection, int width, int height);
     
     private:
         std::shared_ptr<LightManager> lights = std::make_shared<LightManager>();

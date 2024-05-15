@@ -30,7 +30,7 @@ glm::mat4 SceneNode::get_world_transform() {
     }
 }
 
-void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
+void SceneNode::draw(glm::mat4& view, glm::mat4& projection, int width, int height) {
     glm::mat4 model_matrix = get_world_transform();
 
     if (model) {
@@ -54,7 +54,7 @@ void SceneNode::draw(glm::mat4& view, glm::mat4& projection) {
     }
 
     for (const auto child : children) {
-        child->draw(view, projection);
+        child->draw(view, projection, width, height);
     }
 }
 
