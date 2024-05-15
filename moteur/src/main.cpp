@@ -226,6 +226,9 @@ int main(int argc, char* argv[]) {
     obst2_node->rigid_body->is_in_motion=true;
     pe->add_entity(obst2_node);
 
+
+
+
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
     // auto capsule_node = SceneNode::create(capsule);
@@ -290,6 +293,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+
     float temps_debut = glfwGetTime();
 
     // Render loop
@@ -307,6 +311,7 @@ int main(int argc, char* argv[]) {
                 timing += 1.0;
             }            
         } 
+
 
         // ImGui
         ImGui_ImplOpenGL3_NewFrame();
@@ -337,7 +342,10 @@ int main(int argc, char* argv[]) {
         }
 
         view = player->get_view_matrix();
-        proj = player->get_projection_matrix();        
+        proj = player->get_projection_matrix();
+        scene->draw(view, proj, SCR_WIDTH, SCR_HEIGHT);
+        
+        pe->update(deltaTime);
 
         globalPos = player->get_camera()->getPosition();
         fin = globalPos.y >= 83. && globalPos.x <= -27.;
@@ -358,8 +366,7 @@ int main(int argc, char* argv[]) {
         view = player->get_view_matrix();
         proj = player->get_projection_matrix();
 
-        scene->draw(view, proj, SCR_WIDTH, SCR_HEIGHT);
-
+        scene->draw(view, proj);
 
         if(obst2_node->rigid_body->is_child){
             //std::cout<<"-----il est lie-------"<<std::endl;
@@ -369,7 +376,7 @@ int main(int argc, char* argv[]) {
         }
 
         // Scene
-        obst2_node->draw(view,proj, SCR_WIDTH, SCR_HEIGHT);    
+        obst2_node->draw(view,proj);    
         //obst3_node->draw(view,proj);
         //capsule_node->draw(view, proj);
         //std::cout<<scene->scene_nodes[0]->mesh->bounding_box.min.x<<std::endl;
