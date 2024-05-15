@@ -2,9 +2,6 @@
 #include <glm/gtx/string_cast.hpp>
 #include <memory>
 
-const float MAX_SPEED = 2.0f;
-const float ACCELERATION = 0.5f;
-const float JUMP_STRENGTH = 1.0f;
 const float CAMERA_HEIGHT = 1.8f;
 
 void Player::update(float delta_time) {
@@ -63,14 +60,22 @@ void Player::handleInput(float delta_time) {
             moveDirection = glm::normalize(moveDirection);
         }
 
-        float max_speed = 15.0f;
+        float max_speed = 12.0f;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             max_speed *= sprint_speed_multiplier; // Adjust max speed when sprinting
         }
 
         // Apply the movement to the velocity
-        player_node->rigid_body->velocity.x = moveDirection.x * max_speed;
-        player_node->rigid_body->velocity.z = moveDirection.z * max_speed;
+        float acceleration = 6.0;
+        player_node->rigid_body->velocity.x += moveDirection.x * acceleration;
+        player_node->rigid_body->velocity.z += moveDirection.z * acceleration;
+
+        glm::vec3 horizontalVelocity = glm::vec3(player_node->rigid_body->velocity.x, 0.0f, player_node->rigid_body->velocity.z);
+        if(glm::length(horizontalVelocity) > max_speed) {
+            horizontalVelocity = glm::normalize(horizontalVelocity) * max_speed;
+            player_node->rigid_body->velocity.x = horizontalVelocity.x;
+            player_node->rigid_body->velocity.z = horizontalVelocity.z;
+        }
     }
 
     // Handle jumping

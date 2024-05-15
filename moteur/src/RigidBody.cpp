@@ -9,6 +9,7 @@ void RigidBody::updatePhysics(float delta_time) {
         glm::vec3 gravity = glm::vec3(0.0f,-100.0f,0.0f);
         glm::vec3 acceleration = gravity;
         velocity += acceleration * delta_time;
+        applyAirResistance();
         auto shared_node = node.lock();
         if(shared_node) {
             shared_node->transform.adjust_translation(velocity * delta_time);
@@ -18,7 +19,6 @@ void RigidBody::updatePhysics(float delta_time) {
         std::cerr<<"Attempted to update physics on a SceneNode that no longer exists"<<std::endl;
         }
     }
-    applyAirResistance();
     is_on_ground = false;
 }
 
@@ -48,7 +48,7 @@ bool RigidBody::checkCollision(std::shared_ptr<RigidBody> other, float& collisio
 
 int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {
     int acc=-1;
-    float safetyOffset = 0.0001f;
+    float safetyOffset = 0.00001f;
     glm::vec3 correction = (collisionDepth + safetyOffset) * collisionNormal;
     auto shared_node = node.lock();
     if(shared_node) {
@@ -94,64 +94,8 @@ int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collision
     return acc;
 }
 
-// int RigidBody::solveCollision(std::shared_ptr<RigidBody> other, float& collisionDepth, glm::vec3 &collisionNormal) {
-//     int acc = -1;
-//     float safetyOffset = 0.0001f; // Adjust this value as needed
-//     glm::vec3 correction = (collisionDepth + safetyOffset) * collisionNormal;
-//     auto shared_node = node.lock();
-//     if (shared_node) {
-//         if (collisionNormal.y > 0.1f) {
-//             if (!other->is_trampoline) {
-//                 is_on_ground = true;
-//             }
-//             if (other->restitution_coefficient == 0.0f) {
-//                 velocity.y = 0.0f;
-//             } else {
-//                 float velocity_normal_component = glm::dot(velocity, collisionNormal);
-//                 if (velocity_normal_component < 0) {
-//                     glm::vec3 velocity_perpendicular = velocity_normal_component * collisionNormal;
-//                     glm::vec3 velocity_tangential = velocity - velocity_perpendicular;
-//                     velocity = velocity_tangential - other->restitution_coefficient * velocity_perpendicular;
-//                 }
-//             }
-//         }
-
-//         // Correct the position iteratively to avoid snapping
-//         for (int i = 0; i < 10; ++i) {
-//             shared_node->transform.adjust_translation(correction * 0.1f);
-//             shared_node->transform.transform_updated = true;
-
-//             // Re-check for collision
-//             float newCollisionDepth;
-//             glm::vec3 newCollisionNormal;
-//             if (checkCollision(other, newCollisionDepth, newCollisionNormal)) {
-//                 correction = (newCollisionDepth + safetyOffset) * newCollisionNormal;
-//             } else {
-//                 break;
-//             }
-//         }
-
-//         if (other->is_ladder) {
-//             use_gravity = false;
-//             is_on_ladder = true;
-//             acc = 0;
-//         } else {
-//             use_gravity = true;
-//             is_on_ladder = false;
-//         }
-//         if (other->is_in_motion) {
-//             other->is_child = true;
-//             acc = 1;
-//         }
-//         applyGroundFriction(other);
-//     } else {
-//         std::cerr << "Attempted to update physics on a SceneNode that no longer exists" << std::endl;
-//     }
-//     return acc;
-// }
-
 void RigidBody::applyAirResistance() {
-    float air_resistance = 0.08f;
+    float air_resistance = 0.05f;
     velocity.x *= (1.0f - air_resistance);
     velocity.z *= (1.0f - air_resistance);
 }

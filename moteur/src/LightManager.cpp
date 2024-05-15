@@ -20,14 +20,15 @@ void LightManager::setup_lights(std::shared_ptr<Shader> shader) const {
     for(int i = 0; i < nb_point_lights; ++i) {
         point_lights[i]->setup_light(shader, i);
     }
-    int shadow_map_index = 10;
+    int shadow_map_index = 5;
     for(int i = 0; i < nb_torch_lights; ++i) {
-        torch_lights[i]->setup_light(shader, nb_point_lights + i);
+        torch_lights[i]->setup_light(shader, i);
         glActiveTexture(GL_TEXTURE0 + shadow_map_index + i);
         glBindTexture(GL_TEXTURE_2D, torch_lights[i]->fbo_index);
         shader->setBind1i(("shadow_map["+std::to_string(i)+"]").c_str(), shadow_map_index + i);
         shader->setBind1i(("shadow_map_indices["+std::to_string(i)+"]").c_str(), i);
     }
     if(directional_light) directional_light->setup_light(shader, 0);
-    shader->setBind1i("nb_point_lights", nb_point_lights + nb_torch_lights);
+    shader->setBind1i("nb_point_lights", nb_point_lights);
+    shader->setBind1i("nb_torch_lights", nb_torch_lights);
 }

@@ -10,6 +10,4 @@ void PointLight::setup_light(std::shared_ptr<Shader> shader, int light_index) co
     shader->setBind1f(("pointLights["+std::to_string(light_index)+"].constant").c_str(), constant);
     shader->setBind1f(("pointLights["+std::to_string(light_index)+"].linear").c_str(), linear);
     shader->setBind1f(("pointLights["+std::to_string(light_index)+"].quadratic").c_str(), quadratic);
-    shader->setBool(("pointLights["+std::to_string(light_index)+"].is_torch_light").c_str(), is_torch_light);
-    shader->setBind1f(("pointLights["+std::to_string(light_index)+"].far_place").c_str(), far_plane);
 }

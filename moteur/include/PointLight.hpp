@@ -11,8 +11,6 @@ class PointLight : public Light {
         float constant;
         float linear;
         float quadratic;
-        float far_plane = 25.0f;
-        bool is_torch_light = false;
         
         // Constructors
         PointLight() : Light() {}
