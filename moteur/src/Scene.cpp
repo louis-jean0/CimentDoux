@@ -271,11 +271,3 @@ void Scene::on_off_torch_light_player(){
 void Scene::mode_torch_light_player(){
     lights->torch_lights[0]->mode=!lights->torch_lights[0]->mode;
 }
-
-void Scene::on_off_torch_light_player(){
-    lights->torch_lights[0]->power=!lights->torch_lights[0]->power;
-}
-
-void Scene::mode_torch_light_player(){
-    lights->torch_lights[0]->mode=!lights->torch_lights[0]->mode;
-}
