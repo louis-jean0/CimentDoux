@@ -8,7 +8,7 @@ void Scene::setup_scene() {
     auto shader = shaders->getShader();
 
     // Map
-    auto map = Model::create("../data/models/map_final_ben/Ciment_doux_level_v2.obj", shader);
+    auto map = Model::create("../data/models/map/Ciment_doux_level_v2.obj", shader);
     //auto map = Model::create("../data/models/mapsansnormale/map_sans_normales.obj", shader);
     add_meshes_from_model(map);
 
