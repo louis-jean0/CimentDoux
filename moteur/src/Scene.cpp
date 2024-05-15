@@ -241,12 +241,10 @@ void Scene::updateAABB() {
     }
 }
 
-void Scene::draw(glm::mat4& view, glm::mat4& projection) {
+void Scene::draw(glm::mat4& view, glm::mat4& projection, unsigned int width, unsigned int height) {
     update_light_player();
     auto shadow_shader = shaders->getShadowShader();
     shadow_shader->useShader();
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_FRONT);
     for (auto& torch_light : lights->torch_lights) {
         torch_light->setup_shadow_map(shadow_shader);
         torch_light->shadow_map->bind();
@@ -255,8 +253,7 @@ void Scene::draw(glm::mat4& view, glm::mat4& projection) {
         }
         torch_light->shadow_map->unbind();
     }
-    //glCullFace(GL_BACK);
-    glViewport(0, 0, 2560, 1440);
+    glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     lights->setup_lights(shaders->getShader());
     for(auto& scene_node : scene_nodes) {

@@ -74,3 +74,15 @@ unsigned int Window::get_minor() {
 GLFWwindow* Window::get_window() {
     return this->window;
 }
+
+GLFWmonitor* Window::get_ecran() {
+    return this->ecran;
+}
+
+int Window::get_maxWidth() {
+    return this->windowParams->width;
+}
+
+int Window::get_maxHeight() {
+    return this->windowParams->height;
+}
