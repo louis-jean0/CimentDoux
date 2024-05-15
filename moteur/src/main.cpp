@@ -38,7 +38,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam); 
 
 // Window settings
-unsigned int SCR_WIDTH = 1920;
+unsigned int SCR_WIDTH = 1440;
 unsigned int SCR_HEIGHT = 1080;
 bool showMouse = true;
 
@@ -222,9 +222,6 @@ int main(int argc, char* argv[]) {
     float sensi = player->get_camera()->get_sensivity();
 
     float volume = 0.3;
-    ma_result result;
-    ma_engine engine;
-    ma_sound sound;
     result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS){
         std::cout << "Failed to initialized miniaudio engine\n";
@@ -280,6 +277,7 @@ int main(int argc, char* argv[]) {
 
             if (acc >= 1.) {
                 timing += 1.0;
+                acc = 0.;
             }            
         } 
 
@@ -301,7 +299,7 @@ int main(int argc, char* argv[]) {
         }
 
         if(Fullscreen == false) {
-            SCR_WIDTH = 1920;
+            SCR_WIDTH = 1440;
             SCR_HEIGHT = 1080;
             glfwSetWindowMonitor(window.get_window(), NULL, SCR_WIDTH/4, 0, SCR_WIDTH, SCR_HEIGHT, window.windowParams->refreshRate);
         } else {
@@ -955,8 +953,8 @@ int main(int argc, char* argv[]) {
                 float posX2 = (ImGui::GetWindowWidth() - textSizech2.x) * 0.515f;
                 float posX3 = (ImGui::GetWindowWidth() - textSizech3.x) * 0.52f;
                 float posX5 = (ImGui::GetWindowWidth() - textSizech5.x) * 0.5f;
-                float posX6 = (ImGui::GetWindowWidth() - textSizech6.x) * 0.57f;
-                float posX7 = (ImGui::GetWindowWidth() - textSizech7.x) * 0.6f;
+                float posX6 = (ImGui::GetWindowWidth() - textSizech6.x) * 0.6f;
+                float posX7 = (ImGui::GetWindowWidth() - textSizech7.x) * 0.7f;
 
                 float baseY = ImGui::GetCursorPosY() + ImGui::GetWindowHeight() / 8; 
                 float spacing = textSizech1.y * 1.25f;
@@ -1077,7 +1075,10 @@ int main(int argc, char* argv[]) {
                 ImGui::End();
 
                 display_return_CREDITS(fontMenu);                
-            };
+            }
+            ma_sound_stop(&sound);
+            ma_sound_set_looping(&sound2,true);
+            ma_sound_start(&sound2);
         } else {
             ma_sound_stop(&sound2);
             ma_sound_set_looping(&sound,true);
@@ -1095,7 +1096,7 @@ int main(int argc, char* argv[]) {
             showMouse = true;
             ma_sound_stop(&sound);
             ma_sound_set_looping(&sound3,true);
-            ma_sound_start(&sound3);            
+            ma_sound_start(&sound3);             
 
             if(Fullscreen == true) {
                 ImGui::SetNextWindowBgAlpha(0.7f);
@@ -1320,8 +1321,7 @@ int main(int argc, char* argv[]) {
         } else {
             ma_sound_stop(&sound3);
             ma_sound_set_looping(&sound,true);
-            ma_sound_start(&sound);            
-
+            ma_sound_start(&sound); 
         }
         
         // Render window & ImGui
