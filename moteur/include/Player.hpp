@@ -20,8 +20,8 @@ class Player {
         auto p_node = SceneNode::create(p_model);
         p_node->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
         //p_node->set_translation(glm::vec3(-20.0f, 100.0f, -17.0f));
-        p_node->set_translation(glm::vec3(-21.0f, 500.0f, 23.4f));
-        p_node->set_rotation(glm::vec3(0.0f,0.0f,90.0f));
+        p_node->set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+        p_node->set_rotation(glm::vec3(0.0f, 90.0f,.0f));
         p_node->enable_physics(true);
         this->player_node = p_node;
         this->camera = std::make_shared<Camera>();
@@ -68,7 +68,7 @@ class Player {
 
       float get_vitesse();
       float get_hauteur();
-
+      void set_ValueInput(bool newvalue);
 
     private:
 		  std::shared_ptr<Camera> camera;
@@ -87,4 +87,6 @@ class Player {
       glm::vec3 F = glm::vec3(0., 0., 0.);
       glm::vec3 a = glm::vec3(0., 0., 0.);
       float max_speed = 1.0f;
+
+      bool isinMenu = true;
 };
