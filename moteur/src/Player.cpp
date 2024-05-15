@@ -5,12 +5,10 @@
 const float CAMERA_HEIGHT = 1.8f;
 
 void Player::update(float delta_time) {
-
     handleInput(delta_time);
     syncCamera();
-    camera->update(delta_time, window);     
     player_node->updateAABB();
-
+    camera->update(delta_time, window);
     //std::cout<<player_node->rigid_body->is_on_ladder<<std::endl;
     //std::cout<<glm::to_string(player_node->get_translation())<<std::endl;
     //std::cout<<player_node->rigid_body->velocity.y<<std::endl;
@@ -20,13 +18,12 @@ void Player::update(float delta_time) {
 }
 
 void Player::handleInput(float delta_time) {
- 
-        glm::vec3 moveDirection = glm::vec3(0.0f);
+    glm::vec3 moveDirection = glm::vec3(0.0f);
 
-        int forward_key = camera->mode_cam == 0 ? GLFW_KEY_Z : GLFW_KEY_W;
-        int backward_key = GLFW_KEY_S;
-        int left_key = camera->mode_cam == 0 ? GLFW_KEY_Q : GLFW_KEY_A;
-        int right_key = GLFW_KEY_D;
+    int forward_key = camera->mode_cam == 0 ? GLFW_KEY_Z : GLFW_KEY_W;
+    int backward_key = GLFW_KEY_S;
+    int left_key = camera->mode_cam == 0 ? GLFW_KEY_Q : GLFW_KEY_A;
+    int right_key = GLFW_KEY_D;
 
     // Handle ladder movement
     if (player_node->rigid_body->is_on_ladder) {
@@ -144,8 +141,4 @@ float Player::get_vitesse() {
 }
 float Player::get_hauteur() {
     return this->hauteur;
-}
-
-void Player::set_ValueInput(bool newValue) {
-    this->isinMenu = newValue;
 }

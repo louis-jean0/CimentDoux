@@ -133,7 +133,7 @@ void Camera::updateFreeInput(float _deltaTime, GLFWwindow* _window)
 	if(!m_isTransitioning) {
 
 		static bool lastShowMouseState = m_showMouse;
-	
+
 		if(m_showMouse && !lastShowMouseState) {
 			double cursorXPos, cursorYPos;
 			glfwGetCursorPos(_window, &cursorXPos, &cursorYPos);

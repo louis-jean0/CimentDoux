@@ -28,26 +28,7 @@ void Window::setup_GLFW() {
         exit(1);
     }
 
-
-    this->ecran = glfwGetPrimaryMonitor();
-    if (!this->ecran) {
-        std::cerr << "ERREUR : Impossible d'obtenir le moniteur principal !" << std::endl;
-        glfwDestroyWindow(this->window);
-        glfwTerminate();
-        exit(1);
-    }
-
-    this->windowParams = glfwGetVideoMode(this->ecran);
-    if (!this->windowParams) {
-        std::cerr << "ERREUR : Impossible d'obtenir le mode vidéo du moniteur principal !" << std::endl;
-        glfwDestroyWindow(this->window);
-        glfwTerminate();
-        exit(1);
-    }
-
-
     glfwMakeContextCurrent(this->window);
-
 
     if(this->Vsync == true) {
         glfwSwapInterval(1);
@@ -92,16 +73,4 @@ unsigned int Window::get_minor() {
 
 GLFWwindow* Window::get_window() {
     return this->window;
-}
-
-GLFWmonitor* Window::get_ecran() {
-    return this->ecran;
-}
-
-int Window::get_maxWidth() {
-    return this->windowParams->width;
-}
-
-int Window::get_maxHeight() {
-    return this->windowParams->height;
 }
