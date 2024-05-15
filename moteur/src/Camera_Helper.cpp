@@ -37,7 +37,7 @@ glm::vec3 Camera_Helper::quatToEuler(glm::quat _quat)
 void Camera_Helper::computeFinalView(glm::mat4& _outProjectionMatrix, glm::mat4& _outviewMatrix, glm::vec3& _position, glm::quat _rotation, float _fovDegree)
 {
 	// Projection matrix : FOV, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	_outProjectionMatrix = glm::perspective(glm::radians(_fovDegree), 4.0f / 3.0f, 0.1f, 10000.0f);
+	_outProjectionMatrix = glm::perspective(glm::radians(_fovDegree), 16.0f / 9.0f, 0.1f, 10000.0f);
 
 	const glm::vec3 front = normalize(_rotation* VEC_FRONT);
 	const glm::vec3 up = normalize(_rotation * VEC_UP);
