@@ -226,9 +226,6 @@ int main(int argc, char* argv[]) {
     obst2_node->rigid_body->is_in_motion=true;
     pe->add_entity(obst2_node);
 
-
-
-
     // // Capsule (for test)
     // auto capsule = Model::create("../data/models/capsule/capsule.gltf", shader);
     // auto capsule_node = SceneNode::create(capsule);
@@ -293,7 +290,6 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-
     float temps_debut = glfwGetTime();
 
     // Render loop
@@ -312,7 +308,6 @@ int main(int argc, char* argv[]) {
             }            
         } 
 
-
         // ImGui
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -327,7 +322,6 @@ int main(int argc, char* argv[]) {
         else {
             glfwSetInputMode(window.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
-
 
         if(Fullscreen == false) {
             SCR_WIDTH = 1920;
@@ -382,7 +376,6 @@ int main(int argc, char* argv[]) {
             player->player_node->transform.set_translation(glm::vec3(-21.0f, 95.0f, 23.4f));
             player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
         }
-
 
         if(principal == true) {
             showMouse = false;  
