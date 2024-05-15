@@ -65,6 +65,16 @@ void Player::handleInput(float delta_time) {
         float max_speed = 12.0f;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             max_speed *= sprint_speed_multiplier; // Adjust max speed when sprinting
+            float acc_fov=get_camera()->getFOV();
+            if(acc_fov<get_fov_max()){
+                get_camera()->setFOV(acc_fov+1.);                
+            }
+
+        }else{
+            float acc_fov=get_camera()->getFOV();
+            if(acc_fov>get_fov_min()){
+                get_camera()->setFOV(acc_fov-1.);
+            }
         }
 
         // Apply the movement to the velocity
@@ -141,4 +151,10 @@ float Player::get_vitesse() {
 }
 float Player::get_hauteur() {
     return this->hauteur;
+}
+float Player::get_fov_min(){
+    return this->user_base_fov;
+}
+float Player::get_fov_max(){
+    return this->sprint_fov;
 }
