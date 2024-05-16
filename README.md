@@ -7,7 +7,6 @@
 
 2. **Compiler :** 
 ```
-   $ cd moteur
    $ mkdir build
    $ cd build
    $ cmake ..
