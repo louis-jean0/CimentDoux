@@ -1,3 +1,15 @@
+## Instructions pour la compilation et l'exécution du jeu
+
+1. **Cloner le dépôt :**
+   ```
+   $ git clone <url_du_dépôt>
+   $ cd moteur
+   $ mkdir build
+   $ cd build
+   $ cmake ..
+   $ make
+   $ ./main 
+   ```
 -Tout d'abord vous devez clone le dépot 
 -Ensuite placer vous dans le dossier moteur avec la commande cd moteur
 -taper la commande mkdir build
