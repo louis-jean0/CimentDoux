@@ -2,7 +2,7 @@
 
 1. **Cloner le dépôt :**
    ```
-   $ git clone <url_du_dépôt>   
+   $ git clone "https://github.com/louis-jean0/HAI819I-moteurjeux"  
    ```
 
 2. **Compiler :** 
