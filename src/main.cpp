@@ -320,12 +320,13 @@ int main(int argc, char* argv[]) {
                 player->update(MS_PER_UPDATE);
                 scene->updateAABB();
                 pe->update(MS_PER_UPDATE);
+                // Moving cube
+                obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*MS_PER_UPDATE,0.f,0.f));
+                obst2_node->updateAABB();
             }
             lag -= MS_PER_UPDATE;    
 
-            // Moving cube
-            obst2_node->transform.adjust_translation(glm::vec3(-sin(temps_debut-currentFrame)*10*MS_PER_UPDATE,0.f,0.f));
-            obst2_node->updateAABB();
+            
 
             if(obst2_node->rigid_body->is_child){
                 glm::vec3 acc=obst2_node->transform.get_translation()-player->player_node->transform.get_translation();
