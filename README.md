@@ -13,7 +13,7 @@
    $ cmake ..
    $ make
 ```
-# conseil: ne compilez pas avec make -j pour la première compilation mais prenez la moitié des threads possibles dans votre ordinateur
+### conseil: ne compilez pas avec make -j pour la première compilation mais prenez la moitié des threads possibles dans votre ordinateur
 
 3. **Jouer :** 
 	```
