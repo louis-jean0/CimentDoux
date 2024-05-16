@@ -161,6 +161,14 @@ void display_return_CREDITS(ImFont* fontMenu) {
     ImGui::End();
 }
 
+    // Variables menu
+    double hauteur = 0.;
+    double MaxHeight = 0.;
+    int currentRun = 0;
+
+    double timing = 0.0;
+    double acc = 0.0;
+
 int main(int argc, char* argv[]) {
     // Initialize window
     Window window(4,1,SCR_WIDTH,SCR_HEIGHT,"Ciment doux",true);
@@ -212,12 +220,7 @@ int main(int argc, char* argv[]) {
     obst2_node->rigid_body->is_in_motion=true;
     pe->add_entity(obst2_node);
 
-    // Variables menu
-    double hauteur = 0.;
-    double MaxHeight = 0.;
-    int currentRun = 0;
 
-    double timing = 0.0, acc;
     float fov = player->get_camera()->getFOV();
     float sensi = player->get_camera()->get_sensivity();
 
@@ -345,10 +348,7 @@ int main(int argc, char* argv[]) {
         char TempsFormater[9];
         char TempsFormaterMenu[9];
 
-        if(glfwGetKey(window.get_window(), GLFW_KEY_R) == GLFW_PRESS) {
-            player->player_node->transform.set_translation(glm::vec3(-21.0f, 4.0f, 23.4f));
-            player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
-        }
+
 
         if(principal == true) {
             showMouse = false;  
@@ -635,7 +635,8 @@ int main(int argc, char* argv[]) {
             {
                 currentRun += 1;
                 MaxHeight = std::min(0., hauteur);
-                player->player_node->transform.set_translation(glm::vec3(-20.0f, 95.0f, -17.0f));
+                player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+                player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
                 timing = 0.;
                 acc = 0.0;
                 ESCAPE = false;
@@ -1369,6 +1370,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         if (key == GLFW_KEY_H) {
             // player->get_camera()->mode_cam=(player->get_camera()->mode_cam+1)%3;
             // player->get_camera()->reset();
+        }
+        if(key==GLFW_KEY_R) {
+            currentRun += 1;
+            MaxHeight = std::min(0., hauteur);
+            player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+            player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
+            timing = 0.;
+            acc = 0.0;
         }
 
     }
