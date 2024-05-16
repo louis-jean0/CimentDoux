@@ -771,6 +771,7 @@ int main(int argc, char* argv[]) {
                 float sliderPosXFOV = (contentWidth - sliderWidth) * 0.5f - sliderPosOffsetFOV;
                 ImGui::SetCursorPosX(sliderPosXFOV);
                 ImGui::SliderFloat("##FOV", &fov, 45.f, 120.f);
+                player->get_camera()->setFOV_set(fov);
                 player->get_camera()->setFOV(fov);
 
                 ImGui::SetCursorPosX(textPosXSensi);

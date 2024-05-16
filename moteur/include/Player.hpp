@@ -71,8 +71,9 @@ class Player {
       float get_vitesse();
       float get_hauteur();
 
+      void set_fov_min(float new_fov_min);
       float get_fov_min();
-      float get_fov_max();
+      float get_fov_gap();
 
 
     private:
@@ -83,6 +84,7 @@ class Player {
       bool is_jumping;
       float sprint_speed_multiplier = 1.5;
       float user_base_fov = 90.0f;
+      float gap=10.f;
       float sprint_fov = 100.0f; // Maybe define according to userBaseFOV for a better feeling
 
       double v0_Vitesse = 0.01f;
