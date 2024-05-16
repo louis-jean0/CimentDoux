@@ -38,7 +38,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void APIENTRY openglCallbackFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam); 
 
 // Window settings
-unsigned int SCR_WIDTH = 1440;
+unsigned int SCR_WIDTH = 1920;
 unsigned int SCR_HEIGHT = 1080;
 bool showMouse = true;
 
@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) {
         }
 
         if(Fullscreen == false) {
-            SCR_WIDTH = 1440;
+            SCR_WIDTH = 1920;
             SCR_HEIGHT = 1080;
             glfwSetWindowMonitor(window.get_window(), NULL, SCR_WIDTH/4, 0, SCR_WIDTH, SCR_HEIGHT, window.windowParams->refreshRate);
         } else {
