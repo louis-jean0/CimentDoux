@@ -358,7 +358,7 @@ int main(int argc, char* argv[]) {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
             ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0., 0., 0., 0.));
             ImGui::PushFont(font);
-            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 0.6;
+            hauteur = (player->player_node->transform.get_translation().y - 3.0) * 0.31;
             if(hauteur >= MaxHeight) {
                 MaxHeight = std::max(hauteur, MaxHeight);
             }
