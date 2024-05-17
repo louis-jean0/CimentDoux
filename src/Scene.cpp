@@ -84,7 +84,7 @@ void Scene::setup_scene() {
     lights->add_point_light(pointLight);
 
     //lumiere 3
-    glm::vec3 position3 = glm::vec3(31.0f,16.f,16.f);
+    glm::vec3 position3 = glm::vec3(31.0f,23.3f,16.f);
     auto pointLight3 = PointLight::create(ambient2, diffuse2, specular2, position3, reglage_lumiere.x, reglage_lumiere.y, reglage_lumiere.z);
     lights->add_point_light(pointLight3);
 

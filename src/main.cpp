@@ -1374,7 +1374,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
         if(key==GLFW_KEY_R) {
             currentRun += 1;
             MaxHeight = std::min(0., hauteur);
-            player->player_node->transform.set_translation(glm::vec3(-21.0f, 5.0f, 23.4f));
+            player->player_node->transform.set_translation(glm::vec3(0.0f, 5.0f, 23.4f));
+            //player->player_node->transform.set_translation(glm::vec3(-20.0f, 100.0f, -17.0f));
             player->get_camera()->setRotationDegrees(glm::vec3(0., 90., 0.));
             timing = 0.;
             acc = 0.0;
