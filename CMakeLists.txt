@@ -56,6 +56,7 @@ target_include_directories(main PRIVATE
     external/glad/include
     external/assimp/include
     #external/openal-soft-master/include/AL
+    external
 )
 
 # Add OpenGL to the target link libraries
