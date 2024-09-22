@@ -4,7 +4,7 @@
    <img src="screens/door.png" width="400"/>
 </div>
 
-**Ciment Doux** est un jeu vidéo de type platformer à la première personne, conçu comme une démonstration pour un moteur de jeu développé en C++ et OpenGL dans le cadre de notre master d'Informatique parcours IMAGINE à l'Université de Montpellier. Ce projet met en œuvre plusieurs bibliothèques et outils, dont **GLFW**, **GLAD**, **GLM**, et **ImGui**.
+**Ciment Doux** est un jeu vidéo de type platformer à la première personne, conçu comme une démonstration pour un moteur de jeu développé en C++ et OpenGL dans le cadre de notre master d'Informatique parcours IMAGINE à l'Université de Montpellier. Ce projet met en œuvre plusieurs bibliothèques et outils, dont **Assimp**, **GLFW**, **GLAD**, **GLM**, et **ImGui**.
 
 Pour plus d'informations, veuillez consulter notre [rapport de projet](RapportCimentDoux.pdf).
 
