@@ -11,21 +11,19 @@ Pour plus d'informations, veuillez consulter notre [rapport de projet](RapportCi
 ## Moteur
 
 <div align="center">
-   <img src="screens/UMLMoteur1.png" width="400"/>
-</div>
-<div align="center">
-   <img src="screens/hitboxes.png" width="400"/>
+   <img src="screens/UMLMoteur1.png" height="250" width="400"/>
+   <img src="screens/hitboxes.png" height="250" width="400"/>
 </div>
 
 ## Jeu
 
 <div align="center">
-   <img src="screens/cd_screen.jpg" width="400"/>
-   <img src="screens/rendu_map.png" width="400"/>
+   <img src="screens/cd_screen.jpg" height="200" width="400"/>
+   <img src="screens/rendu_map.png" height="200" width="400"/>
 </div>
 <div align="center">
-  <img src="screens/ui.png" width="400"/>
-  <img src="screens/pb2_cimentdoux.jpg" width="400"/>
+  <img src="screens/ui.png" height="200" width="400"/>
+  <img src="screens/pb2_cimentdoux.jpg" height="200" width="400"/>
 </div>
 
 ## Instructions pour la compilation et l'exécution du jeu
