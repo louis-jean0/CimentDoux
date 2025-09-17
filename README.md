@@ -91,9 +91,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <details>
-<summary>🇫🇷 Version française</summary>
+<summary>Version française</summary>
 
-# 🇫🇷 Version française
+# <img src="https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg" alt="FR" width="20"/> Version française
 
 # Ciment Doux
 
