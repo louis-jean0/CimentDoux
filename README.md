@@ -93,6 +93,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <details>
 <summary>🇫🇷 Version française</summary>
 
+# 🇫🇷 Version française
+
 # Ciment Doux
 
 <div align="center">
