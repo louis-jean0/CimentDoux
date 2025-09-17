@@ -1,8 +1,16 @@
+<div align="center">
+   <img src="https://img.shields.io/badge/C%2B%2B-17-blue?logo=cplusplus&logoColor=white" alt="C++17"/>
+   <img src="https://img.shields.io/badge/OpenGL-4.6-blue?logo=opengl" alt="OpenGL"/>
+   <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT"/>
+</div>
+
 # Ciment Doux
 
 <div align="center">
    <img src="screens/door.png" width="400"/>
 </div>
+
+_Also available in [French](#-version-française)._
 
 **Ciment Doux** is a first-person platformer video game, inspired by the brutalist parkour game [*Beton Brutal*](https://store.steampowered.com/app/2330500/BETON_BRUTAL), created to demonstrate a custom 3D game engine. The engine was developed from the ground up in C++ and OpenGL as part of the IMAGINE Computer Graphics Master's program at the University of Montpellier.
 
